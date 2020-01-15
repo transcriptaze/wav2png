@@ -12,13 +12,19 @@ import (
 
 func main() {
 	var out = ""
+	var height = uint(256)
+	var width = uint(1024)
+	var padding = uint(0)
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
+	flag.UintVar(&height, "height", 256, "Image height (pixels)")
+	flag.UintVar(&width, "width", 1024, "Image width (pixels)")
+	flag.UintVar(&padding, "padding", 0, "Image padding (pixels)")
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
 		println()
-		println("   Usage: waveform [--out <filepath>] <filename>")
+		println("   Usage: waveform [--height <height>] [--width <width>] [--padding <padding>] [--out <filepath>] <filename>")
 		println()
 
 		os.Exit(1)
@@ -63,12 +69,13 @@ func main() {
 	}
 
 	fmt.Printf("   File:     %s\n", wavfile)
+	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, width+2*padding, height+2*padding)
 	fmt.Printf("   Format:   %+v\n", *format)
 	fmt.Printf("   Bits:     %+v\n", bits)
 	fmt.Printf("   Duration: %s\n", duration)
 	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
 
-	err = wav2png.Plot(decoder, pngfile)
+	err = wav2png.Plot(decoder, pngfile, width, height, padding)
 	if err != nil {
 		fmt.Printf("\n   ERROR: EOF\n\n")
 		os.Exit(1)

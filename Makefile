@@ -24,5 +24,5 @@ clean:
 	rm -rf bin/*
 
 run: build
-	./bin/wav2png -out runtime runtime/entangled.wav
+	./bin/wav2png --height 256 --width 1024 --padding 4 -out runtime runtime/entangled.wav
 

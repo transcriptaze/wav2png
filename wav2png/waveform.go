@@ -12,12 +12,9 @@ import (
 	"time"
 )
 
-func Plot(decoder *wav.Decoder, pngfile string) error {
-	const width = 1024
-	const height = 256
-	const padding = 4
-	const w = width + 2*padding
-	const h = height + 2*padding
+func Plot(decoder *wav.Decoder, pngfile string, width, height, padding uint) error {
+	w := width + 2*padding
+	h := height + 2*padding
 
 	bytes := decoder.PCMLen()
 	bits := decoder.SampleBitDepth()
@@ -27,12 +24,12 @@ func Plot(decoder *wav.Decoder, pngfile string) error {
 	duration := time.Duration(1000000000 * samples / int64(rate))
 
 	pixels := int64(duration.Round(time.Duration(10)*time.Millisecond)) / 10000000
-	msPerPixel := 10 * int64(math.Ceil(float64(pixels)/width))
+	msPerPixel := 10 * int64(math.Ceil(float64(pixels)/float64(width)))
 
 	buffer := audio.IntBuffer{Data: make([]int, int64(channels)*441*msPerPixel/10)}
-	x := 0
+	x := uint(0)
 
-	waveform := image.NewNRGBA(image.Rect(0, 0, w, h))
+	waveform := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
 	palette := ice.realize()
 
 	for {
@@ -58,7 +55,7 @@ func Plot(decoder *wav.Decoder, pngfile string) error {
 		px := 0
 		pixels[px] = palette[0]
 		px++
-		for y := 0; y < height; y++ {
+		for y := uint(0); y < height; y++ {
 			pixels[px] = palette[0]
 			if sum[y] > 0 {
 				l := len(palette)
@@ -71,14 +68,14 @@ func Plot(decoder *wav.Decoder, pngfile string) error {
 
 		p := antialias(pixels)
 
-		for y := 0; y < height; y++ {
-			waveform.Set(x+padding, (height-y-1)+padding, p[y+1])
+		for y := uint(0); y < height; y++ {
+			waveform.Set(int(x+padding), int(height-y-1+padding), p[y+1])
 		}
 
 		x++
 	}
 
-	img := image.NewNRGBA(image.Rect(0, 0, w, h))
+	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
 
 	grid(img, width, height, padding)
 	draw.Draw(img, waveform.Bounds(), waveform, waveform.Bounds().Min, draw.Over)
@@ -116,8 +113,8 @@ func ceil(p int, q int) int {
 	return d
 }
 
-func vscale(v int, height int) int {
-	return height * (v + 32768) / 65536
+func vscale(v int, height uint) int {
+	return int(height) * (v + 32768) / 65536
 }
 
 func antialias(pixels []color.NRGBA) []color.NRGBA {
@@ -139,25 +136,25 @@ func antialias(pixels []color.NRGBA) []color.NRGBA {
 	return p
 }
 
-func grid(img *image.NRGBA, width, height, padding int) {
+func grid(img *image.NRGBA, width, height, padding uint) {
 	w := width + 2*padding
 	h := height + 2*padding
 
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			img.Set(x, y, color.NRGBA{R: 0x22, G: 0x22, B: 0x22, A: 255})
+	for y := uint(0); y < h; y++ {
+		for x := uint(0); x < w; x++ {
+			img.Set(int(x), int(y), color.NRGBA{R: 0x22, G: 0x22, B: 0x22, A: 255})
 		}
 	}
 
-	for _, y := range []int{1, 63, 127, 128, 191, 254} {
-		for x := 0; x < width; x++ {
-			img.Set(x+padding, y+padding, color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255})
+	for _, y := range []uint{1, 63, 127, 128, 191, 254} {
+		for x := uint(0); x < width; x++ {
+			img.Set(int(x+padding), int(y+padding), color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255})
 		}
 	}
 
-	for x := 0; x <= width; x += 64 {
-		for y := 1; y < height-1; y++ {
-			img.Set(x+padding, y+padding, color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255})
+	for x := uint(0); x <= width; x += 64 {
+		for y := uint(1); y < height-1; y++ {
+			img.Set(int(x+padding), int(y+padding), color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255})
 		}
 	}
 
