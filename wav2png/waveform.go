@@ -1,6 +1,7 @@
 package wav2png
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
@@ -39,10 +40,26 @@ func Plot(wavfile, pngfile string, width, height, padding uint) error {
 	fmt.Printf("   Duration: %s\n", duration)
 	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
 
-	return plot(decoder, pngfile, width, height, padding)
+	img, err := plot(decoder, width, height, padding)
+	if err != nil {
+		return err
+	}
+
+	if img == nil {
+		return errors.New("wav2png failed to create image")
+	}
+
+	f, err := os.Create(pngfile)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	return png.Encode(f, img)
 }
 
-func plot(decoder *wav.Decoder, pngfile string, width, height, padding uint) error {
+func plot(decoder *wav.Decoder, width, height, padding uint) (*image.NRGBA, error) {
 	w := width + 2*padding
 	h := height + 2*padding
 
@@ -65,7 +82,7 @@ func plot(decoder *wav.Decoder, pngfile string, width, height, padding uint) err
 	for {
 		N, err := decoder.PCMBuffer(&buffer)
 		if err != nil {
-			return err
+			return nil, err
 		} else if N == 0 {
 			break
 		}
@@ -81,47 +98,28 @@ func plot(decoder *wav.Decoder, pngfile string, width, height, padding uint) err
 			}
 		}
 
-		pixels := make([]color.NRGBA, height+2)
-		px := 0
-		pixels[px] = palette[0]
-		px++
 		for y := uint(0); y < height; y++ {
-			pixels[px] = palette[0]
 			if sum[y] > 0 {
 				l := len(palette)
 				i := ceil((l-1)*sum[y], N)
-				pixels[px] = palette[i]
+				waveform.Set(int(x+padding), int(height-y-1+padding), palette[i])
 			}
-			px++
-		}
-		pixels[px] = palette[0]
-
-		p := antialias(pixels)
-
-		for y := uint(0); y < height; y++ {
-			waveform.Set(int(x+padding), int(height-y-1+padding), p[y+1])
 		}
 
 		x++
 	}
 
-	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
+	antialiased := antialias(waveform)
+	img := grid(width, height, padding)
 
-	grid(img, width, height, padding)
-	draw.Draw(img, waveform.Bounds(), waveform, waveform.Bounds().Min, draw.Over)
+	xy := image.Point{0, 0}
+	tl := image.Point{0, 0}
+	br := image.Point{int(w), int(h)}
+	rect := image.Rectangle{tl, br}
 
-	f, err := os.Create(pngfile)
-	if err != nil {
-		return err
-	}
+	draw.Draw(img, rect, antialiased, xy, draw.Over)
 
-	defer f.Close()
-
-	if err := png.Encode(f, img); err != nil {
-		return err
-	}
-
-	return nil
+	return img, nil
 }
 
 func signum(N int) int {
@@ -147,28 +145,53 @@ func vscale(v int, height uint) int {
 	return int(height) * (v + 32768) / 65536
 }
 
-func antialias(pixels []color.NRGBA) []color.NRGBA {
-	p := make([]color.NRGBA, len(pixels))
-	L := len(pixels) - 1
-	i := 0
+func antialias(img *image.NRGBA) *image.NRGBA {
+	out := image.NewNRGBA(img.Bounds())
+	w := img.Bounds().Max.X - img.Bounds().Min.X
+	h := img.Bounds().Max.Y - img.Bounds().Min.Y
 
-	p[i] = pixels[i]
-	i++
-	for ; i < L; i++ {
-		r := (2*uint32(pixels[i].R) + uint32(pixels[i-1].R) + uint32(pixels[i+1].R)) / 4
-		g := (2*uint32(pixels[i].G) + uint32(pixels[i-1].G) + uint32(pixels[i+1].G)) / 4
-		b := (2*uint32(pixels[i].B) + uint32(pixels[i-1].B) + uint32(pixels[i+1].B)) / 4
-		a := (2*uint32(pixels[i].A) + uint32(pixels[i-1].A) + uint32(pixels[i+1].A)) / 4
-		p[i] = color.NRGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
+	kernel := [][]uint32{
+		{1, 2, 1},
+		{2, 12, 2},
+		{1, 2, 1},
 	}
-	p[i] = pixels[i]
 
-	return p
+	N := uint32(0)
+	for _, row := range kernel {
+		for _, k := range row {
+			N += k
+		}
+	}
+
+	for x := 1; x < w-1; x++ {
+		for y := 1; y < h-1; y++ {
+			r := uint32(0)
+			g := uint32(0)
+			b := uint32(0)
+			a := uint32(0)
+
+			for i, row := range kernel {
+				for j, k := range row {
+					u := img.At(x+j-1, y+i-1)
+
+					r += k * uint32(u.(color.NRGBA).R)
+					g += k * uint32(u.(color.NRGBA).G)
+					b += k * uint32(u.(color.NRGBA).B)
+					a += k * uint32(u.(color.NRGBA).A)
+				}
+			}
+
+			out.Set(x, y, color.NRGBA{R: uint8(r / N), G: uint8(g / N), B: uint8(b / N), A: uint8(a / N)})
+		}
+	}
+
+	return out
 }
 
-func grid(img *image.NRGBA, width, height, padding uint) {
+func grid(width, height, padding uint) *image.NRGBA {
 	w := width + 2*padding
 	h := height + 2*padding
+	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
 
 	for y := uint(0); y < h; y++ {
 		for x := uint(0); x < w; x++ {
@@ -188,4 +211,5 @@ func grid(img *image.NRGBA, width, height, padding uint) {
 		}
 	}
 
+	return img
 }
