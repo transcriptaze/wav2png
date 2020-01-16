@@ -20,6 +20,7 @@
 1. Remove external decoder dependency
 2. Use 'flag' package with -- and - options
 3. Online renderer
+4. GPU/WebGL implementation
 
 ## NOTES
 
