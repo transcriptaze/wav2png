@@ -1,6 +1,7 @@
 package wav2png
 
 import (
+	"fmt"
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
 	"image"
@@ -12,7 +13,36 @@ import (
 	"time"
 )
 
-func Plot(decoder *wav.Decoder, pngfile string, width, height, padding uint) error {
+func Plot(wavfile, pngfile string, width, height, padding uint) error {
+	file, err := os.Open(wavfile)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	decoder := wav.NewDecoder(file)
+
+	decoder.FwdToPCM()
+
+	format := decoder.Format()
+	bits := decoder.SampleBitDepth()
+	duration, err := decoder.Duration()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("   File:     %s\n", wavfile)
+	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, width+2*padding, height+2*padding)
+	fmt.Printf("   Format:   %+v\n", *format)
+	fmt.Printf("   Bits:     %+v\n", bits)
+	fmt.Printf("   Duration: %s\n", duration)
+	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
+
+	return plot(decoder, pngfile, width, height, padding)
+}
+
+func plot(decoder *wav.Decoder, pngfile string, width, height, padding uint) error {
 	w := width + 2*padding
 	h := height + 2*padding
 

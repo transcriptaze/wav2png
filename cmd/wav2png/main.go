@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/go-audio/wav"
 	"os"
 	"path"
 	"strings"
@@ -48,36 +47,9 @@ func main() {
 		}
 	}
 
-	file, err := os.Open(wavfile)
+	err := wav2png.Plot(wavfile, pngfile, width, height, padding)
 	if err != nil {
-		fmt.Printf("\n   ERROR: %v\n\n", err)
-		os.Exit(1)
-	}
-
-	defer file.Close()
-
-	decoder := wav.NewDecoder(file)
-
-	decoder.FwdToPCM()
-
-	format := decoder.Format()
-	bits := decoder.SampleBitDepth()
-	duration, err := decoder.Duration()
-	if err != nil {
-		fmt.Printf("\n   ERROR: %v\n\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("   File:     %s\n", wavfile)
-	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, width+2*padding, height+2*padding)
-	fmt.Printf("   Format:   %+v\n", *format)
-	fmt.Printf("   Bits:     %+v\n", bits)
-	fmt.Printf("   Duration: %s\n", duration)
-	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
-
-	err = wav2png.Plot(decoder, pngfile, width, height, padding)
-	if err != nil {
-		fmt.Printf("\n   ERROR: EOF\n\n")
+		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
 }
