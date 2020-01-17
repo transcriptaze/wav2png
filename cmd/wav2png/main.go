@@ -10,10 +10,10 @@ import (
 )
 
 func main() {
-	var out = ""
-	var height = uint(256)
-	var width = uint(1024)
-	var padding = uint(0)
+	var out string
+	var height uint
+	var width uint
+	var padding uint
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
 	flag.UintVar(&height, "height", 256, "Image height (pixels)")
@@ -47,7 +47,13 @@ func main() {
 		}
 	}
 
-	err := wav2png.Plot(wavfile, pngfile, width, height, padding)
+	params := wav2png.Params{
+		Width:   width,
+		Height:  height,
+		Padding: padding,
+	}
+
+	err := wav2png.Plot(wavfile, pngfile, params)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)

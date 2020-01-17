@@ -14,7 +14,13 @@ import (
 	"time"
 )
 
-func Plot(wavfile, pngfile string, width, height, padding uint) error {
+type Params struct {
+	Width   uint
+	Height  uint
+	Padding uint
+}
+
+func Plot(wavfile, pngfile string, params Params) error {
 	file, err := os.Open(wavfile)
 	if err != nil {
 		return err
@@ -34,13 +40,13 @@ func Plot(wavfile, pngfile string, width, height, padding uint) error {
 	}
 
 	fmt.Printf("   File:     %s\n", wavfile)
-	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, width+2*padding, height+2*padding)
+	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, params.Width+2*params.Padding, params.Height+2*params.Padding)
 	fmt.Printf("   Format:   %+v\n", *format)
 	fmt.Printf("   Bits:     %+v\n", bits)
 	fmt.Printf("   Duration: %s\n", duration)
 	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
 
-	img, err := plot(decoder, width, height, padding)
+	img, err := plot(decoder, params)
 	if err != nil {
 		return err
 	}
@@ -59,7 +65,11 @@ func Plot(wavfile, pngfile string, width, height, padding uint) error {
 	return png.Encode(f, img)
 }
 
-func plot(decoder *wav.Decoder, width, height, padding uint) (*image.NRGBA, error) {
+func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
+	width := params.Width
+	height := params.Height
+	padding := params.Padding
+
 	w := width + 2*padding
 	h := height + 2*padding
 
