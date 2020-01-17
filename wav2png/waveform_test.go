@@ -5,7 +5,7 @@ import (
 )
 
 func TestVScale(t *testing.T) {
-	height := 256
+	height := uint(256)
 	vector := []struct {
 		value    int
 		expected int

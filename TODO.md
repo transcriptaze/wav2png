@@ -9,13 +9,14 @@
 - [ ] Fix offsets for odd heights
 - [ ] Fix grid size
 - [ ] Render waveform to width x height image (i.e. ignore padding)
-- [ ] Check anti-aliasing (unit test ?)
+- [x] Check anti-aliasing (unit test ?)
 - [ ] 'fire' palette
 - [ ] 'green' palette
 - [ ] 'amber' palette
 - [ ] Add anti-aliasing to command line options
 - [ ] Add grid to command line options
 - [ ] Define palette in terms of gradients
+- [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 
 ## TODO
 
