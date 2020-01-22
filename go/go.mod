@@ -1,4 +1,4 @@
-module wav2png
+module github.com/twystd/wav2png/go
 
 go 1.13
 
