@@ -70,9 +70,6 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 	height := params.Height
 	padding := params.Padding
 
-	w := width + 2*padding
-	h := height + 2*padding
-
 	bytes := decoder.PCMLen()
 	bits := decoder.SampleBitDepth()
 	channels := decoder.Format().NumChannels
@@ -86,7 +83,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 	buffer := audio.IntBuffer{Data: make([]int, int64(channels)*441*msPerPixel/10)}
 	x := uint(0)
 
-	waveform := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
+	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	palette := ice.realize()
 
 	for {
@@ -112,7 +109,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 			if sum[y] > 0 {
 				l := len(palette)
 				i := ceil((l-1)*sum[y], N)
-				waveform.Set(int(x+padding), int(height-y-1+padding), palette[i])
+				waveform.Set(int(x), int(height-y-1), palette[i])
 			}
 		}
 
@@ -123,8 +120,8 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 	img := grid(width, height, padding)
 
 	xy := image.Point{0, 0}
-	tl := image.Point{0, 0}
-	br := image.Point{int(w), int(h)}
+	tl := image.Point{int(padding), int(padding)}
+	br := image.Point{int(padding + width), int(padding + height)}
 	rect := image.Rectangle{tl, br}
 
 	draw.Draw(img, rect, antialiased, xy, draw.Over)
@@ -156,9 +153,12 @@ func vscale(v int, height uint) int {
 }
 
 func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {
-	out := image.NewNRGBA(img.Bounds())
 	w := img.Bounds().Max.X - img.Bounds().Min.X
 	h := img.Bounds().Max.Y - img.Bounds().Min.Y
+	out := image.NewNRGBA(image.Rectangle{
+		Min: image.Point{X: 0, Y: 0},
+		Max: image.Point{X: w, Y: h},
+	})
 
 	N := uint32(0)
 	for _, row := range kernel {
@@ -167,8 +167,8 @@ func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {
 		}
 	}
 
-	for x := 1; x < w-1; x++ {
-		for y := 1; y < h-1; y++ {
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
 			r := uint32(0)
 			g := uint32(0)
 			b := uint32(0)

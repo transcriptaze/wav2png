@@ -6,11 +6,11 @@ format:
 	go fmt ./...
 
 build: format
-	go build -o bin ./... 
+	go build -o ../bin ./... 
 
 test: build
 	go clean -testcache
-	go test ./...
+	go test -v ./...
 
 benchmark: build
 	go test -bench ./...
@@ -24,5 +24,5 @@ clean:
 	rm -rf bin/*
 
 run: build
-	./bin/wav2png --height 256 --width 1024 --padding 4 -out runtime runtime/entangled.wav
+	../bin/wav2png --height 256 --width 1024 --padding 4 -out ../runtime ../runtime/entangled.wav
 

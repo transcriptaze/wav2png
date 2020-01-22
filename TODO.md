@@ -1,6 +1,6 @@
 ## v0.0
 
-*wav2png*
+*wav2png/go*
 
 - [ ] Select channel to render
 - [ ] Mix channels
@@ -8,7 +8,7 @@
 - [ ] Load anti-aliasing kernel from file
 - [ ] Fix offsets for odd heights
 - [ ] Fix grid size
-- [ ] Render waveform to width x height image (i.e. ignore padding)
+- [x] Anti-alias full image
 - [x] Check anti-aliasing (unit test ?)
 - [ ] 'fire' palette
 - [ ] 'green' palette
@@ -17,6 +17,8 @@
 - [ ] Add grid to command line options
 - [ ] Define palette in terms of gradients
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
+- [ ] start/end/duration command line options
+- [ ] Executables
 
 ## TODO
 
