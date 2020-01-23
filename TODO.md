@@ -2,20 +2,20 @@
 
 *wav2png/go*
 
-- [ ] Select channel to render
-- [ ] Mix channels
-- [ ] Load palette from file
-- [ ] Load anti-aliasing kernel from file
 - [ ] Fix offsets for odd heights
 - [ ] Fix grid size
+- [ ] Define palette in terms of gradients
+- [ ] Load palette from file
+- [ ] Load anti-aliasing kernel from file
+- [ ] Select channel to render
+- [ ] Mix channels
 - [x] Anti-alias full image
-- [x] Check anti-aliasing (unit test ?)
+- [x] Check anti-aliasing
 - [ ] 'fire' palette
 - [ ] 'green' palette
 - [ ] 'amber' palette
 - [ ] Add anti-aliasing to command line options
 - [ ] Add grid to command line options
-- [ ] Define palette in terms of gradients
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] start/end/duration command line options
 - [ ] Executables
