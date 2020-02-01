@@ -3,6 +3,7 @@
 *wav2png/go*
 
 - [ ] Fix offsets for odd heights
+- [ ] Normalize to 16 bit PCM
 - [ ] Fix grid size
 - [ ] Define palette in terms of gradients
 - [ ] Load palette from file
@@ -14,11 +15,13 @@
 - [ ] 'fire' palette
 - [ ] 'green' palette
 - [ ] 'amber' palette
+- [ ] 'blues' palette
+- [ ] 'inverted' palette
 - [ ] Add anti-aliasing to command line options
 - [ ] Add grid to command line options
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] start/end/duration command line options
-- [ ] Executables
+- [ ] Platform executables
 
 ## TODO
 
@@ -26,7 +29,9 @@
 2. Use different 'flag' package with separate -- and - options
 3. Online renderer
 4. GPU/WebGL implementation
+5. Add support for other audio formats
 
 ## NOTES
 
-
+1. binpac for WAV parser ?
+2. mmap

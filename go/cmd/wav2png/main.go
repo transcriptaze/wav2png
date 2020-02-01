@@ -53,7 +53,7 @@ func main() {
 		Padding: padding,
 	}
 
-	err := wav2png.Plot(wavfile, pngfile, params)
+	err := wav2png.Draw(wavfile, pngfile, params)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)

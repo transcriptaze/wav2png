@@ -19,6 +19,12 @@ coverage: build
 	go clean -testcache
 	go test -cover ./...
 
+vet: test
+	go vet uhppote...
+
+lint: vet
+	golint uhppote...
+
 clean:
 	go clean
 	rm -rf bin/*
