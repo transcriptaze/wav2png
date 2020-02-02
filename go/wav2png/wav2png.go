@@ -22,6 +22,12 @@ type Params struct {
 	Padding uint
 }
 
+const (
+	BITS      = 17
+	RANGE_MIN = -65535
+	RANGE_MAX = +65535
+)
+
 func Draw(wavfile, pngfile string, params Params) error {
 	file, err := os.Open(wavfile)
 	if err != nil {
@@ -74,7 +80,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 	channels := decoder.Format().NumChannels
 
 	bytes := decoder.PCMLen()
-	bits := decoder.SampleBitDepth()
+	bits := uint(decoder.SampleBitDepth())
 	rate := decoder.Format().SampleRate
 	samples := bytes / int64(channels*int(bits)/8)
 	duration := time.Duration(int64(time.Second) * samples / int64(rate))
@@ -97,12 +103,13 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		}
 
 		sum := make([]int, height)
-		u := vscale(0, height)
+		u := vscale(rescale(0, bits), height)
 		for i := 0; i < N; i += channels {
-			v := vscale(buffer.Data[i], height)
-			dy := signum(v - u)
+			v := rescale(buffer.Data[i], bits)
+			h := vscale(v, height)
+			dy := signum(int(h) - int(u))
 
-			for y := u; y != v; y += dy {
+			for y := int(u); y != int(h); y += dy {
 				sum[y]++
 			}
 		}
@@ -166,14 +173,14 @@ func ceil(p int, q int) int {
 // the two halves (wav2png cops out here and renders the 0 X-axis in both halves since it
 // doesn't know how to draw between pixels).
 //
-// For a PNG image with a height that is an odd numver however, there is a real pixel that
+// For a PNG image with a height that is an odd number however, there is a real pixel that
 // is '0', and drawing the PCM '0' code on the '0' X-axis is not correct (not that anybody
 // would notice but some of us wake up a 3AM wondering about stuff like this).
 //
 // Rather than workaround the (whole non-)issue as a bunch of edge cases scattered around
 // the code base, wav2png rescales the PCM code to a representative value in the middle of
 // the sample bucket with a 17-bit sample depth. 0 is now 0, the sample range is symmetrical
-// ( ±65535), and a 16 bit PCM code becomes the 'next' 17 bit value e.g. PCM code 0x0000 (0)
+// (±65535), and a 16 bit PCM code becomes the 'next' 17 bit value e.g. PCM code 0x0000 (0)
 // becomes 0x00001 (+1) and PCM code 0x0001 (+1) becomes 0x00003 (+3).
 //
 // As a further example - PCM code 0xffff (-1) represents the 'bucket' -30µV to 0µV, the
@@ -181,17 +188,21 @@ func ceil(p int, q int) int {
 // 0xffff (-1).
 //
 // As mentioned above, for practical purposes this is essentially irrelevant but it does
-// mean the maths becomes mentally tidy and neat and consistent.
+// mean the internal arithmetic becomes mentally neat, tidy and and consistent.
 func rescale(pcmValue int, sampleBitDepth uint) int32 {
-	v := int64(pcmValue) * int64(sampleBitDepth) / 16
+	v := int64(pcmValue) * int64(sampleBitDepth) / (BITS - 1)
 	v <<= 1
 	v += 1
 
 	return int32(v)
 }
 
-func vscale(v int, height uint) int {
-	return int(height) * (v + 32768) / 65536
+// vscale maps the 17-bit internal sample value to a pixel range [0..height). i.e. for a
+// height of 256 pixels, vscale maps -65535 to 0 and +65535 to 255.
+func vscale(v int32, height uint) int16 {
+	vv := int64(v-RANGE_MIN) * int64(height) / ((RANGE_MAX + 1) - (RANGE_MIN - 1))
+
+	return int16(vv)
 }
 
 func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {

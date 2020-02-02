@@ -3,6 +3,9 @@
 *wav2png/go*
 
 - [ ] Fix offsets for odd heights
+  - check the weird 511 thing
+  - negative height to invert
+  - verify for 257
 - [ ] Normalize to 16 bit PCM
 - [ ] Fix grid size
 - [ ] Define palette in terms of gradients
@@ -30,6 +33,7 @@
 3. Online renderer
 4. GPU/WebGL implementation
 5. Add support for other audio formats
+6. SVG out
 
 ## NOTES
 

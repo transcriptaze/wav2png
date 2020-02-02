@@ -4,6 +4,28 @@ import (
 	"testing"
 )
 
+func TestPCMToPixelScaling(t *testing.T) {
+	tests := []struct {
+		pcm      int
+		height   uint
+		expected int16
+	}{
+		{-32768, 256, 0},
+		{32767, 256, 255},
+		{-1, 256, 127},
+		{0, 256, 128},
+	}
+
+	for _, test := range tests {
+		v := rescale(test.pcm, 16)
+		h := vscale(v, test.height)
+
+		if h != test.expected {
+			t.Errorf("%d incorrectly scaled to %d pixels: expected:%v, got:%v", test.pcm, test.height, test.expected, h)
+		}
+	}
+}
+
 func TestRescale(t *testing.T) {
 	tests := []struct {
 		pcm      int
@@ -26,21 +48,26 @@ func TestRescale(t *testing.T) {
 }
 
 func TestVScale(t *testing.T) {
-	height := uint(256)
-	vector := []struct {
-		value    int
-		expected int
+	tests := []struct {
+		value    int32
+		height   uint
+		expected int16
 	}{
-		{-32768, 0},
-		{-1, 127},
-		{0, 128},
-		{+1, 128},
-		{32767, 255},
+		{-65535, 256, 0},
+		{+65535, 256, 255},
+		{1, 256, 128},
+		{-1, 256, 127},
+
+		{511, 256, 128},
+		// ???{512, 256, 129},
+
+		{-511, 256, 127},
+		{-512, 256, 126},
 	}
 
-	for _, v := range vector {
-		if h := vscale(v.value, height); h != v.expected {
-			t.Errorf("Incorrect scale for %v: expected:%v, got:%v", v.value, v.expected, h)
+	for _, test := range tests {
+		if h := vscale(test.value, test.height); h != test.expected {
+			t.Errorf("%d incorrectly scaled to %d pixels: expected:%v, got:%v", test.value, test.height, test.expected, h)
 		}
 	}
 }

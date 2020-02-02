@@ -31,4 +31,5 @@ clean:
 
 run: build
 	../bin/wav2png --height 256 --width 1024 --padding 4 -out ../runtime ../runtime/entangled.wav
+	open ../runtime/entangled.png
 
