@@ -104,10 +104,10 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		}
 
 		sum := make([]int, height)
-		u := vscale(rescale(0, bits), height)
+		u := vscale(rescale(0, bits), int(height))
 		for i := 0; i < N; i += channels {
 			v := rescale(buffer.Data[i], 16)
-			h := vscale(v, height)
+			h := vscale(v, int(height))
 			dy := signum(int(h) - int(u))
 
 			for y := int(u); y != int(h); y += dy {
@@ -167,12 +167,19 @@ func rescale(pcmValue int, sampleBitDepth uint) int16 {
 }
 
 // vscale maps the 16-bit internal sample value to a pixel range [0..height). i.e. for a
-// height of 256 pixels, vscale maps -32768 to 0 and +32767 to 255.
-func vscale(v int16, height uint) int16 {
+// height of 256 pixels, vscale maps -32768 to 0 and +32767 to 255. A negative height
+// 'flips' the conversion e.g. for height of -256, -32768 is mapped to 255 and +32767 is
+// mapped to 0.
+func vscale(v int16, height int) int16 {
 	h := int32(height)
 	vv := int32(v) - RANGE_MIN
+	vvv := int16(h * vv / RANGE)
 
-	return int16(h * vv / RANGE)
+	if height < 0 {
+		return vvv - int16(height+1)
+	}
+
+	return vvv
 }
 
 func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {

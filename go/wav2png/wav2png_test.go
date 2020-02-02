@@ -7,7 +7,7 @@ import (
 func TestPCMToPixelScaling(t *testing.T) {
 	tests := []struct {
 		pcm      int
-		height   uint
+		height   int
 		expected int16
 	}{
 		{-32768, 256, 0},
@@ -56,7 +56,7 @@ func TestRescale(t *testing.T) {
 func TestVScale(t *testing.T) {
 	tests := []struct {
 		value    int16
-		height   uint
+		height   int
 		expected int16
 	}{
 		// even height
@@ -84,6 +84,46 @@ func TestVScale(t *testing.T) {
 		{-256, 257, 127},
 		{-257, 257, 127},
 		{-32768, 257, 0},
+	}
+
+	for _, test := range tests {
+		if h := vscale(test.value, test.height); h != test.expected {
+			t.Errorf("%d incorrectly scaled to %d pixels: expected:%v, got:%v", test.value, test.height, test.expected, h)
+		}
+	}
+}
+
+func TestVScaleWithNegativeHeight(t *testing.T) {
+	tests := []struct {
+		value    int16
+		height   int
+		expected int16
+	}{
+		// even height
+		{+32767, -256, 0},
+		{+256, -256, 126},
+		{+255, -256, 127},
+		{+1, -256, 127},
+		{0, -256, 127},
+		{-1, -256, 128},
+		{-256, -256, 128},
+		{-257, -256, 129},
+		{-32768, -256, 255},
+
+		// odd height
+		{+32767, -257, 0},
+		{+256, -257, 127},
+		{+255, -257, 127},
+		{+128, -257, 127},
+		{+127, -257, 128},
+		{+1, -257, 128},
+		{0, -257, 128},
+		{-1, -257, 128},
+		{-127, -257, 128},
+		{-128, -257, 129},
+		{-256, -257, 129},
+		{-257, -257, 129},
+		{-32768, -257, 256},
 	}
 
 	for _, test := range tests {
