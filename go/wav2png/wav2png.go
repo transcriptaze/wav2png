@@ -23,9 +23,10 @@ type Params struct {
 }
 
 const (
-	BITS      = 17
-	RANGE_MIN = -65535
-	RANGE_MAX = +65535
+	BITS      int32 = 16
+	RANGE_MIN int32 = -32768
+	RANGE_MAX int32 = +32767
+	RANGE     int32 = RANGE_MAX - RANGE_MIN + 1
 )
 
 func Draw(wavfile, pngfile string, params Params) error {
@@ -105,7 +106,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		sum := make([]int, height)
 		u := vscale(rescale(0, bits), height)
 		for i := 0; i < N; i += channels {
-			v := rescale(buffer.Data[i], bits)
+			v := rescale(buffer.Data[i], 16)
 			h := vscale(v, height)
 			dy := signum(int(h) - int(u))
 
@@ -157,52 +158,21 @@ func ceil(p int, q int) int {
 	return d
 }
 
-// rescale converts a PCM value to a representative 17-bit integer.
-//
-// This probably needs some explanation:
-//
-// The PCM code for a sample represents the 'bottom' value for a bucket of audio values,
-// which is all good and fine in practice, but results in some odd quirks when drawing
-// waveforms on images with an odd height. For example:
-//
-// Each PCM code in 16 bit audio sample represents a signal range (scaled to ±1V) of about
-// 30µV, which means that '0' is not 0V but is value somewhere in the range 0 - 30µV. Which
-// is moot for all practical purposes because the average error of 15µV is entirely lost in
-// noise. And is alos irrelevant for PNG files with a height that is an even number because
-// the PCM waveform can be correctly rendered as 'two halves', with the '0' X-axis between
-// the two halves (wav2png cops out here and renders the 0 X-axis in both halves since it
-// doesn't know how to draw between pixels).
-//
-// For a PNG image with a height that is an odd number however, there is a real pixel that
-// is '0', and drawing the PCM '0' code on the '0' X-axis is not correct (not that anybody
-// would notice but some of us wake up a 3AM wondering about stuff like this).
-//
-// Rather than workaround the (whole non-)issue as a bunch of edge cases scattered around
-// the code base, wav2png rescales the PCM code to a representative value in the middle of
-// the sample bucket with a 17-bit sample depth. 0 is now 0, the sample range is symmetrical
-// (±65535), and a 16 bit PCM code becomes the 'next' 17 bit value e.g. PCM code 0x0000 (0)
-// becomes 0x00001 (+1) and PCM code 0x0001 (+1) becomes 0x00003 (+3).
-//
-// As a further example - PCM code 0xffff (-1) represents the 'bucket' -30µV to 0µV, the
-// middle of the bucket is -15µV so PCM code 0xffff (-1) is encoded as the 17-bit value
-// 0xffff (-1).
-//
-// As mentioned above, for practical purposes this is essentially irrelevant but it does
-// mean the internal arithmetic becomes mentally neat, tidy and and consistent.
-func rescale(pcmValue int, sampleBitDepth uint) int32 {
-	v := int64(pcmValue) * int64(sampleBitDepth) / (BITS - 1)
-	v <<= 1
-	v += 1
+// rescale converts a PCM value to the 16-bit value used internally.
+func rescale(pcmValue int, sampleBitDepth uint) int16 {
+	v := int32(pcmValue)
+	bits := int32(sampleBitDepth)
 
-	return int32(v)
+	return int16(v * bits / BITS)
 }
 
-// vscale maps the 17-bit internal sample value to a pixel range [0..height). i.e. for a
-// height of 256 pixels, vscale maps -65535 to 0 and +65535 to 255.
-func vscale(v int32, height uint) int16 {
-	vv := int64(v-RANGE_MIN) * int64(height) / ((RANGE_MAX + 1) - (RANGE_MIN - 1))
+// vscale maps the 16-bit internal sample value to a pixel range [0..height). i.e. for a
+// height of 256 pixels, vscale maps -32768 to 0 and +32767 to 255.
+func vscale(v int16, height uint) int16 {
+	h := int32(height)
+	vv := int32(v) - RANGE_MIN
 
-	return int16(vv)
+	return int16(h * vv / RANGE)
 }
 
 func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {

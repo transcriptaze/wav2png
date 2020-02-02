@@ -30,14 +30,14 @@ func TestRescale(t *testing.T) {
 	tests := []struct {
 		pcm      int
 		bits     uint
-		expected int32
+		expected int16
 	}{
-		{0, 16, 1},
+		{0, 16, 0},
 		{-1, 16, -1},
-		{1, 16, 3},
-		{-2, 16, -3},
-		{32767, 16, 65535},
-		{-32768, 16, -65535},
+		{1, 16, 1},
+		{-2, 16, -2},
+		{32767, 16, 32767},
+		{-32768, 16, -32768},
 	}
 
 	for _, test := range tests {
@@ -45,37 +45,45 @@ func TestRescale(t *testing.T) {
 			t.Errorf("Incorrectly rescaled value for %d-bit value %d: expected:%d, got:%d", test.bits, test.pcm, test.expected, v)
 		}
 	}
+
+	for pcm := -32768; pcm < 32768; pcm++ {
+		if v := rescale(pcm, 16); int(v) != pcm {
+			t.Errorf("Incorrectly rescaled value for %d-bit value %d: expected:%d, got:%d", 16, pcm, pcm, v)
+		}
+	}
 }
 
 func TestVScale(t *testing.T) {
 	tests := []struct {
-		value    int32
+		value    int16
 		height   uint
 		expected int16
 	}{
 		// even height
-		{-65535, 256, 0},
-		{+65535, 256, 255},
+		{+32767, 256, 255},
+		{+256, 256, 129},
+		{+255, 256, 128},
 		{+1, 256, 128},
+		{0, 256, 128},
 		{-1, 256, 127},
-		{+511, 256, 128},
-
-		{+513, 256, 129}, //TODO not symmetrical - check the math
-		{-511, 256, 127},
-		{-512, 256, 126},
+		{-256, 256, 127},
+		{-257, 256, 126},
+		{-32768, 256, 0},
 
 		// odd height
-		{-65535, 257, 0},
-		{+65535, 257, 256},
-		{0, 257, 128},
+		{+32767, 257, 256},
+		{+256, 257, 129},
+		{+255, 257, 129},
+		{+128, 257, 129},
+		{+127, 257, 128},
 		{+1, 257, 128},
+		{0, 257, 128},
 		{-1, 257, 128},
-
-		// TODO not symmetrical - check the math
-		{+256, 257, 128},
-		{-254, 257, 128},
-		{+257, 257, 129},
-		{-255, 257, 127},
+		{-127, 257, 128},
+		{-128, 257, 127},
+		{-256, 257, 127},
+		{-257, 257, 127},
+		{-32768, 257, 0},
 	}
 
 	for _, test := range tests {
