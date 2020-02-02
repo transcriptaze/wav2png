@@ -3,9 +3,8 @@
 *wav2png/go*
 
 - [ ] Fix offsets for odd heights
-  - check the weird 511 thing
+  - check the math on the edges of buckets (weird)
   - negative height to invert
-  - verify for 257
 - [ ] Normalize to 16 bit PCM
 - [ ] Fix grid size
 - [ ] Define palette in terms of gradients
