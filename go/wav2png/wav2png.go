@@ -104,10 +104,10 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		}
 
 		sum := make([]int, height)
-		u := vscale(rescale(0, bits), int(height))
+		u := vscale(rescale(0, bits), int(-height))
 		for i := 0; i < N; i += channels {
 			v := rescale(buffer.Data[i], 16)
-			h := vscale(v, int(height))
+			h := vscale(v, int(-height))
 			dy := signum(int(h) - int(u))
 
 			for y := int(u); y != int(h); y += dy {
@@ -119,7 +119,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 			if sum[y] > 0 {
 				l := len(palette)
 				i := ceil((l-1)*sum[y], N)
-				waveform.Set(int(x), int(height-y-1), palette[i])
+				waveform.Set(int(x+1), int(y), palette[i])
 			}
 		}
 

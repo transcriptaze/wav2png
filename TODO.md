@@ -3,7 +3,7 @@
 *wav2png/go*
 
 - [x] Fix offsets for odd heights
-- [ ] Negative height to invert
+- [x] Negative height to invert
 - [x] Normalize to 16 bit PCM
 - [ ] Fix grid size
 - [ ] Define palette in terms of gradients
@@ -23,6 +23,7 @@
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] start/end/duration command line options
 - [ ] Platform executables
+- [ ] Set background colour
 
 ## TODO
 
