@@ -127,7 +127,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 	}
 
 	antialiased := antialias(waveform, soft)
-	img := grid(width, height, padding)
+	img := Grid(width, height, padding)
 
 	xy := image.Point{0, 0}
 	tl := image.Point{int(padding), int(padding)}
@@ -222,7 +222,7 @@ func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {
 	return out
 }
 
-func grid(width, height, padding uint) *image.NRGBA {
+func Grid(width, height, padding uint) *image.NRGBA {
 	w := width + 2*padding
 	h := height + 2*padding
 	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))

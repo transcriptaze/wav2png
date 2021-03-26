@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/twystd/wav2png/go/wav2png"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/transcriptaze/wav2png/wav2png"
 )
 
 func main() {

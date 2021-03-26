@@ -1,4 +1,4 @@
-module github.com/twystd/wav2png/go
+module github.com/transcriptaze/wav2png
 
 go 1.13
 

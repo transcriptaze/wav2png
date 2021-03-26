@@ -6,7 +6,8 @@ format:
 	go fmt ./...
 
 build: format
-	go build -o ../bin ./... 
+	mkdir -p bin
+	go build -o ./bin ./... 
 
 test: build
 	go clean -testcache
@@ -20,10 +21,10 @@ coverage: build
 	go test -cover ./...
 
 vet: test
-	go vet uhppote...
+	go vet ./...
 
 lint: vet
-	golint uhppote...
+	golint ./...
 
 clean:
 	go clean
@@ -33,6 +34,6 @@ debug: build
 	go test -v ./... -run TestVScale
 
 run: build
-	../bin/wav2png --height 256 --width 1024 --padding 4 -out ../runtime ../runtime/entangled.wav
-	open ../runtime/entangled.png
+	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./runtime/entangled.wav
+	open ./runtime/entangled.png
 
