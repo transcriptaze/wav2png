@@ -9,7 +9,7 @@ import (
 	"github.com/go-audio/wav"
 	"image"
 	"image/color"
-	"image/draw"
+	//	"image/draw"
 	"image/png"
 	"math"
 	"os"
@@ -126,15 +126,15 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		x++
 	}
 
-	antialiased := antialias(waveform, soft)
+	//antialiased := antialias(waveform, soft)
 	img := Grid(width, height, padding)
 
-	xy := image.Point{0, 0}
-	tl := image.Point{int(padding), int(padding)}
-	br := image.Point{int(padding + width), int(padding + height)}
-	rect := image.Rectangle{tl, br}
-
-	draw.Draw(img, rect, antialiased, xy, draw.Over)
+	//	xy := image.Point{0, 0}
+	//	tl := image.Point{int(padding), int(padding)}
+	//	br := image.Point{int(padding + width), int(padding + height)}
+	//	rect := image.Rectangle{tl, br}
+	//
+	//	draw.Draw(img, rect, antialiased, xy, draw.Over)
 
 	return img, nil
 }
@@ -220,30 +220,4 @@ func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {
 	}
 
 	return out
-}
-
-func Grid(width, height, padding uint) *image.NRGBA {
-	w := width + 2*padding
-	h := height + 2*padding
-	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
-
-	for y := uint(0); y < h; y++ {
-		for x := uint(0); x < w; x++ {
-			img.Set(int(x), int(y), color.NRGBA{R: 0x22, G: 0x22, B: 0x22, A: 255})
-		}
-	}
-
-	for _, y := range []uint{1, 63, 127, 128, 191, 254} {
-		for x := uint(0); x < width; x++ {
-			img.Set(int(x+padding), int(y+padding), color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255})
-		}
-	}
-
-	for x := uint(0); x <= width; x += 64 {
-		for y := uint(1); y < height-1; y++ {
-			img.Set(int(x+padding), int(y+padding), color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255})
-		}
-	}
-
-	return img
 }
