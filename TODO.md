@@ -1,18 +1,21 @@
 ## v0.0
 
-*wav2png/go*
+### IN PROGRESS
 
-- [x] Fix offsets for odd heights
-- [x] Negative height to invert
-- [x] Normalize to 16 bit PCM
-- [ ] Fix grid size
+- [x] Split fill/grid
+- [ ] GridSpec
+      - fit to border
+      - spacing 
+      - lines
+      - colour
+- [ ] Move WAV decoding to cmd
+
+
 - [ ] Define palette in terms of gradients
 - [ ] Load palette from file
 - [ ] Load anti-aliasing kernel from file
 - [ ] Select channel to render
 - [ ] Mix channels
-- [x] Anti-alias full image
-- [x] Check anti-aliasing
 - [ ] 'fire' palette
 - [ ] 'green' palette
 - [ ] 'amber' palette
@@ -25,7 +28,14 @@
 - [ ] Platform executables
 - [ ] Set background colour
 
-## TODO
+- [x] Fix grid size
+- [x] Fix offsets for odd heights
+- [x] Negative height to invert
+- [x] Normalize to 16 bit PCM
+- [x] Anti-alias full image
+- [x] Check anti-aliasing
+
+### TODO
 
 1. Remove external decoder dependency
 2. Use different 'flag' package with separate -- and - options
@@ -33,8 +43,10 @@
 4. GPU/WebGL implementation
 5. Add support for other audio formats
 6. SVG out
+7. Spectrogram
+8. MP4
 
-## NOTES
+### NOTES
 
 1. binpac for WAV parser ?
 2. mmap

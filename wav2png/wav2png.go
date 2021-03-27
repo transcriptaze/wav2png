@@ -9,7 +9,7 @@ import (
 	"github.com/go-audio/wav"
 	"image"
 	"image/color"
-	//	"image/draw"
+	"image/draw"
 	"image/png"
 	"math"
 	"os"
@@ -28,6 +28,9 @@ const (
 	RANGE_MAX int32 = +32767
 	RANGE     int32 = RANGE_MAX - RANGE_MIN + 1
 )
+
+var BACKGROUND = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 255}
+var GRID = color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255}
 
 func Draw(wavfile, pngfile string, params Params) error {
 	file, err := os.Open(wavfile)
@@ -126,15 +129,20 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		x++
 	}
 
-	//antialiased := antialias(waveform, soft)
-	img := Grid(width, height, padding)
+	w := width + 2*padding
+	h := height + 2*padding
+	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
+	antialiased := antialias(waveform, soft)
 
-	//	xy := image.Point{0, 0}
-	//	tl := image.Point{int(padding), int(padding)}
-	//	br := image.Point{int(padding + width), int(padding + height)}
-	//	rect := image.Rectangle{tl, br}
-	//
-	//	draw.Draw(img, rect, antialiased, xy, draw.Over)
+	Fill(img, BACKGROUND)
+	Grid(img, GRID)
+
+	xy := image.Point{0, 0}
+	tl := image.Point{int(padding), int(padding)}
+	br := image.Point{int(padding + width), int(padding + height)}
+	rect := image.Rectangle{tl, br}
+
+	draw.Draw(img, rect, antialiased, xy, draw.Over)
 
 	return img, nil
 }
