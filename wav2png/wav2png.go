@@ -5,8 +5,6 @@ package wav2png
 import (
 	"errors"
 	"fmt"
-	"github.com/go-audio/audio"
-	"github.com/go-audio/wav"
 	"image"
 	"image/color"
 	"image/draw"
@@ -14,6 +12,9 @@ import (
 	"math"
 	"os"
 	"time"
+
+	"github.com/go-audio/audio"
+	"github.com/go-audio/wav"
 )
 
 type Params struct {
@@ -29,8 +30,14 @@ const (
 	RANGE     int32 = RANGE_MAX - RANGE_MIN + 1
 )
 
-var BACKGROUND = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 255}
-var GRID = color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255}
+var BACKGROUND = SolidFill{
+	colour: color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 255},
+}
+
+var GRID = SquareGrid{
+	colour: color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255},
+	size:   64,
+}
 
 func Draw(wavfile, pngfile string, params Params) error {
 	file, err := os.Open(wavfile)
