@@ -49,10 +49,11 @@ type SquareGrid struct {
 	padding uint
 }
 
-func NewSquareGrid(colour color.NRGBA, size uint) SquareGrid {
+func NewSquareGrid(colour color.NRGBA, size, padding uint) SquareGrid {
 	return SquareGrid{
-		colour: colour,
-		size:   size,
+		colour:  colour,
+		size:    size,
+		padding: padding,
 	}
 }
 
