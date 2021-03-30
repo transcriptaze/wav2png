@@ -35,8 +35,9 @@ var BACKGROUND = SolidFill{
 }
 
 var GRID = SquareGrid{
-	colour: color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255},
-	size:   64,
+	colour:  color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255},
+	size:    64,
+	padding: 0,
 }
 
 func Draw(wavfile, pngfile string, params Params) error {
@@ -65,14 +66,48 @@ func Draw(wavfile, pngfile string, params Params) error {
 	fmt.Printf("   Duration: %s\n", duration)
 	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
 
-	img, err := plot(decoder, params)
-	if err != nil {
-		return err
-	}
+	width := params.Width
+	height := params.Height
+	padding := params.Padding
 
+	w := width + 2*padding
+	h := height + 2*padding
+
+	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
 	if img == nil {
 		return errors.New("wav2png failed to create image")
 	}
+
+	Fill(img, BACKGROUND)
+	Grid(img, SquareGrid{
+		colour:  GRID.colour,
+		size:    GRID.size,
+		padding: padding,
+	})
+
+	if err := plot(img, padding, decoder); err != nil {
+		return err
+	}
+
+	//	bytes := decoder.PCMLen()
+	//	channels := decoder.Format().NumChannels
+	//	samples := bytes / int64(channels*int(bits)/8)
+	//	buffer := audio.IntBuffer{Data: make([]int, samples)}
+	//	if _, err := decoder.PCMBuffer(&buffer); err != nil {
+	//		return err
+	//	}
+	//
+	//	floats := buffer.AsFloat32Buffer()
+	//	if w, err := render(2*time.Second, floats.Data, 640, 390); err != nil {
+	//		return err
+	//	} else {
+	//		xy := image.Point{0, 0}
+	//		tl := image.Point{int(padding), int(padding)}
+	//		br := image.Point{int(padding + width), int(padding + height)}
+	//		rect := image.Rectangle{tl, br}
+	//
+	//		draw.Draw(img, rect, w, xy, draw.Over)
+	//	}
 
 	f, err := os.Create(pngfile)
 	if err != nil {
@@ -84,10 +119,10 @@ func Draw(wavfile, pngfile string, params Params) error {
 	return png.Encode(f, img)
 }
 
-func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
-	width := params.Width
-	height := params.Height
-	padding := params.Padding
+func plot(img *image.NRGBA, padding uint, decoder *wav.Decoder) error {
+	bounds := img.Bounds()
+	width := bounds.Max.X - bounds.Min.X - 2*int(padding)
+	height := bounds.Max.Y - bounds.Min.Y - 2*int(padding)
 	channels := decoder.Format().NumChannels
 
 	bytes := decoder.PCMLen()
@@ -108,7 +143,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 	for {
 		N, err := decoder.PCMBuffer(&buffer)
 		if err != nil {
-			return nil, err
+			return err
 		} else if N == 0 {
 			break
 		}
@@ -125,7 +160,7 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 			}
 		}
 
-		for y := uint(0); y < height; y++ {
+		for y := 0; y < height; y++ {
 			if sum[y] > 0 {
 				l := len(palette)
 				i := ceil((l-1)*sum[y], N)
@@ -136,22 +171,53 @@ func plot(decoder *wav.Decoder, params Params) (*image.NRGBA, error) {
 		x++
 	}
 
-	w := width + 2*padding
-	h := height + 2*padding
-	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
 	antialiased := antialias(waveform, soft)
-
-	Fill(img, BACKGROUND)
-	Grid(img, GRID)
 
 	xy := image.Point{0, 0}
 	tl := image.Point{int(padding), int(padding)}
-	br := image.Point{int(padding + width), int(padding + height)}
+	br := image.Point{int(padding) + width, int(padding) + height}
 	rect := image.Rectangle{tl, br}
 
 	draw.Draw(img, rect, antialiased, xy, draw.Over)
 
-	return img, nil
+	return nil
+}
+
+func render(duration time.Duration, pcm []float32, width, height int) (*image.NRGBA, error) {
+	l := 44100 * int(math.Ceil(duration.Seconds()))
+
+	buffer := make([]float32, l/int(width))
+	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
+	palette := ice.realize()
+
+	x := uint(0)
+	offset := 0
+	for N := copy(buffer, pcm[offset:]); N > 0; N = copy(buffer, pcm[offset:]) {
+		offset += N
+
+		sum := make([]int, height)
+		u := vscale(0, -int(height))
+		for _, sample := range buffer[0:N] {
+			v := int16(32768 * sample)
+			h := vscale(v, -int(height))
+			dy := signum(int(h) - int(u))
+			for y := int(u); y != int(h); y += dy {
+				sum[y]++
+			}
+		}
+
+		for y := 0; y < height; y++ {
+			if sum[y] > 0 {
+				l := len(palette)
+				i := ceil((l-1)*sum[y], N)
+				waveform.Set(int(x+1), int(y), palette[i])
+			}
+		}
+
+		x++
+	}
+
+	return antialias(waveform, soft), nil
 }
 
 func signum(N int) int {

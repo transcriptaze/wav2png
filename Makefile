@@ -39,7 +39,7 @@ run: build
 	open ./runtime/entangled.png
 
 noise: build
-	./bin/wav2png --height 390 --width 640 --padding 0 -out ./runtime ./runtime/noise.wav
+	./bin/wav2png --height 390 --width 641 --padding 0 -out ./runtime ./runtime/noise.wav
 	open ./runtime/noise.png
 
 entangled: build
