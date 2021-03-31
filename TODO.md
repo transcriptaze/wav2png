@@ -2,15 +2,14 @@
 
 ### IN PROGRESS
 
-- [x] Split fill/grid
-- [ ] GridSpec
-      - fit to border
-      - spacing 
-      - lines
-      - colour
+- [ ] Grid size
+      -- horizontal lines start 1 pixel above/below 0
+      -- size to number of lines and/or grid size
+
 - [ ] Move WAV decoding to cmd
+- [ ] Render should take a reader parameter
 
-
+- [ ] Add references to README
 - [ ] Define palette in terms of gradients
 - [ ] Load palette from file
 - [ ] Load anti-aliasing kernel from file
@@ -28,7 +27,9 @@
 - [ ] Platform executables
 - [ ] Set background colour
 
-- [x] Fix grid size
+- [x] FillSpec
+- [x] GridSpec
+- [x] Split fill/grid
 - [x] Fix offsets for odd heights
 - [x] Negative height to invert
 - [x] Normalize to 16 bit PCM
@@ -39,12 +40,11 @@
 
 1. Remove external decoder dependency
 2. Use different 'flag' package with separate -- and - options
-3. Online renderer
-4. GPU/WebGL implementation
-5. Add support for other audio formats
-6. SVG out
-7. Spectrogram
-8. MP4
+3. GPU/WebGL implementation
+4. Add support for other audio formats
+5. SVG out
+6. Spectrogram
+7. MP4
 
 ### NOTES
 

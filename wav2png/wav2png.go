@@ -89,26 +89,6 @@ func Draw(wavfile, pngfile string, params Params) error {
 		return err
 	}
 
-	//	bytes := decoder.PCMLen()
-	//	channels := decoder.Format().NumChannels
-	//	samples := bytes / int64(channels*int(bits)/8)
-	//	buffer := audio.IntBuffer{Data: make([]int, samples)}
-	//	if _, err := decoder.PCMBuffer(&buffer); err != nil {
-	//		return err
-	//	}
-	//
-	//	floats := buffer.AsFloat32Buffer()
-	//	if w, err := render(2*time.Second, floats.Data, 640, 390); err != nil {
-	//		return err
-	//	} else {
-	//		xy := image.Point{0, 0}
-	//		tl := image.Point{int(padding), int(padding)}
-	//		br := image.Point{int(padding + width), int(padding + height)}
-	//		rect := image.Rectangle{tl, br}
-	//
-	//		draw.Draw(img, rect, w, xy, draw.Over)
-	//	}
-
 	f, err := os.Create(pngfile)
 	if err != nil {
 		return err
@@ -171,7 +151,7 @@ func plot(img *image.NRGBA, padding uint, decoder *wav.Decoder) error {
 		x++
 	}
 
-	antialiased := antialias(waveform, soft)
+	antialiased := Antialias(waveform, Soft)
 
 	xy := image.Point{0, 0}
 	tl := image.Point{int(padding), int(padding)}
@@ -183,7 +163,7 @@ func plot(img *image.NRGBA, padding uint, decoder *wav.Decoder) error {
 	return nil
 }
 
-func render(duration time.Duration, pcm []float32, width, height int) (*image.NRGBA, error) {
+func Render(duration time.Duration, pcm []float32, width, height int) *image.NRGBA {
 	l := 44100 * int(math.Ceil(duration.Seconds()))
 
 	buffer := make([]float32, l/int(width))
@@ -217,9 +197,48 @@ func render(duration time.Duration, pcm []float32, width, height int) (*image.NR
 		x++
 	}
 
-	return antialias(waveform, soft), nil
+	return waveform
 }
 
+func Antialias(img *image.NRGBA, kernel Kernel) *image.NRGBA {
+	w := img.Bounds().Max.X - img.Bounds().Min.X
+	h := img.Bounds().Max.Y - img.Bounds().Min.Y
+	out := image.NewNRGBA(image.Rectangle{
+		Min: image.Point{X: 0, Y: 0},
+		Max: image.Point{X: w, Y: h},
+	})
+
+	N := uint32(0)
+	for _, row := range kernel {
+		for _, k := range row {
+			N += k
+		}
+	}
+
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			r := uint32(0)
+			g := uint32(0)
+			b := uint32(0)
+			a := uint32(0)
+
+			for i, row := range kernel {
+				for j, k := range row {
+					u := img.At(x+j-1, y+i-1)
+
+					r += k * uint32(u.(color.NRGBA).R)
+					g += k * uint32(u.(color.NRGBA).G)
+					b += k * uint32(u.(color.NRGBA).B)
+					a += k * uint32(u.(color.NRGBA).A)
+				}
+			}
+
+			out.Set(x, y, color.NRGBA{R: uint8(r / N), G: uint8(g / N), B: uint8(b / N), A: uint8(a / N)})
+		}
+	}
+
+	return out
+}
 func signum(N int) int {
 	if N < 0 {
 		return -1
@@ -261,44 +280,4 @@ func vscale(v int16, height int) int16 {
 	}
 
 	return vvv
-}
-
-func antialias(img *image.NRGBA, kernel [][]uint32) *image.NRGBA {
-	w := img.Bounds().Max.X - img.Bounds().Min.X
-	h := img.Bounds().Max.Y - img.Bounds().Min.Y
-	out := image.NewNRGBA(image.Rectangle{
-		Min: image.Point{X: 0, Y: 0},
-		Max: image.Point{X: w, Y: h},
-	})
-
-	N := uint32(0)
-	for _, row := range kernel {
-		for _, k := range row {
-			N += k
-		}
-	}
-
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			r := uint32(0)
-			g := uint32(0)
-			b := uint32(0)
-			a := uint32(0)
-
-			for i, row := range kernel {
-				for j, k := range row {
-					u := img.At(x+j-1, y+i-1)
-
-					r += k * uint32(u.(color.NRGBA).R)
-					g += k * uint32(u.(color.NRGBA).G)
-					b += k * uint32(u.(color.NRGBA).B)
-					a += k * uint32(u.(color.NRGBA).A)
-				}
-			}
-
-			out.Set(x, y, color.NRGBA{R: uint8(r / N), G: uint8(g / N), B: uint8(b / N), A: uint8(a / N)})
-		}
-	}
-
-	return out
 }
