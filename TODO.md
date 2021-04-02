@@ -2,12 +2,14 @@
 
 ### IN PROGRESS
 
+- [ ] Render should take a reader parameter
+- [ ] Move WAV decoding to cmd
+
 - [ ] Grid size
       -- horizontal lines start 1 pixel above/below 0
       -- size to number of lines and/or grid size
-
-- [ ] Move WAV decoding to cmd
-- [ ] Render should take a reader parameter
+- [ ] Decoder for extended format/float32 WAV
+      -- https://github.com/go-audio/wav/issues/8
 
 - [ ] Add references to README
 - [ ] Define palette in terms of gradients

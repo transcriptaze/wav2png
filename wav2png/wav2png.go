@@ -89,6 +89,17 @@ func Draw(wavfile, pngfile string, params Params) error {
 		return err
 	}
 
+	//	buffer, _ := decoder.FullPCMBuffer()
+	//	floats := buffer.AsFloat32Buffer()
+	//	waveform := Render(duration, floats.Data, int(width), int(height))
+	//
+	//	xy := image.Point{0, 0}
+	//	tl := image.Point{int(padding), int(padding)}
+	//	br := image.Point{int(padding + width), int(padding + height)}
+	//	rect := image.Rectangle{tl, br}
+	//
+	//	draw.Draw(img, rect, waveform, xy, draw.Over)
+
 	f, err := os.Create(pngfile)
 	if err != nil {
 		return err
@@ -114,7 +125,7 @@ func plot(img *image.NRGBA, padding uint, decoder *wav.Decoder) error {
 	pixels := int64(duration.Round(time.Duration(10)*time.Millisecond)) / 10000000
 	msPerPixel := 10 * int64(math.Ceil(float64(pixels)/float64(width)))
 
-	buffer := audio.IntBuffer{Data: make([]int, int64(channels)*441*msPerPixel/10)}
+	buffer := audio.IntBuffer{Data: make([]int, msPerPixel*int64(channels)*int64(rate)/1000)}
 	x := uint(0)
 
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))

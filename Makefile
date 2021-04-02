@@ -31,18 +31,24 @@ clean:
 	rm -rf bin/*
 
 debug: build
-	./bin/wav2png --height 390 --width 640 --padding 0 -out ./runtime ./runtime/noise.wav
+	./bin/wav2png --height 390 --width 640 --padding 0 -out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
 run: build
-	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./runtime/entangled.wav
+	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav
 	open ./runtime/entangled.png
-
-noise: build
-	./bin/wav2png --height 390 --width 641 --padding 0 -out ./runtime ./runtime/noise.wav
-	open ./runtime/noise.png
 
 entangled: build
-	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./runtime/entangled.wav
+	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav
 	open ./runtime/entangled.png
+
+# 16-bit signed integer PCM WAV file
+noise: build
+	./bin/wav2png --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise.wav
+	open ./runtime/noise.png
+
+# float32 WAV format file
+# noise-float32: build
+#	./bin/wav2png --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise-float32.wav
+#	open ./runtime/noise-float32.png
 
