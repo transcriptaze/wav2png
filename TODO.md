@@ -2,6 +2,13 @@
 
 ### IN PROGRESS
 
+- [ ] Grid spec
+      - none/square/rectangular
+      - 'smart' e.g. flip between no. of lines/size
+      - colour
+      - overlay/underlay
+      - return array of intercepts
+
 - [ ] Render should take a reader parameter
 - [ ] Move WAV decoding to cmd
 
