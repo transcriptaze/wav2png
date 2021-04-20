@@ -20,7 +20,7 @@ import (
 type Params struct {
 	Width   uint
 	Height  uint
-	Padding uint
+	Padding int
 }
 
 const (
@@ -35,7 +35,7 @@ var BACKGROUND = SolidFill{
 }
 
 var GRID = SquareGrid{
-	colour:  color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 255},
+	colour:  color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff},
 	size:    64,
 	padding: 0,
 }
@@ -60,20 +60,24 @@ func Draw(wavfile, pngfile string, params Params) error {
 	}
 
 	fmt.Printf("   File:     %s\n", wavfile)
-	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, params.Width+2*params.Padding, params.Height+2*params.Padding)
+	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, int(params.Width)+2*params.Padding, int(params.Height)+2*params.Padding)
 	fmt.Printf("   Format:   %+v\n", *format)
 	fmt.Printf("   Bits:     %+v\n", bits)
 	fmt.Printf("   Duration: %s\n", duration)
 	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
 
-	width := params.Width
-	height := params.Height
+	width := int(params.Width)
+	height := int(params.Height)
 	padding := params.Padding
 
-	w := width + 2*padding
-	h := height + 2*padding
+	w := width
+	h := height
+	if padding > 0 {
+		w += 2 * padding
+		h += 2 * padding
+	}
 
-	img := image.NewNRGBA(image.Rect(0, 0, int(w), int(h)))
+	img := image.NewNRGBA(image.Rect(0, 0, w, h))
 	if img == nil {
 		return errors.New("wav2png failed to create image")
 	}
@@ -110,7 +114,7 @@ func Draw(wavfile, pngfile string, params Params) error {
 	return png.Encode(f, img)
 }
 
-func plot(img *image.NRGBA, padding uint, decoder *wav.Decoder) error {
+func plot(img *image.NRGBA, padding int, decoder *wav.Decoder) error {
 	bounds := img.Bounds()
 	width := bounds.Max.X - bounds.Min.X - 2*int(padding)
 	height := bounds.Max.Y - bounds.Min.Y - 2*int(padding)

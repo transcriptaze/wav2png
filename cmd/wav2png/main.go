@@ -14,12 +14,12 @@ func main() {
 	var out string
 	var height uint
 	var width uint
-	var padding uint
+	var padding int
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
 	flag.UintVar(&height, "height", 256, "Image height (pixels)")
 	flag.UintVar(&width, "width", 1024, "Image width (pixels)")
-	flag.UintVar(&padding, "padding", 0, "Image padding (pixels)")
+	flag.IntVar(&padding, "padding", 0, "Image padding (pixels)")
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {

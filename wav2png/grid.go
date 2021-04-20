@@ -9,47 +9,71 @@ import (
 type GridSpec interface {
 	Colour() color.NRGBA
 	Size(bounds image.Rectangle) uint
-	Padding(bounds image.Rectangle) uint
+	Padding(bounds image.Rectangle) int
+	Border(bounds image.Rectangle) *image.Rectangle
+	VLines(bounds image.Rectangle) []int
+	HLines(bounds image.Rectangle) []int
 }
 
 func Grid(img *image.NRGBA, spec GridSpec) {
 	bounds := img.Bounds()
 	colour := spec.Colour()
-	dw := int(spec.Size(bounds))
-	padding := int(spec.Padding(bounds))
+
+	// calculate grid metrics
+	x0 := bounds.Min.X
+	x1 := bounds.Max.X - 1
+
+	y0 := bounds.Min.Y
+	y1 := bounds.Max.Y - 1
+
+	border := spec.Border(bounds)
+	if border != nil {
+		x0 = border.Min.X
+		x1 = border.Max.X
+
+		y0 = border.Min.Y
+		y1 = border.Max.Y
+	}
 
 	// vertical lines
-	for x := bounds.Min.X + padding; x < bounds.Max.X-padding; x += dw {
-		for y := bounds.Min.Y + padding; y < bounds.Max.Y-padding; y++ {
+	vlines := spec.VLines(bounds)
+	for _, x := range vlines {
+		for y := y0; y <= y1; y++ {
 			img.Set(x, y, colour)
 		}
 	}
 
 	// horizontal lines
-	y0 := float64(bounds.Min.Y) + float64(bounds.Max.Y-bounds.Min.Y-1)/2.0
-	yt := int(math.Floor(y0))
-	yl := int(math.Ceil(y0))
-
-	for y := yt; y > bounds.Min.Y+padding; y -= dw {
-		for x := bounds.Min.X + padding; x < bounds.Max.X-padding; x++ {
+	// c := color.NRGBA{R: 0xff, G: 0x80, B: 0x00, A: 0xff}
+	hlines := spec.HLines(bounds)
+	for _, y := range hlines {
+		for x := x0; x <= x1; x++ {
 			img.Set(x, y, colour)
 		}
 	}
 
-	for y := yl; y < bounds.Max.Y-padding; y += dw {
-		for x := bounds.Min.X + padding; x < bounds.Max.X-padding; x++ {
-			img.Set(x, y, colour)
+	// border
+	if border != nil {
+		for x := border.Min.X; x <= border.Max.X; x++ {
+			img.Set(x, border.Min.Y, colour)
+			img.Set(x, border.Max.Y, colour)
+		}
+
+		for y := border.Min.Y; y <= border.Max.Y; y++ {
+			img.Set(border.Min.X, y, colour)
+			img.Set(border.Max.X, y, colour)
 		}
 	}
+
 }
 
 type SquareGrid struct {
 	colour  color.NRGBA
 	size    uint
-	padding uint
+	padding int
 }
 
-func NewSquareGrid(colour color.NRGBA, size, padding uint) SquareGrid {
+func NewSquareGrid(colour color.NRGBA, size uint, padding int) SquareGrid {
 	return SquareGrid{
 		colour:  colour,
 		size:    size,
@@ -65,6 +89,70 @@ func (g SquareGrid) Size(bound image.Rectangle) uint {
 	return g.size
 }
 
-func (g SquareGrid) Padding(bound image.Rectangle) uint {
+func (g SquareGrid) Padding(bound image.Rectangle) int {
 	return g.padding
+}
+
+func (g SquareGrid) Border(bounds image.Rectangle) *image.Rectangle {
+	padding := g.padding
+	border := image.Rect(bounds.Min.X+padding, bounds.Min.Y+padding, bounds.Max.X-1-padding, bounds.Max.Y-1-padding)
+
+	return &border
+}
+
+func (g SquareGrid) VLines(bounds image.Rectangle) []int {
+	vlines := []int{}
+
+	x0 := bounds.Min.X
+	x1 := bounds.Max.X - 1
+
+	padding := g.padding
+	border := g.Border(bounds)
+	if border != nil {
+		x0 = border.Min.X
+		x1 = border.Max.X
+	}
+
+	if dw := (x1 - x0) / 10.0; dw > 0 {
+		for gx := x0 + padding + dw; gx < x1; gx += dw {
+			vlines = append(vlines, gx)
+		}
+	}
+
+	return vlines
+}
+
+func (g SquareGrid) HLines(bounds image.Rectangle) []int {
+	hlines := []int{}
+
+	x0 := bounds.Min.X
+	x1 := bounds.Max.X - 1
+
+	y0 := bounds.Min.Y
+	y1 := bounds.Max.Y - 1
+
+	padding := g.padding
+	border := g.Border(bounds)
+	if border != nil {
+		x0 = border.Min.X
+		x1 = border.Max.X
+
+		y0 = border.Min.Y
+		y1 = border.Max.Y
+	}
+
+	ym := float64(y1-y0+2*padding) / 2.0
+	if dw := (x1 - x0) / 10.0; dw > 0 {
+		y := int(math.Floor(ym))
+		for gy := y; gy > y0; gy -= dw {
+			hlines = append(hlines, gy)
+		}
+
+		y = int(math.Ceil(ym))
+		for gy := y; gy < y1; gy += dw {
+			hlines = append(hlines, gy)
+		}
+	}
+
+	return hlines
 }
