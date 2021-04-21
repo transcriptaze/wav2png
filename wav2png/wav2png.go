@@ -70,14 +70,7 @@ func Draw(wavfile, pngfile string, params Params) error {
 	height := int(params.Height)
 	padding := params.Padding
 
-	w := width
-	h := height
-	if padding > 0 {
-		w += 2 * padding
-		h += 2 * padding
-	}
-
-	img := image.NewNRGBA(image.Rect(0, 0, w, h))
+	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	if img == nil {
 		return errors.New("wav2png failed to create image")
 	}

@@ -31,7 +31,13 @@ clean:
 	rm -rf bin/*
 
 debug: build
-	./bin/wav2png --width 643 --height 388 --padding 1 -out ./runtime ./samples/noise.wav
+#	go test -v ./... -run TestSquareGridSpecVLinesWithNonIntegralSize
+#	./bin/wav2png --width 641 --height 386 --padding 0 -out ./runtime ./samples/noise.wav
+#	./bin/wav2png --width 643 --height 388 --padding 1 -out ./runtime ./samples/noise.wav
+#	./bin/wav2png --width 643 --height 387 --padding 1 -out ./runtime ./samples/noise.wav
+#	./bin/wav2png --width 645 --height 390 --padding 2 -out ./runtime ./samples/noise.wav
+#	./bin/wav2png --width 645 --height 388 --padding 1 -out ./runtime ./samples/noise.wav
+	./bin/wav2png --width 645 --height 390 --padding 1 -out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
 run: build
