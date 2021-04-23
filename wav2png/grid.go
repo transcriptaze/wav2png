@@ -72,7 +72,7 @@ type SquareGrid struct {
 	padding int
 }
 
-func NewSquareGrid(colour color.NRGBA, size uint, padding int) SquareGrid {
+func NewSquareGrid(colour color.NRGBA, size uint, padding int) GridSpec {
 	return SquareGrid{
 		colour:  colour,
 		size:    size,
