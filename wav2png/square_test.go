@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestSquareGridSpecBorder(t *testing.T) {
+func TestSquareGridBorder(t *testing.T) {
 	bounds := image.Rect(0, 0, 641, 386)
 	expected := image.Rect(0, 0, 640, 385)
 	gridspec := SquareGrid{size: 64, padding: 0}
@@ -21,7 +21,7 @@ func TestSquareGridSpecBorder(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecBorderWithPadding(t *testing.T) {
+func TestSquareGridBorderWithPadding(t *testing.T) {
 	bounds := image.Rect(0, 0, 643, 388)
 	expected := image.Rect(1, 1, 641, 386)
 	gridspec := SquareGrid{size: 64, padding: 1}
@@ -36,7 +36,7 @@ func TestSquareGridSpecBorderWithPadding(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecVLines(t *testing.T) {
+func TestSquareGridVLines(t *testing.T) {
 	bounds := image.Rect(0, 0, 641, 386)
 	expected := []int{64, 128, 192, 256, 320, 384, 448, 512, 576}
 	gridspec := SquareGrid{size: 64, padding: 0}
@@ -47,7 +47,7 @@ func TestSquareGridSpecVLines(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecVLinesWithPadding(t *testing.T) {
+func TestSquareGridVLinesWithPadding(t *testing.T) {
 	bounds := image.Rect(0, 0, 643, 388)
 	expected := []int{65, 129, 193, 257, 321, 385, 449, 513, 577}
 	gridspec := SquareGrid{size: 64, padding: 1}
@@ -58,7 +58,7 @@ func TestSquareGridSpecVLinesWithPadding(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecVLinesWithNonIntegralSize(t *testing.T) {
+func TestSquareGridVLinesWithNonIntegralSize(t *testing.T) {
 	bounds := image.Rect(0, 0, 645, 388)
 	expected := []int{65, 129, 194, 258, 322, 386, 450, 515, 579}
 	gridspec := SquareGrid{size: 64, padding: 1}
@@ -69,7 +69,7 @@ func TestSquareGridSpecVLinesWithNonIntegralSize(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecHLines(t *testing.T) {
+func TestSquareGridHLines(t *testing.T) {
 	bounds := image.Rect(0, 0, 641, 386)
 	expected := []int{192, 128, 64, 193, 257, 321}
 	gridspec := SquareGrid{size: 64, padding: 0}
@@ -80,7 +80,7 @@ func TestSquareGridSpecHLines(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecHLinesWithPadding(t *testing.T) {
+func TestSquareGridHLinesWithPadding(t *testing.T) {
 	bounds := image.Rect(0, 0, 643, 388)
 	expected := []int{193, 129, 65, 194, 258, 322}
 	gridspec := SquareGrid{size: 64, padding: 1}
@@ -91,7 +91,7 @@ func TestSquareGridSpecHLinesWithPadding(t *testing.T) {
 	}
 }
 
-func TestSquareGridSpecHLinesWithNonIntegralSize(t *testing.T) {
+func TestSquareGridHLinesWithNonIntegralSize(t *testing.T) {
 	bounds := image.Rect(0, 0, 643, 390)
 	expected := []int{194, 130, 65, 195, 260, 324}
 	gridspec := SquareGrid{size: 64, padding: 1}
