@@ -24,7 +24,7 @@ func (g SquareGrid) Colour() color.NRGBA {
 	return g.colour
 }
 
-func (g SquareGrid) Padding(bound image.Rectangle) int {
+func (g SquareGrid) Padding() int {
 	return g.padding
 }
 

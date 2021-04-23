@@ -19,7 +19,7 @@ func (g NoGrid) Colour() color.NRGBA {
 	return color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00}
 }
 
-func (g NoGrid) Padding(bound image.Rectangle) int {
+func (g NoGrid) Padding() int {
 	return g.padding
 }
 

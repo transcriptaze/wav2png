@@ -7,7 +7,7 @@ import (
 
 type GridSpec interface {
 	Colour() color.NRGBA
-	Padding(bounds image.Rectangle) int
+	Padding() int
 	Border(bounds image.Rectangle) *image.Rectangle
 	VLines(bounds image.Rectangle) []int
 	HLines(bounds image.Rectangle) []int
