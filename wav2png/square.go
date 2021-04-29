@@ -8,15 +8,26 @@ import (
 
 type SquareGrid struct {
 	colour  color.NRGBA
-	size    uint
 	padding int
+	size    uint
+	fit     Fit
 }
 
-func NewSquareGrid(colour color.NRGBA, size uint, padding int) GridSpec {
+type Fit int
+
+const (
+	Approximate Fit = iota
+	Exact
+	AtLeast
+	AtMost
+)
+
+func NewSquareGrid(colour color.NRGBA, size uint, padding int, fit Fit) GridSpec {
 	return SquareGrid{
 		colour:  colour,
-		size:    size,
 		padding: padding,
+		size:    size,
+		fit:     fit,
 	}
 }
 
@@ -50,6 +61,17 @@ func (g SquareGrid) VLines(bounds image.Rectangle) []int {
 	N := float64(x1-x0) / float64(g.size)
 	dw := float64(x1-x0) / math.Round(N)
 
+	switch g.fit {
+	case Exact:
+		dw = float64(g.size)
+
+	case AtLeast:
+		dw = math.Max(dw, float64(g.size))
+
+	case AtMost:
+		dw = math.Min(dw, float64(g.size))
+	}
+
 	if dw > 0.0 {
 		for line := 1; ; line++ {
 			if gx := math.Round(float64(x0) + float64(line)*dw); gx < float64(x1) {
@@ -79,6 +101,17 @@ func (g SquareGrid) HLines(bounds image.Rectangle) []int {
 
 	N := float64(y1-y0) / float64(g.size)
 	dw := float64(y1-y0) / math.Round(N)
+
+	switch g.fit {
+	case Exact:
+		dw = float64(g.size)
+
+	case AtLeast:
+		dw = math.Max(dw, float64(g.size))
+
+	case AtMost:
+		dw = math.Min(dw, float64(g.size))
+	}
 
 	ym := float64(y1-y0+2*padding) / 2.0
 	if dw > 0 {

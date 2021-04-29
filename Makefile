@@ -37,8 +37,9 @@ debug: build
 #	./bin/wav2png --width 643 --height 387 --padding 1 -out ./runtime ./samples/noise.wav
 #	./bin/wav2png --width 645 --height 390 --padding 2 -out ./runtime ./samples/noise.wav
 #	./bin/wav2png --width 645 --height 388 --padding 1 -out ./runtime ./samples/noise.wav
-	./bin/wav2png --width 645 --height 390 --padding 1 -out ./runtime ./samples/noise.wav
-	open ./runtime/noise.png
+#	./bin/wav2png --width 645 --height 390 --padding 1 -out ./runtime ./samples/noise.wav
+#	open ./runtime/noise.png
+	go test -v ./... -run TestSquareGridExactFit
 
 run: build
 	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav
