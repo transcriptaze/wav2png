@@ -14,8 +14,9 @@ type GridSpec interface {
 	HLines(bounds image.Rectangle) []int
 }
 
-func Grid(img *image.NRGBA, spec GridSpec) {
-	bounds := img.Bounds()
+func Grid(spec GridSpec, width, height int) *image.NRGBA {
+	bounds := image.Rect(0, 0, width, height)
+	img := image.NewNRGBA(bounds)
 	colour := spec.Colour()
 
 	// calculate grid metrics
@@ -64,4 +65,5 @@ func Grid(img *image.NRGBA, spec GridSpec) {
 		}
 	}
 
+	return img
 }

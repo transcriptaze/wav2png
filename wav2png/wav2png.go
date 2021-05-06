@@ -76,12 +76,13 @@ func Draw(wavfile, pngfile string, params Params) error {
 	}
 
 	Fill(img, BACKGROUND)
-	Grid(img, SquareGrid{
-		colour:  GRID.colour,
-		size:    GRID.size,
-		padding: padding,
-	})
 
+	grid := Grid(SquareGrid{colour: GRID.colour, size: GRID.size, padding: padding}, width, height)
+	if grid == nil {
+		return errors.New("wav2png failed to render grid")
+	}
+
+	draw.Draw(img, img.Bounds(), grid, image.Point{0, 0}, draw.Over)
 	if err := plot(img, padding, decoder); err != nil {
 		return err
 	}
