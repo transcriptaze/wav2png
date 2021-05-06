@@ -11,6 +11,7 @@ type SquareGrid struct {
 	padding int
 	size    uint
 	fit     Fit
+	overlay bool
 }
 
 type Fit int
@@ -22,12 +23,13 @@ const (
 	AtMost
 )
 
-func NewSquareGrid(colour color.NRGBA, size uint, padding int, fit Fit) GridSpec {
+func NewSquareGrid(colour color.NRGBA, size uint, padding int, fit Fit, overlay bool) GridSpec {
 	return SquareGrid{
 		colour:  colour,
 		padding: padding,
 		size:    size,
 		fit:     fit,
+		overlay: overlay,
 	}
 }
 
@@ -37,6 +39,10 @@ func (g SquareGrid) Colour() color.NRGBA {
 
 func (g SquareGrid) Padding() int {
 	return g.padding
+}
+
+func (g SquareGrid) Overlay() bool {
+	return g.overlay
 }
 
 func (g SquareGrid) Border(bounds image.Rectangle) *image.Rectangle {

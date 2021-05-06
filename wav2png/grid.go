@@ -8,6 +8,7 @@ import (
 type GridSpec interface {
 	Colour() color.NRGBA
 	Padding() int
+	Overlay() bool
 	Border(bounds image.Rectangle) *image.Rectangle
 	VLines(bounds image.Rectangle) []int
 	HLines(bounds image.Rectangle) []int

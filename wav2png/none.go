@@ -23,6 +23,10 @@ func (g NoGrid) Padding() int {
 	return g.padding
 }
 
+func (g NoGrid) Overlay() bool {
+	return false
+}
+
 func (g NoGrid) Border(bounds image.Rectangle) *image.Rectangle {
 	return nil
 }
