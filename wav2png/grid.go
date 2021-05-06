@@ -14,6 +14,15 @@ type GridSpec interface {
 	HLines(bounds image.Rectangle) []int
 }
 
+type Fit int
+
+const (
+	Approximate Fit = iota
+	Exact
+	AtLeast
+	AtMost
+)
+
 func Grid(spec GridSpec, width, height int) *image.NRGBA {
 	bounds := image.Rect(0, 0, width, height)
 	img := image.NewNRGBA(bounds)

@@ -38,4 +38,3 @@ func (f SolidFill) Fill(img *image.NRGBA) {
 		}
 	}
 }
-
