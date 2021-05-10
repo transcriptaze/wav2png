@@ -8,17 +8,15 @@ import (
 
 type RectangularGrid struct {
 	colour  color.NRGBA
-	padding int
 	width   uint
 	height  uint
 	fit     Fit
 	overlay bool
 }
 
-func NewRectangularGrid(colour color.NRGBA, width, height uint, padding int, fit Fit, overlay bool) RectangularGrid {
+func NewRectangularGrid(colour color.NRGBA, width, height uint, fit Fit, overlay bool) RectangularGrid {
 	return RectangularGrid{
 		colour:  colour,
-		padding: padding,
 		width:   width,
 		height:  height,
 		fit:     fit,
@@ -30,28 +28,23 @@ func (g RectangularGrid) Colour() color.NRGBA {
 	return g.colour
 }
 
-func (g RectangularGrid) Padding() int {
-	return g.padding
-}
-
 func (g RectangularGrid) Overlay() bool {
 	return g.overlay
 }
 
-func (g RectangularGrid) Border(bounds image.Rectangle) *image.Rectangle {
-	padding := g.padding
+func (g RectangularGrid) Border(bounds image.Rectangle, padding int) *image.Rectangle {
 	border := image.Rect(bounds.Min.X+padding, bounds.Min.Y+padding, bounds.Max.X-1-padding, bounds.Max.Y-1-padding)
 
 	return &border
 }
 
-func (g RectangularGrid) VLines(bounds image.Rectangle) []int {
+func (g RectangularGrid) VLines(bounds image.Rectangle, padding int) []int {
 	vlines := []int{}
 
 	x0 := bounds.Min.X
 	x1 := bounds.Max.X - 1
 
-	border := g.Border(bounds)
+	border := g.Border(bounds, padding)
 	if border != nil {
 		x0 = border.Min.X
 		x1 = border.Max.X
@@ -85,14 +78,13 @@ func (g RectangularGrid) VLines(bounds image.Rectangle) []int {
 	return vlines
 }
 
-func (g RectangularGrid) HLines(bounds image.Rectangle) []int {
+func (g RectangularGrid) HLines(bounds image.Rectangle, padding int) []int {
 	hlines := []int{}
 
 	y0 := bounds.Min.Y
 	y1 := bounds.Max.Y - 1
 
-	padding := g.padding
-	border := g.Border(bounds)
+	border := g.Border(bounds, padding)
 	if border != nil {
 		y0 = border.Min.Y
 		y1 = border.Max.Y
