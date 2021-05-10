@@ -7,11 +7,10 @@ import (
 
 type GridSpec interface {
 	Colour() color.NRGBA
-	Padding() int
 	Overlay() bool
-	Border(bounds image.Rectangle) *image.Rectangle
-	VLines(bounds image.Rectangle) []int
-	HLines(bounds image.Rectangle) []int
+	Border(bounds image.Rectangle, padding int) *image.Rectangle
+	VLines(bounds image.Rectangle, padding int) []int
+	HLines(bounds image.Rectangle, padding int) []int
 }
 
 type Fit int
@@ -23,7 +22,7 @@ const (
 	AtMost
 )
 
-func Grid(spec GridSpec, width, height int) *image.NRGBA {
+func Grid(spec GridSpec, width, height, padding int) *image.NRGBA {
 	bounds := image.Rect(0, 0, width, height)
 	img := image.NewNRGBA(bounds)
 	colour := spec.Colour()
@@ -35,7 +34,7 @@ func Grid(spec GridSpec, width, height int) *image.NRGBA {
 	y0 := bounds.Min.Y
 	y1 := bounds.Max.Y - 1
 
-	border := spec.Border(bounds)
+	border := spec.Border(bounds, padding)
 	if border != nil {
 		x0 = border.Min.X
 		x1 = border.Max.X
@@ -45,7 +44,7 @@ func Grid(spec GridSpec, width, height int) *image.NRGBA {
 	}
 
 	// vertical lines
-	vlines := spec.VLines(bounds)
+	vlines := spec.VLines(bounds, padding)
 	for _, x := range vlines {
 		for y := y0; y <= y1; y++ {
 			img.Set(x, y, colour)
@@ -54,7 +53,7 @@ func Grid(spec GridSpec, width, height int) *image.NRGBA {
 
 	// horizontal lines
 	// c := color.NRGBA{R: 0xff, G: 0x80, B: 0x00, A: 0xff}
-	hlines := spec.HLines(bounds)
+	hlines := spec.HLines(bounds, padding)
 	for _, y := range hlines {
 		for x := x0; x <= x1; x++ {
 			img.Set(x, y, colour)

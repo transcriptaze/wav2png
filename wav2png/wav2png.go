@@ -35,9 +35,8 @@ var BACKGROUND = SolidFill{
 }
 
 var GRID = SquareGrid{
-	colour:  color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff},
-	size:    64,
-	padding: 0,
+	colour: color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff},
+	size:   64,
 }
 
 func Draw(wavfile, pngfile string, params Params) error {
@@ -77,7 +76,7 @@ func Draw(wavfile, pngfile string, params Params) error {
 
 	Fill(img, BACKGROUND)
 
-	grid := Grid(SquareGrid{colour: GRID.colour, size: GRID.size, padding: padding}, width, height)
+	grid := Grid(SquareGrid{colour: GRID.colour, size: GRID.size}, width, height, padding)
 	if grid == nil {
 		return errors.New("wav2png failed to render grid")
 	}

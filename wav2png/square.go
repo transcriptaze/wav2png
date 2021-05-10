@@ -8,16 +8,14 @@ import (
 
 type SquareGrid struct {
 	colour  color.NRGBA
-	padding int
 	size    uint
 	fit     Fit
 	overlay bool
 }
 
-func NewSquareGrid(colour color.NRGBA, size uint, padding int, fit Fit, overlay bool) SquareGrid {
+func NewSquareGrid(colour color.NRGBA, size uint, fit Fit, overlay bool) SquareGrid {
 	return SquareGrid{
 		colour:  colour,
-		padding: padding,
 		size:    size,
 		fit:     fit,
 		overlay: overlay,
@@ -28,28 +26,23 @@ func (g SquareGrid) Colour() color.NRGBA {
 	return g.colour
 }
 
-func (g SquareGrid) Padding() int {
-	return g.padding
-}
-
 func (g SquareGrid) Overlay() bool {
 	return g.overlay
 }
 
-func (g SquareGrid) Border(bounds image.Rectangle) *image.Rectangle {
-	padding := g.padding
+func (g SquareGrid) Border(bounds image.Rectangle, padding int) *image.Rectangle {
 	border := image.Rect(bounds.Min.X+padding, bounds.Min.Y+padding, bounds.Max.X-1-padding, bounds.Max.Y-1-padding)
 
 	return &border
 }
 
-func (g SquareGrid) VLines(bounds image.Rectangle) []int {
+func (g SquareGrid) VLines(bounds image.Rectangle, padding int) []int {
 	vlines := []int{}
 
 	x0 := bounds.Min.X
 	x1 := bounds.Max.X - 1
 
-	border := g.Border(bounds)
+	border := g.Border(bounds, padding)
 	if border != nil {
 		x0 = border.Min.X
 		x1 = border.Max.X
@@ -83,14 +76,13 @@ func (g SquareGrid) VLines(bounds image.Rectangle) []int {
 	return vlines
 }
 
-func (g SquareGrid) HLines(bounds image.Rectangle) []int {
+func (g SquareGrid) HLines(bounds image.Rectangle, padding int) []int {
 	hlines := []int{}
 
 	y0 := bounds.Min.Y
 	y1 := bounds.Max.Y - 1
 
-	padding := g.padding
-	border := g.Border(bounds)
+	border := g.Border(bounds, padding)
 	if border != nil {
 		y0 = border.Min.Y
 		y1 = border.Max.Y
