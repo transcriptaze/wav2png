@@ -1,6 +1,6 @@
 module github.com/transcriptaze/wav2png
 
-go 1.13
+go 1.16
 
 require (
 	github.com/cosiner/argv v0.0.1 // indirect

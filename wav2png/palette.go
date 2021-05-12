@@ -1,11 +1,33 @@
 package wav2png
 
 import (
+	"fmt"
+	"image"
 	"image/color"
 )
 
 type Palette struct {
 	colours []color.NRGBA
+}
+
+func PaletteFromPng(png image.Image) (*Palette, error) {
+
+	bounds := png.Bounds()
+	if bounds.Empty() {
+		return nil, fmt.Errorf("Cannot create palette from empty PNG")
+	}
+
+	h := bounds.Size().Y
+	colours := make([]color.NRGBA, h)
+	nrgba := color.NRGBAModel
+
+	for i := 0; i < h; i++ {
+		colours[i] = nrgba.Convert(png.At(0, i)).(color.NRGBA)
+	}
+
+	return &Palette{
+		colours: colours,
+	}, nil
 }
 
 func (p *Palette) realize() []color.NRGBA {
