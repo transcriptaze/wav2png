@@ -171,12 +171,12 @@ func plot(img *image.NRGBA, padding int, decoder *wav.Decoder) error {
 	return nil
 }
 
-func Render(duration time.Duration, pcm []float32, width, height int) *image.NRGBA {
+func Render(duration time.Duration, pcm []float32, width, height int, palette Palette) *image.NRGBA {
 	l := 44100 * int(math.Ceil(duration.Seconds()))
 
 	buffer := make([]float32, l/int(width))
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
-	palette := Ice.realize()
+	colours := palette.realize()
 
 	x := uint(0)
 	offset := 0
@@ -196,9 +196,9 @@ func Render(duration time.Duration, pcm []float32, width, height int) *image.NRG
 
 		for y := 0; y < height; y++ {
 			if sum[y] > 0 {
-				l := len(palette)
+				l := len(colours)
 				i := ceil((l-1)*sum[y], N)
-				waveform.Set(int(x+1), int(y), palette[i])
+				waveform.Set(int(x+1), int(y), colours[i])
 			}
 		}
 
