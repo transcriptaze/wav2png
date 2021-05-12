@@ -9,10 +9,10 @@ import (
 )
 
 //go:embed ice.png
-var file []byte
+var ice []byte
 
 func TestPaletteFromPng(t *testing.T) {
-	buffer := bytes.NewBuffer(file)
+	buffer := bytes.NewBuffer(ice)
 	img, err := png.Decode(buffer)
 	if err != nil {
 		t.Fatalf("Error loading PNG file (%v)", err)
@@ -25,13 +25,13 @@ func TestPaletteFromPng(t *testing.T) {
 		t.Fatalf("Failed to create palette from PNG (%v)", palette)
 	}
 
-	if !reflect.DeepEqual(*palette, ice) {
-		if len(palette.colours) != len(ice.colours) {
-			t.Errorf("Palette size is incorrect - expected:%v, got:%v", len(ice.colours), len(palette.colours))
+	if !reflect.DeepEqual(*palette, Ice) {
+		if len(palette.colours) != len(Ice.colours) {
+			t.Errorf("Palette size is incorrect - expected:%v, got:%v", len(Ice.colours), len(palette.colours))
 		} else {
-			for i, colour := range ice.colours {
+			for i, colour := range Ice.colours {
 				if !reflect.DeepEqual(palette.colours[i], colour) {
-					t.Errorf("Colour %v is incorrect - expected:%v, got:%v", i, ice.colours[i], palette.colours[i])
+					t.Errorf("Colour %v is incorrect - expected:%v, got:%v", i, Ice.colours[i], palette.colours[i])
 				}
 			}
 		}

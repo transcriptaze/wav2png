@@ -34,14 +34,14 @@ func (p *Palette) realize() []color.NRGBA {
 	return p.colours
 }
 
-var mono Palette = Palette{
+var Mono Palette = Palette{
 	colours: []color.NRGBA{
 		color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00},
 		color.NRGBA{R: 0x80, G: 0x80, B: 0xff, A: 0xff},
 	},
 }
 
-var ice Palette = Palette{
+var Ice Palette = Palette{
 	colours: []color.NRGBA{
 		color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00},
 		color.NRGBA{R: 0xd3, G: 0xf0, B: 0xff, A: 0x40},

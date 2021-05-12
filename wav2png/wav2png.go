@@ -126,7 +126,7 @@ func plot(img *image.NRGBA, padding int, decoder *wav.Decoder) error {
 	x := uint(0)
 
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
-	palette := ice.realize()
+	palette := Ice.realize()
 
 	for {
 		N, err := decoder.PCMBuffer(&buffer)
@@ -176,7 +176,7 @@ func Render(duration time.Duration, pcm []float32, width, height int) *image.NRG
 
 	buffer := make([]float32, l/int(width))
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
-	palette := ice.realize()
+	palette := Ice.realize()
 
 	x := uint(0)
 	offset := 0
