@@ -171,7 +171,7 @@ func plot(img *image.NRGBA, padding int, decoder *wav.Decoder) error {
 	return nil
 }
 
-func Render(duration time.Duration, pcm []float32, width, height int, palette Palette) *image.NRGBA {
+func Render(duration time.Duration, pcm []float32, width, height int, palette Palette, volume float64) *image.NRGBA {
 	l := 44100 * int(math.Ceil(duration.Seconds()))
 
 	buffer := make([]float32, l/int(width))
@@ -186,7 +186,7 @@ func Render(duration time.Duration, pcm []float32, width, height int, palette Pa
 		sum := make([]int, height)
 		u := vscale(0, -int(height))
 		for _, sample := range buffer[0:N] {
-			v := int16(32768 * sample)
+			v := int16(32768 * float64(sample) * volume)
 			h := vscale(v, -int(height))
 			dy := signum(int(h) - int(u))
 			for y := int(u); y != int(h); y += dy {
