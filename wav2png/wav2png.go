@@ -172,8 +172,7 @@ func plot(img *image.NRGBA, padding int, decoder *wav.Decoder) error {
 }
 
 func Render(duration time.Duration, pcm []float32, width, height int, palette Palette, volume float64) *image.NRGBA {
-	l := 44100 * int(math.Ceil(duration.Seconds()))
-
+	l := int(math.Ceil(44100.0 * duration.Seconds()))
 	buffer := make([]float32, l/int(width))
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := palette.realize()
