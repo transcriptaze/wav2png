@@ -60,6 +60,12 @@ func (g SquareGrid) VLines(bounds image.Rectangle, padding int) []int {
 
 	case AtMost:
 		dw = math.Min(dw, float64(g.size))
+
+	case LargerThan:
+		dw = math.Max(dw, float64(g.size+1))
+
+	case SmallerThan:
+		dw = math.Min(dw, float64(g.size-1))
 	}
 
 	if dw > 0.0 {

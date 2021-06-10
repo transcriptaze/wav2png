@@ -20,7 +20,13 @@ const (
 	Exact
 	AtLeast
 	AtMost
+	LargerThan
+	SmallerThan
 )
+
+func (f Fit) String() string {
+	return [...]string{"~", "=", "≥", "≤", ">", "<"}[f]
+}
 
 func Grid(spec GridSpec, width, height, padding int) *image.NRGBA {
 	bounds := image.Rect(0, 0, width, height)
