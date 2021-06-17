@@ -3,25 +3,11 @@
 package wav2png
 
 import (
-	"errors"
-	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
-	"image/png"
 	"math"
-	"os"
 	"time"
-
-	"github.com/go-audio/audio"
-	"github.com/go-audio/wav"
 )
-
-type Params struct {
-	Width   uint
-	Height  uint
-	Padding int
-}
 
 const (
 	BITS      int32 = 16
@@ -30,149 +16,8 @@ const (
 	RANGE     int32 = RANGE_MAX - RANGE_MIN + 1
 )
 
-var BACKGROUND = SolidFill{
-	colour: color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 255},
-}
-
-var GRID = SquareGrid{
-	colour: color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff},
-	size:   64,
-}
-
-func Draw(wavfile, pngfile string, params Params) error {
-	file, err := os.Open(wavfile)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	decoder := wav.NewDecoder(file)
-
-	decoder.FwdToPCM()
-
-	format := decoder.Format()
-	bits := decoder.SampleBitDepth()
-	duration, err := decoder.Duration()
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("   File:     %s\n", wavfile)
-	fmt.Printf("   PNG:      %s (%d x %d)\n", pngfile, int(params.Width)+2*params.Padding, int(params.Height)+2*params.Padding)
-	fmt.Printf("   Format:   %+v\n", *format)
-	fmt.Printf("   Bits:     %+v\n", bits)
-	fmt.Printf("   Duration: %s\n", duration)
-	fmt.Printf("   Length:   %d\n", decoder.PCMLen())
-
-	width := int(params.Width)
-	height := int(params.Height)
-	padding := params.Padding
-
-	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	if img == nil {
-		return errors.New("wav2png failed to create image")
-	}
-
-	Fill(img, BACKGROUND)
-
-	grid := Grid(SquareGrid{colour: GRID.colour, size: GRID.size}, width, height, padding)
-	if grid == nil {
-		return errors.New("wav2png failed to render grid")
-	}
-
-	draw.Draw(img, img.Bounds(), grid, image.Point{0, 0}, draw.Over)
-	if err := plot(img, padding, decoder); err != nil {
-		return err
-	}
-
-	//	buffer, _ := decoder.FullPCMBuffer()
-	//	floats := buffer.AsFloat32Buffer()
-	//	waveform := Render(duration, floats.Data, int(width), int(height))
-	//
-	//	xy := image.Point{0, 0}
-	//	tl := image.Point{int(padding), int(padding)}
-	//	br := image.Point{int(padding + width), int(padding + height)}
-	//	rect := image.Rectangle{tl, br}
-	//
-	//	draw.Draw(img, rect, waveform, xy, draw.Over)
-
-	f, err := os.Create(pngfile)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	return png.Encode(f, img)
-}
-
-func plot(img *image.NRGBA, padding int, decoder *wav.Decoder) error {
-	bounds := img.Bounds()
-	width := bounds.Max.X - bounds.Min.X - 2*int(padding)
-	height := bounds.Max.Y - bounds.Min.Y - 2*int(padding)
-	channels := decoder.Format().NumChannels
-
-	bytes := decoder.PCMLen()
-	bits := uint(decoder.SampleBitDepth())
-	rate := decoder.Format().SampleRate
-	samples := bytes / int64(channels*int(bits)/8)
-	duration := time.Duration(int64(time.Second) * samples / int64(rate))
-
-	pixels := int64(duration.Round(time.Duration(10)*time.Millisecond)) / 10000000
-	msPerPixel := 10 * int64(math.Ceil(float64(pixels)/float64(width)))
-
-	buffer := audio.IntBuffer{Data: make([]int, msPerPixel*int64(channels)*int64(rate)/1000)}
-	x := uint(0)
-
-	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
-	palette := Ice.realize()
-
-	for {
-		N, err := decoder.PCMBuffer(&buffer)
-		if err != nil {
-			return err
-		} else if N == 0 {
-			break
-		}
-
-		sum := make([]int, height)
-		u := vscale(rescale(0, bits), int(-height))
-		for i := 0; i < N; i += channels {
-			v := rescale(buffer.Data[i], 16)
-			h := vscale(v, int(-height))
-			dy := signum(int(h) - int(u))
-
-			for y := int(u); y != int(h); y += dy {
-				sum[y]++
-			}
-		}
-
-		for y := 0; y < height; y++ {
-			if sum[y] > 0 {
-				l := len(palette)
-				i := ceil((l-1)*sum[y], N)
-				waveform.Set(int(x+1), int(y), palette[i])
-			}
-		}
-
-		x++
-	}
-
-	antialiased := Antialias(waveform, Soft)
-
-	xy := image.Point{0, 0}
-	tl := image.Point{int(padding), int(padding)}
-	br := image.Point{int(padding) + width, int(padding) + height}
-	rect := image.Rectangle{tl, br}
-
-	draw.Draw(img, rect, antialiased, xy, draw.Over)
-
-	return nil
-}
-
-func Render(duration time.Duration, pcm []float32, width, height int, palette Palette, volume float64) *image.NRGBA {
-	l := int(math.Ceil(44100.0 * duration.Seconds()))
+func Render(duration time.Duration, pcm []float32, fs float64, width, height int, palette Palette, volume float64) *image.NRGBA {
+	l := int(math.Ceil(fs * duration.Seconds()))
 	buffer := make([]float32, l/int(width))
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := palette.realize()
@@ -246,6 +91,7 @@ func Antialias(img *image.NRGBA, kernel Kernel) *image.NRGBA {
 
 	return out
 }
+
 func signum(N int) int {
 	if N < 0 {
 		return -1

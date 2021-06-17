@@ -2,8 +2,7 @@
 
 ### IN PROGRESS
 
-- [ ] Decoder for extended format/float32 WAV
-      -- https://github.com/go-audio/wav/issues/8
+- [ ] Get settings from command line/file
 
 - [ ] Grid spec
       - none/square/rectangular
@@ -13,7 +12,6 @@
       - return array of intercepts
 
 - [ ] Render should take a reader parameter
-- [ ] Move WAV decoding to cmd
 
 - [ ] Grid size
       -- horizontal lines start 1 pixel above/below 0
@@ -37,6 +35,8 @@
 - [ ] Platform executables
 - [ ] Set background colour
 
+- [x] Move WAV decoding to cmd
+- [x] Replace WAV decoder (cf. https://github.com/go-audio/wav/issues/8)
 - [x] FillSpec
 - [x] GridSpec
 - [x] Split fill/grid

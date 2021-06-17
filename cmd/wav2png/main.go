@@ -187,7 +187,7 @@ func render(wav audio, settings Settings) (*image.NRGBA, error) {
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	grid := wav2png.Grid(gridspec, width, height, padding)
-	waveform := wav2png.Render(duration, samples, w, h, cache.palette, vscale)
+	waveform := wav2png.Render(duration, samples, fs, w, h, cache.palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
 	origin := image.Pt(0, 0)
