@@ -7,7 +7,6 @@ import (
 type WAV struct {
 	Header  Header
 	Format  Format
-	Data    []byte
 	Samples []float32
 }
 
@@ -35,7 +34,7 @@ type Data struct {
 }
 
 func (w *WAV) Duration() time.Duration {
-	d := float64(len(w.Data)) / float64(w.Format.ByteRate)
+	d := float64(len(w.Samples)) / float64(w.Format.SampleRate)
 
 	return time.Duration(d * float64(time.Second))
 }

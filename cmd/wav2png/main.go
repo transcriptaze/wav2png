@@ -136,14 +136,6 @@ func main() {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
-
-	// params := wav2png.Params{
-	// 	Width:   width,
-	// 	Height:  height,
-	// 	Padding: padding,
-	// }
-	//
-	// wav2png.Draw(wavfile, pngfile, params)
 }
 
 func render(wav audio, settings Settings) (*image.NRGBA, error) {

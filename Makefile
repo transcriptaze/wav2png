@@ -31,14 +31,6 @@ clean:
 	rm -rf bin/*
 
 debug: build
-#	go test -v ./... -run TestSquareGridSpecVLinesWithNonIntegralSize
-#	./bin/wav2png --width 641 --height 386 --padding 0 -out ./runtime ./samples/noise.wav
-#	./bin/wav2png --width 643 --height 388 --padding 1 -out ./runtime ./samples/noise.wav
-#	./bin/wav2png --width 643 --height 387 --padding 1 -out ./runtime ./samples/noise.wav
-#	./bin/wav2png --width 645 --height 390 --padding 2 -out ./runtime ./samples/noise.wav
-#	./bin/wav2png --width 645 --height 388 --padding 1 -out ./runtime ./samples/noise.wav
-#	./bin/wav2png --width 645 --height 390 --padding 1 -out ./runtime ./samples/noise.wav
-#	open ./runtime/noise.png
 	go test -v ./... -run TestSquareGridExactFit
 
 run: build
@@ -55,7 +47,7 @@ noise: build
 	open ./runtime/noise.png
 
 # float32 WAV format file
-# noise-float32: build
-#	./bin/wav2png --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise-float32.wav
-#	open ./runtime/noise-float32.png
+noise-float32: build
+	./bin/wav2png --debug --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise-float32.wav
+	open ./runtime/noise-float32.png
 

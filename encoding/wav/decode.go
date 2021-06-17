@@ -35,7 +35,6 @@ func Decode(r io.Reader) (*WAV, error) {
 	return &WAV{
 		Header:  *header,
 		Format:  *format,
-		Data:    data,
 		Samples: samples,
 	}, nil
 }

@@ -2,24 +2,16 @@
 
 ### IN PROGRESS
 
+- [ ] float WAV file
 - [ ] Get settings from command line/file
-
-- [ ] Grid spec
-      - none/square/rectangular
-      - 'smart' e.g. flip between no. of lines/size
-      - colour
-      - overlay/underlay
-      - return array of intercepts
+- [ ] from/to
+- [ ] Load palette from file
+- [ ] Add references to README
 
 - [ ] Render should take a reader parameter
-
-- [ ] Grid size
+- [ ] Grid
       -- horizontal lines start 1 pixel above/below 0
-      -- size to number of lines and/or grid size
 
-- [ ] Add references to README
-- [ ] Define palette in terms of gradients
-- [ ] Load palette from file
 - [ ] Load anti-aliasing kernel from file
 - [ ] Select channel to render
 - [ ] Mix channels
@@ -31,10 +23,10 @@
 - [ ] Add anti-aliasing to command line options
 - [ ] Add grid to command line options
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
-- [ ] start/end/duration command line options
 - [ ] Platform executables
-- [ ] Set background colour
 
+- [x] Grid spec
+- [x] Set background colour
 - [x] Move WAV decoding to cmd
 - [x] Replace WAV decoder (cf. https://github.com/go-audio/wav/issues/8)
 - [x] FillSpec
