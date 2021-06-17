@@ -51,7 +51,7 @@ entangled: build
 
 # 16-bit signed integer PCM WAV file
 noise: build
-	./bin/wav2png --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise.wav
+	./bin/wav2png --debug --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
 # float32 WAV format file

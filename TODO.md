@@ -2,6 +2,9 @@
 
 ### IN PROGRESS
 
+- [ ] Decoder for extended format/float32 WAV
+      -- https://github.com/go-audio/wav/issues/8
+
 - [ ] Grid spec
       - none/square/rectangular
       - 'smart' e.g. flip between no. of lines/size
@@ -15,8 +18,6 @@
 - [ ] Grid size
       -- horizontal lines start 1 pixel above/below 0
       -- size to number of lines and/or grid size
-- [ ] Decoder for extended format/float32 WAV
-      -- https://github.com/go-audio/wav/issues/8
 
 - [ ] Add references to README
 - [ ] Define palette in terms of gradients
