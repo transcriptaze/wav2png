@@ -2,6 +2,8 @@
 
 ### IN PROGRESS
 
+- [ ] Add grid to command line options
+
 - [ ] Load palette from file
       - 'fire' palette
       - 'green' palette
@@ -9,14 +11,12 @@
       - 'blues' palette
       - 'inverted' palette
       
-- [ ] Add grid to command line options
 - [ ] Get settings from command line/file
 - [ ] Add references to README
 
 - [ ] Render should take a reader parameter
 - [ ] Grid
       -- horizontal lines start 1 pixel above/below 0
-
 - [ ] Load anti-aliasing kernel from file
 - [ ] Select channel to render
       - 1

@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/transcriptaze/wav2png/cmd/wav2png/options"
 	"github.com/transcriptaze/wav2png/encoding/wav"
 	"github.com/transcriptaze/wav2png/wav2png"
 )
@@ -22,44 +23,6 @@ type audio struct {
 	samples    []float32
 }
 
-var settings = Settings{
-	Size: Size{
-		width:  645,
-		height: 390,
-	},
-
-	// Palettes: Palettes{
-	// 	Selected: "palette1",
-	// 	Palettes: map[string][]byte{},
-	// },
-
-	Fill: Fill{
-		Fill:   "solid",
-		Colour: "#000000",
-		Alpha:  255,
-	},
-
-	Padding: Padding(2),
-
-	Grid: Grid{
-		Grid:   "square",
-		Colour: "#008000",
-		Alpha:  255,
-		Size:   "~64",
-		WH:     "~64x48",
-	},
-
-	Antialias: Antialias{
-		Type:   "vertical",
-		kernel: wav2png.Vertical,
-	},
-
-	Scale: Scale{
-		Horizontal: 1.0,
-		Vertical:   1.0,
-	},
-}
-
 var cache = struct {
 	palette wav2png.Palette
 }{
@@ -67,13 +30,13 @@ var cache = struct {
 }
 
 func main() {
-	options := options{}
-	if err := options.parse(); err != nil {
+	options := options.NewOptions()
+	if err := options.Parse(); err != nil {
 		usage()
 		os.Exit(1)
 	}
 
-	w, err := read(options.wav)
+	w, err := read(options.WAV)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
@@ -82,37 +45,37 @@ func main() {
 		os.Exit(1)
 	}
 
-	if options.debug {
+	if options.Debug {
 		fmt.Println()
-		fmt.Printf("   File:        %v\n", options.wav)
+		fmt.Printf("   File:        %v\n", options.WAV)
 		fmt.Printf("   Format:      %v\n", w.format)
 		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
 		fmt.Printf("   Duration:    %v\n", w.duration)
 		fmt.Printf("   Samples:     %v\n", w.length)
-		fmt.Printf("   PNG:         %v\n", options.png)
+		fmt.Printf("   PNG:         %v\n", options.PNG)
 		fmt.Println()
 	}
 
-	img, err := render(*w, options.from, options.to, settings)
+	img, err := render(*w, options)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := write(img, options.png); err != nil {
+	if err := write(img, options.PNG); err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func render(wav audio, from, to *time.Duration, settings Settings) (*image.NRGBA, error) {
-	width := settings.Size.width
-	height := settings.Size.height
-	padding := int(settings.Padding)
-	fillspec := settings.Fill.fillspec()
-	gridspec := settings.Grid.gridspec()
-	kernel := settings.Antialias.kernel
-	vscale := settings.Scale.Vertical
+func render(wav audio, options options.Options) (*image.NRGBA, error) {
+	width := int(options.Width)
+	height := int(options.Height)
+	padding := options.Padding
+	fillspec := options.FillSpec
+	gridspec := options.GridSpec
+	kernel := options.Antialias
+	vscale := options.VScale
 
 	w := width
 	h := height
@@ -125,15 +88,15 @@ func render(wav audio, from, to *time.Duration, settings Settings) (*image.NRGBA
 	end := len(wav.samples)
 	fs := wav.sampleRate
 
-	if from != nil {
-		v := int(math.Floor(from.Seconds() * fs))
+	if options.From != nil {
+		v := int(math.Floor(options.From.Seconds() * fs))
 		if v > 0 && v <= len(wav.samples) {
 			start = v
 		}
 	}
 
-	if to != nil {
-		v := int(math.Floor(to.Seconds() * fs))
+	if options.To != nil {
+		v := int(math.Floor(options.To.Seconds() * fs))
 		if v < start {
 			end = start
 		} else if v <= len(wav.samples) {

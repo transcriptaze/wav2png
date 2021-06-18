@@ -1,4 +1,4 @@
-package main
+package options
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
-type Settings struct {
+type settings struct {
 	Size Size `json:"size"`
 	// Palettes   Palettes  `json:"palettes"`
 	Fill      Fill      `json:"fill"`
@@ -43,7 +43,7 @@ type Grid struct {
 
 type Antialias struct {
 	Type   string `json:"type"`
-	kernel wav2png.Kernel
+	Kernel wav2png.Kernel
 }
 
 type Scale struct {
@@ -51,7 +51,7 @@ type Scale struct {
 	Vertical   float64 `json:"vertical"`
 }
 
-func (f *Fill) fillspec() wav2png.FillSpec {
+func (f *Fill) FillSpec() wav2png.FillSpec {
 	colour := color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00}
 
 	red := uint8(0)
@@ -65,7 +65,7 @@ func (f *Fill) fillspec() wav2png.FillSpec {
 	return wav2png.NewSolidFill(colour)
 }
 
-func (g *Grid) gridspec() wav2png.GridSpec {
+func (g *Grid) GridSpec() wav2png.GridSpec {
 	// ... overlay
 	overlay := g.Overlay
 
