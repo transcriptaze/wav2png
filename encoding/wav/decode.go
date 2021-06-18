@@ -240,7 +240,7 @@ func transcode(data []byte) ([]float32, error) {
 			return nil, err
 		}
 
-		samples[i] = float32(sample) / 32767.0
+		samples[i] = float32((2*int32(sample))+1) / 65536.0
 	}
 
 	return samples, nil

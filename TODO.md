@@ -3,7 +3,13 @@
 ### IN PROGRESS
 
 - [ ] Load palette from file
-- [ ] Convert PCM16 to float with 0.5 offset
+      - 'fire' palette
+      - 'green' palette
+      - 'amber' palette
+      - 'blues' palette
+      - 'inverted' palette
+      
+- [ ] Add grid to command line options
 - [ ] Get settings from command line/file
 - [ ] Add references to README
 
@@ -13,17 +19,14 @@
 
 - [ ] Load anti-aliasing kernel from file
 - [ ] Select channel to render
-- [ ] Mix channels
-- [ ] 'fire' palette
-- [ ] 'green' palette
-- [ ] 'amber' palette
-- [ ] 'blues' palette
-- [ ] 'inverted' palette
+      - 1
+      - 2
+      - 1+2
 - [ ] Add anti-aliasing to command line options
-- [ ] Add grid to command line options
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] Platform executables
 
+- [x] Convert PCM16 to float32 symmetrically
 - [x] from/to
 - [x] float32 WAV file
 - [x] Grid spec
