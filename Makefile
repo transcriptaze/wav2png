@@ -31,8 +31,6 @@ clean:
 	rm -rf bin/*
 
 debug: build
-	./bin/wav2png --debug --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise-float32.wav
-	open ./runtime/noise-float32.png
 
 run: build
 	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav

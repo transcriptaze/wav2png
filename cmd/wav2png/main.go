@@ -17,6 +17,7 @@ import (
 
 type audio struct {
 	sampleRate float64
+	format     string
 	channels   int
 	duration   time.Duration
 	length     int
@@ -117,7 +118,7 @@ func main() {
 	if debug {
 		fmt.Println()
 		fmt.Printf("   File:        %v\n", wavfile)
-		// fmt.Printf("   Format:   %+v\n", *format)
+		fmt.Printf("   Format:      %+v\n", w.format)
 		// fmt.Printf("   Bits:     %+v\n", bits)
 		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
 		fmt.Printf("   Duration:    %v\n", w.duration)
@@ -214,6 +215,7 @@ func read(wavfile string) (*audio, error) {
 
 	return &audio{
 		sampleRate: float64(w.Format.SampleRate),
+		format:     fmt.Sprintf("%v", w.Format),
 		channels:   int(w.Format.Channels),
 		duration:   w.Duration(),
 		length:     len(w.Samples),
