@@ -2,10 +2,9 @@
 
 ### IN PROGRESS
 
-- [ ] from/to
+- [ ] Load palette from file
 - [ ] Convert PCM16 to float with 0.5 offset
 - [ ] Get settings from command line/file
-- [ ] Load palette from file
 - [ ] Add references to README
 
 - [ ] Render should take a reader parameter
@@ -25,6 +24,7 @@
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] Platform executables
 
+- [x] from/to
 - [x] float32 WAV file
 - [x] Grid spec
 - [x] Set background colour

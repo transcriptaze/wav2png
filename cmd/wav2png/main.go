@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
+	"math"
 	"os"
 	"path"
 	"strings"
@@ -64,8 +65,6 @@ var settings = Settings{
 
 var cache = struct {
 	palette wav2png.Palette
-	from    *time.Duration
-	to      *time.Duration
 }{
 	palette: wav2png.Ice,
 }
@@ -76,11 +75,15 @@ func main() {
 	var width uint
 	var padding int
 	var debug bool
+	var start time.Duration
+	var end time.Duration
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
 	flag.UintVar(&height, "height", 390, "Image height (pixels)")
 	flag.UintVar(&width, "width", 645, "Image width (pixels)")
 	flag.IntVar(&padding, "padding", 0, "Image padding (pixels)")
+	flag.DurationVar(&start, "start", 0, "start time of audio selection")
+	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
 	flag.BoolVar(&debug, "debug", false, "Displays diagnostic information")
 	flag.Parse()
 
@@ -88,6 +91,20 @@ func main() {
 		usage()
 		os.Exit(1)
 	}
+
+	var from *time.Duration
+	var to *time.Duration
+	visitor := func(a *flag.Flag) {
+		switch a.Name {
+		case "start":
+			from = &start
+
+		case "end":
+			to = &end
+		}
+	}
+
+	flag.Visit(visitor)
 
 	wavfile := path.Clean(flag.Arg(0))
 
@@ -119,7 +136,6 @@ func main() {
 		fmt.Println()
 		fmt.Printf("   File:        %v\n", wavfile)
 		fmt.Printf("   Format:      %+v\n", w.format)
-		// fmt.Printf("   Bits:     %+v\n", bits)
 		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
 		fmt.Printf("   Duration:    %v\n", w.duration)
 		fmt.Printf("   Samples:     %v\n", w.length)
@@ -127,7 +143,7 @@ func main() {
 		fmt.Println()
 	}
 
-	img, err := render(*w, settings)
+	img, err := render(*w, from, to, settings)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
@@ -139,7 +155,7 @@ func main() {
 	}
 }
 
-func render(wav audio, settings Settings) (*image.NRGBA, error) {
+func render(wav audio, from, to *time.Duration, settings Settings) (*image.NRGBA, error) {
 	width := settings.Size.width
 	height := settings.Size.height
 	padding := int(settings.Padding)
@@ -159,21 +175,21 @@ func render(wav audio, settings Settings) (*image.NRGBA, error) {
 	end := len(wav.samples)
 	fs := wav.sampleRate
 
-	// if cache.from != nil {
-	// 	v := int(math.Floor(cache.from.Seconds() * fs))
-	// 	if v > 0 && v <= len(wav.samples) {
-	// 		start = v
-	// 	}
-	// }
+	if from != nil {
+		v := int(math.Floor(from.Seconds() * fs))
+		if v > 0 && v <= len(wav.samples) {
+			start = v
+		}
+	}
 
-	// if cache.to != nil {
-	// 	v := int(math.Floor(cache.to.Seconds() * fs))
-	// 	if v < start {
-	// 		end = start
-	// 	} else if v <= len(wav.samples) {
-	// 		end = v
-	// 	}
-	// }
+	if to != nil {
+		v := int(math.Floor(to.Seconds() * fs))
+		if v < start {
+			end = start
+		} else if v <= len(wav.samples) {
+			end = v
+		}
+	}
 
 	samples := wav.samples[start:end]
 	duration, _ := seconds(float64(len(samples)) / fs)
