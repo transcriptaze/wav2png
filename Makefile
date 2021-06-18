@@ -31,6 +31,7 @@ clean:
 	rm -rf bin/*
 
 debug: build
+	rm -f ./runtime/noise.png
 	./bin/wav2png --debug --height 390 --width 641 --padding 0 --start 0.5s --end 1.5s --out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 

@@ -1,15 +1,12 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
 	"math"
 	"os"
-	"path"
-	"strings"
 	"time"
 
 	"github.com/transcriptaze/wav2png/encoding/wav"
@@ -70,60 +67,13 @@ var cache = struct {
 }
 
 func main() {
-	var out string
-	var height uint
-	var width uint
-	var padding int
-	var debug bool
-	var start time.Duration
-	var end time.Duration
-
-	flag.StringVar(&out, "out", "", "Output file (or directory)")
-	flag.UintVar(&height, "height", 390, "Image height (pixels)")
-	flag.UintVar(&width, "width", 645, "Image width (pixels)")
-	flag.IntVar(&padding, "padding", 0, "Image padding (pixels)")
-	flag.DurationVar(&start, "start", 0, "start time of audio selection")
-	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
-	flag.BoolVar(&debug, "debug", false, "Displays diagnostic information")
-	flag.Parse()
-
-	if len(flag.Args()) < 1 {
+	options := options{}
+	if err := options.parse(); err != nil {
 		usage()
 		os.Exit(1)
 	}
 
-	var from *time.Duration
-	var to *time.Duration
-	visitor := func(a *flag.Flag) {
-		switch a.Name {
-		case "start":
-			from = &start
-
-		case "end":
-			to = &end
-		}
-	}
-
-	flag.Visit(visitor)
-
-	wavfile := path.Clean(flag.Arg(0))
-
-	filename := path.Base(wavfile)
-	ext := path.Ext(filename)
-	pngfile := strings.TrimSuffix(filename, ext) + ".png"
-	if out != "" {
-		info, err := os.Stat(out)
-		if err != nil && !os.IsNotExist(err) {
-			fmt.Printf("\n   ERROR: %v\n\n", err)
-			os.Exit(1)
-		} else if err == nil && info.IsDir() {
-			pngfile = path.Join(out, pngfile)
-		} else {
-			pngfile = out
-		}
-	}
-
-	w, err := read(wavfile)
+	w, err := read(options.wav)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
@@ -132,24 +82,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	if debug {
+	if options.debug {
 		fmt.Println()
-		fmt.Printf("   File:        %v\n", wavfile)
-		fmt.Printf("   Format:      %+v\n", w.format)
+		fmt.Printf("   File:        %v\n", options.wav)
+		fmt.Printf("   Format:      %v\n", w.format)
 		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
 		fmt.Printf("   Duration:    %v\n", w.duration)
 		fmt.Printf("   Samples:     %v\n", w.length)
-		fmt.Printf("   PNG:         %v\n", pngfile)
+		fmt.Printf("   PNG:         %v\n", options.png)
 		fmt.Println()
 	}
 
-	img, err := render(*w, from, to, settings)
+	img, err := render(*w, options.from, options.to, settings)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := write(img, pngfile); err != nil {
+	if err := write(img, options.png); err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
