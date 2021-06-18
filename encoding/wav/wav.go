@@ -25,6 +25,14 @@ type Format struct {
 	ByteRate      uint32
 	BlockAlign    uint16
 	BitsPerSample uint16
+	Extension     Extension
+}
+
+type Extension struct {
+	Length             uint16
+	ValidBitsPerSample uint16
+	ChannelMask        uint32
+	SubFormatGUID      []byte
 }
 
 type Data struct {

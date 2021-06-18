@@ -3,6 +3,7 @@
 ### IN PROGRESS
 
 - [ ] float WAV file
+      - convert byte to float with 0.5 offset
 - [ ] Get settings from command line/file
 - [ ] from/to
 - [ ] Load palette from file

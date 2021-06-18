@@ -7,6 +7,8 @@ import (
 	"io"
 )
 
+const PCM_FLOAT = "0300000000001000800000aa00389b71"
+
 func Decode(r io.Reader) (*WAV, error) {
 	header, err := decodeHeader(r)
 	if err != nil {
@@ -22,14 +24,30 @@ func Decode(r io.Reader) (*WAV, error) {
 		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk")
 	}
 
-	data, err := decodeData(r)
-	if err != nil {
-		return nil, err
-	}
+	var samples []float32
+	switch format.Format {
+	case 1:
+		if audio, err := decodePCM16(r); err != nil {
+			return nil, err
+		} else {
+			samples = audio
+		}
 
-	samples, err := transcode(data)
-	if err != nil {
-		return nil, err
+	case 65534:
+		if fmt.Sprintf("%0x", format.Extension.SubFormatGUID) != PCM_FLOAT {
+			return nil, fmt.Errorf("Unsupported WAV file extension format %0x", format.Extension.SubFormatGUID)
+		} else if format.BitsPerSample != 32 {
+			return nil, fmt.Errorf("Unsupported sample format (float%v)", format.BitsPerSample)
+		}
+
+		if audio, err := decodePCMf32(r); err != nil {
+			return nil, err
+		} else {
+			samples = audio
+		}
+
+	default:
+		return nil, fmt.Errorf("Unsupported WAV file format")
 	}
 
 	return &WAV{
@@ -76,6 +94,10 @@ func decodeFmt(r io.Reader) (*Format, error) {
 	var byteRate uint32
 	var blockAlign uint16
 	var bitsPerSample uint16
+	var extensionSize uint16
+	var validBitsPerSample uint16
+	var channelMask uint32
+	var guid = make([]byte, 16)
 
 	if _, err := r.Read(chunkID); err != nil {
 		return nil, err
@@ -85,14 +107,14 @@ func decodeFmt(r io.Reader) (*Format, error) {
 
 	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
 		return nil, err
-	} else if length != 16 {
-		return nil, fmt.Errorf("Invalid 'fmt ' length %v - expected 16 (16-bit PCM)", length)
+	} else if length != 16 && length != 40 {
+		return nil, fmt.Errorf("Invalid 'fmt ' length %v - expected 16 (16-bit PCM) or 40 (32-bit floating point PCM)", length)
 	}
 
 	if err := binary.Read(r, binary.LittleEndian, &format); err != nil {
 		return nil, err
-	} else if format != 1 {
-		return nil, fmt.Errorf("Invalid 'fmt ' format %v - expected 1 (16-bit PCM)", format)
+	} else if format != 1 && format != 65534 {
+		return nil, fmt.Errorf("Invalid 'fmt ' format %v - expected 1 (16-bit PCM) or 65534 (extensible)", format)
 	}
 
 	if err := binary.Read(r, binary.LittleEndian, &channels); err != nil {
@@ -113,8 +135,30 @@ func decodeFmt(r io.Reader) (*Format, error) {
 
 	if err := binary.Read(r, binary.LittleEndian, &bitsPerSample); err != nil {
 		return nil, err
-	} else if bitsPerSample != 16 {
-		return nil, fmt.Errorf("Invalid 'fmt ' bits per sample %v - expected 16 (16-bit PCM)", format)
+	} else if bitsPerSample != 16 && bitsPerSample != 32 {
+		return nil, fmt.Errorf("Invalid 'fmt ' bits per sample %v - expected 16 (16-bit PCM) or 32 (32-bit PCM)", bitsPerSample)
+	}
+
+	if format != 1 {
+		if err := binary.Read(r, binary.LittleEndian, &extensionSize); err != nil {
+			return nil, err
+		} else if extensionSize != 22 {
+			return nil, fmt.Errorf("Invalid extension size %v - expected 22 (extensible)", extensionSize)
+		}
+
+		if err := binary.Read(r, binary.LittleEndian, &validBitsPerSample); err != nil {
+			return nil, err
+		} else if validBitsPerSample != 32 {
+			return nil, fmt.Errorf("Invalid 'valid bits per sample' extension field %v - expected 32 (32-bit floating point PCM)", validBitsPerSample)
+		}
+
+		if err := binary.Read(r, binary.LittleEndian, &channelMask); err != nil {
+			return nil, err
+		}
+
+		if err := binary.Read(r, binary.LittleEndian, &guid); err != nil {
+			return nil, err
+		}
 	}
 
 	return &Format{
@@ -126,10 +170,16 @@ func decodeFmt(r io.Reader) (*Format, error) {
 		ByteRate:      byteRate,
 		BlockAlign:    blockAlign,
 		BitsPerSample: bitsPerSample,
+		Extension: Extension{
+			Length:             extensionSize,
+			ValidBitsPerSample: validBitsPerSample,
+			ChannelMask:        channelMask,
+			SubFormatGUID:      guid,
+		},
 	}, nil
 }
 
-func decodeData(r io.Reader) ([]byte, error) {
+func decodePCM16(r io.Reader) ([]float32, error) {
 	var chunkID = make([]byte, 4)
 	var length uint32
 	var data []byte
@@ -150,6 +200,29 @@ func decodeData(r io.Reader) ([]byte, error) {
 		return nil, err
 	} else if N != int(length) {
 		return nil, fmt.Errorf("Invalid 'data' length %v (expected %v)", N, length)
+	}
+
+	return transcode(data)
+}
+
+func decodePCMf32(r io.Reader) ([]float32, error) {
+	var chunkID = make([]byte, 4)
+	var length uint32
+	var data []float32
+
+	if _, err := r.Read(chunkID); err != nil {
+		return nil, err
+	} else if string(chunkID) != "data" {
+		return nil, fmt.Errorf("Invalid 'data' chunk ID (%s)", string(chunkID))
+	}
+
+	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
+		return nil, err
+	}
+
+	data = make([]float32, length/4)
+	if err := binary.Read(r, binary.LittleEndian, data); err != nil {
+		return nil, err
 	}
 
 	return data, nil

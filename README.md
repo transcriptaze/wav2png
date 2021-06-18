@@ -10,7 +10,7 @@ it is being extended into a standalone command-line utility.
 
 ## Releases
 
-*Under development*
+*In development*
 
 ## Installation
 
@@ -24,6 +24,7 @@ it is being extended into a standalone command-line utility.
 
 1. [Audio File Format Specifications](http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html)
 2. [SoX](http://sox.sourceforge.net)
+3. [WaveFile Gem](https://wavefilegem.com/how_wave_files_work.html)
 
 
 
