@@ -2,8 +2,7 @@
 
 ### IN PROGRESS
 
-- [ ] Add grid to command line options
-
+- [x] Add fill to command line options
 - [ ] Load palette from file
       - 'fire' palette
       - 'green' palette
@@ -11,7 +10,7 @@
       - 'blues' palette
       - 'inverted' palette
       
-- [ ] Get settings from command line/file
+- [ ] Get default settings from file
 - [ ] Add references to README
 
 - [ ] Render should take a reader parameter
@@ -25,7 +24,9 @@
 - [ ] Add anti-aliasing to command line options
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] Platform executables
+- [ ] README
 
+- [x] Add grid to command line options
 - [x] Convert PCM16 to float32 symmetrically
 - [x] from/to
 - [x] float32 WAV file
@@ -44,13 +45,12 @@
 
 ### TODO
 
-1. Remove external decoder dependency
-2. Use different 'flag' package with separate -- and - options
-3. GPU/WebGL implementation
-4. Add support for other audio formats
-5. SVG out
-6. Spectrogram
-7. MP4
+1. Use different 'flag' package with separate -- and - options
+2. GPU/WebGL implementation
+3. Add support for other audio formats
+4. SVG out
+5. Spectrogram
+6. MP4
 
 ### NOTES
 

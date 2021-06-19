@@ -67,10 +67,16 @@ type Options struct {
 
 func NewOptions() Options {
 	return Options{
+		Width:   uint(defaults.Size.width),
+		Height:  uint(defaults.Size.height),
+		Padding: int(defaults.Padding),
+
 		FillSpec:  defaults.Fill.FillSpec(),
-		GridSpec:  defaults.Grid.GridSpec(),
+		GridSpec:  defaults.Grid.gridspec(),
 		Antialias: defaults.Antialias.Kernel,
 		VScale:    defaults.Scale.Vertical,
+
+		Debug: false,
 	}
 }
 
@@ -78,11 +84,13 @@ func (o *Options) Parse() error {
 	var out string
 	var start time.Duration
 	var end time.Duration
+	var grid Grid
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
 	flag.UintVar(&o.Height, "height", 390, "Image height (pixels)")
 	flag.UintVar(&o.Width, "width", 645, "Image width (pixels)")
 	flag.IntVar(&o.Padding, "padding", 0, "Image padding (pixels)")
+	flag.Var(&grid, "grid", "Grid specification")
 	flag.DurationVar(&start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
@@ -99,6 +107,10 @@ func (o *Options) Parse() error {
 
 	visitor := func(a *flag.Flag) {
 		switch a.Name {
+		case "grid":
+			fmt.Printf(">>> GRID: %v\n", grid)
+			o.GridSpec = grid.gridspec()
+
 		case "start":
 			o.From = &start
 
