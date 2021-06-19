@@ -2,7 +2,7 @@
 
 ### IN PROGRESS
 
-- [x] Add fill to command line options
+- [ ] Add anti-aliasing to command line options
 - [ ] Load palette from file
       - 'fire' palette
       - 'green' palette
@@ -21,11 +21,12 @@
       - 1
       - 2
       - 1+2
-- [ ] Add anti-aliasing to command line options
 - [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] Platform executables
 - [ ] README
+- [ ] github workflow
 
+- [x] Add fill to command line options
 - [x] Add grid to command line options
 - [x] Convert PCM16 to float32 symmetrically
 - [x] from/to

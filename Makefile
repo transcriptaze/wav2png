@@ -31,7 +31,7 @@ clean:
 	rm -rf bin/*
 
 debug: build
-	./bin/wav2png --debug --height 390 --width 641 --padding 0 --grid 'rectangular:#800000ff:~32x128:overlay' --start 0.5s --end 1.5s --out ./runtime ./samples/noise.wav
+	./bin/wav2png --debug --height 390 --width 641 --padding 0 --fill 'solid:#0000ffff' --grid 'rectangular:#800000ff:~32x128:overlay' --start 0.5s --end 1.5s --out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
 run: build

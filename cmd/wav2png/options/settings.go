@@ -24,12 +24,6 @@ type Size struct {
 
 type Padding int
 
-type Fill struct {
-	Fill   string `json:"fill"`
-	Colour string `json:"colour"`
-	Alpha  uint8  `json:"alpha"`
-}
-
 type Antialias struct {
 	Type   string `json:"type"`
 	Kernel wav2png.Kernel
@@ -40,16 +34,15 @@ type Scale struct {
 	Vertical   float64 `json:"vertical"`
 }
 
-func (f *Fill) FillSpec() wav2png.FillSpec {
-	colour := color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00}
+func colour(s string) color.NRGBA {
+	var red uint8
+	var green uint8
+	var blue uint8
+	var alpha uint8
 
-	red := uint8(0)
-	green := uint8(0)
-	blue := uint8(0)
-	alpha := f.Alpha
-	if _, err := fmt.Sscanf(f.Colour, "#%02x%02x%02x", &red, &green, &blue); err == nil {
-		colour = color.NRGBA{R: red, G: green, B: blue, A: alpha}
+	if _, err := fmt.Sscanf(s, "#%02x%02x%02x%02x", &red, &green, &blue, &alpha); err == nil {
+		return color.NRGBA{R: red, G: green, B: blue, A: alpha}
 	}
 
-	return wav2png.NewSolidFill(colour)
+	return color.NRGBA{R: 0, G: 128, B: 0, A: 255}
 }
