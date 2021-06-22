@@ -22,11 +22,6 @@ type Size struct {
 
 type Padding int
 
-type Scale struct {
-	Horizontal float64 `json:"horizontal"`
-	Vertical   float64 `json:"vertical"`
-}
-
 func colour(s string) color.NRGBA {
 	var red uint8
 	var green uint8

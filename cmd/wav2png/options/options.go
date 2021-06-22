@@ -86,6 +86,7 @@ func (o *Options) Parse() error {
 	grid := defaults.Grid
 	fill := defaults.Fill
 	antialias := defaults.Antialias
+	scale := defaults.Scale
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
 	flag.UintVar(&o.Height, "height", 390, "Image height (pixels)")
@@ -94,6 +95,7 @@ func (o *Options) Parse() error {
 	flag.Var(&grid, "grid", "'grid' specification")
 	flag.Var(&fill, "fill", "'fill' specification")
 	flag.Var(&antialias, "antialias", "'antialias' specification")
+	flag.Var(&scale, "scale", "vertical scaling")
 	flag.DurationVar(&start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
@@ -118,6 +120,9 @@ func (o *Options) Parse() error {
 
 		case "antialias":
 			o.Antialias = antialias.kernel()
+
+		case "scale":
+			o.VScale = scale.Vertical
 
 		case "start":
 			o.From = &start

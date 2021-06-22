@@ -38,6 +38,7 @@ debug: build
 	              --fill 'solid:#0000ffff' \
 	              --grid 'rectangular:#800000ff:~32x128:overlay' \
 	              --antialias 'soft' \
+	              --scale 0.5 \
 	              --start 0.5s \
 	              --end 1.5s   \
 	              --out ./runtime ./samples/noise.wav

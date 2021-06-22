@@ -2,7 +2,6 @@
 
 ### IN PROGRESS
 
-- [ ] Add vscale to command line options
 - [ ] Load palette from file
       - 'fire' palette
       - 'green' palette
@@ -16,7 +15,6 @@
 - [ ] Render should take a reader parameter
 - [ ] Grid
       -- horizontal lines start 1 pixel above/below 0
-- [ ] Load anti-aliasing kernel from file
 - [ ] Select channel to render
       - 1
       - 2
@@ -26,6 +24,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Add vscale to command line options
 - [x] Add anti-aliasing to command line options
 - [x] Add fill to command line options
 - [x] Add grid to command line options
@@ -53,6 +52,7 @@
 4. SVG out
 5. Spectrogram
 6. MP4
+7. Load anti-aliasing kernel from file
 
 ### NOTES
 
