@@ -32,6 +32,7 @@ clean:
 
 debug: build
 	./bin/wav2png --debug          \
+	              --settings './runtime/settings.json' \
 	              --height 390     \
 	              --width 641      \
 	              --padding 0      \

@@ -1,26 +1,42 @@
 package options
 
 import (
+	"encoding/json"
 	"fmt"
 	"image/color"
+	"os"
 )
 
 type settings struct {
-	Size      Size      `json:"size"`
-	Palette   Palette   `json:"palette"`
-	Fill      Fill      `json:"fill"`
-	Padding   Padding   `json:"padding"`
-	Grid      Grid      `json:"grid"`
-	Antialias Antialias `json:"antialias"`
-	Scale     Scale     `json:"scale"`
+	Size      Size      `json:"size,omitempty"`
+	Palette   Palette   `json:"palette,omitempty"`
+	Fill      Fill      `json:"fill,omitempty"`
+	Padding   Padding   `json:"padding,omitempty"`
+	Grid      Grid      `json:"grid,omitempty"`
+	Antialias Antialias `json:"antialias,omitempty"`
+	Scale     Scale     `json:"scale,omitempty"`
 }
 
 type Size struct {
-	width  int
-	height int
+	Width  int `json:"width,omitempty"`
+	Height int `json:"height,omitempty"`
 }
 
 type Padding int
+
+func (s *settings) Load(file string) error {
+	b, err := os.ReadFile(file)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(b, s)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func colour(s string) color.NRGBA {
 	var red uint8

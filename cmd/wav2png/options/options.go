@@ -13,20 +13,16 @@ import (
 
 var defaults = settings{
 	Size: Size{
-		width:  645,
-		height: 390,
+		Width:  645,
+		Height: 390,
 	},
-
+	Padding: Padding(2),
 	Palette: "ice",
-
 	Fill: Fill{
 		Fill:   "solid",
 		Colour: "#000000",
 		Alpha:  255,
 	},
-
-	Padding: Padding(2),
-
 	Grid: Grid{
 		Grid:   "square",
 		Colour: "#008000",
@@ -34,11 +30,9 @@ var defaults = settings{
 		Size:   "~64",
 		WH:     "~64x48",
 	},
-
 	Antialias: Antialias{
 		Type: "vertical",
 	},
-
 	Scale: Scale{
 		Horizontal: 1.0,
 		Vertical:   1.0,
@@ -64,22 +58,37 @@ type Options struct {
 
 func NewOptions() Options {
 	return Options{
-		Width:   uint(defaults.Size.width),
-		Height:  uint(defaults.Size.height),
-		Padding: int(defaults.Padding),
-
+		Width:     uint(defaults.Size.Width),
+		Height:    uint(defaults.Size.Height),
+		Padding:   int(defaults.Padding),
 		Palette:   defaults.Palette.palette(),
 		FillSpec:  defaults.Fill.fillspec(),
 		GridSpec:  defaults.Grid.gridspec(),
 		Antialias: defaults.Antialias.kernel(),
 		VScale:    defaults.Scale.Vertical,
-
-		Debug: false,
+		Debug:     false,
 	}
 }
 
 func (o *Options) Parse() error {
+	// ... initialise options from .settings
+	if err := defaults.Load(".settings"); err == nil {
+		o.Width = uint(defaults.Size.Width)
+		o.Height = uint(defaults.Size.Height)
+		o.Padding = int(defaults.Padding)
+		o.Palette = defaults.Palette.palette()
+		o.FillSpec = defaults.Fill.fillspec()
+		o.GridSpec = defaults.Grid.gridspec()
+		o.Antialias = defaults.Antialias.kernel()
+		o.VScale = defaults.Scale.Vertical
+	}
+
+	// ... override default settings with command line options
 	var out string
+	var settings string
+	var width uint
+	var height uint
+	var padding int
 	var start time.Duration
 	var end time.Duration
 
@@ -89,10 +98,11 @@ func (o *Options) Parse() error {
 	antialias := defaults.Antialias
 	scale := defaults.Scale
 
+	flag.StringVar(&settings, "settings", ".settings", "JSON file with the default settings")
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
-	flag.UintVar(&o.Height, "height", 390, "Image height (pixels)")
-	flag.UintVar(&o.Width, "width", 645, "Image width (pixels)")
-	flag.IntVar(&o.Padding, "padding", 0, "Image padding (pixels)")
+	flag.UintVar(&width, "width", o.Width, "Image width (pixels)")
+	flag.UintVar(&height, "height", o.Height, "Image height (pixels)")
+	flag.IntVar(&padding, "padding", o.Padding, "Image padding (pixels)")
 	flag.Var(&palette, "palette", "name of built-in palette or PNG file")
 	flag.Var(&grid, "grid", "'grid' specification")
 	flag.Var(&fill, "fill", "'fill' specification")
@@ -112,23 +122,8 @@ func (o *Options) Parse() error {
 	ext := path.Ext(filename)
 	png := strings.TrimSuffix(filename, ext) + ".png"
 
-	visitor := func(a *flag.Flag) {
+	initialise := func(a *flag.Flag) {
 		switch a.Name {
-		case "palette":
-			o.Palette = palette.palette()
-
-		case "fill":
-			o.FillSpec = fill.fillspec()
-
-		case "grid":
-			o.GridSpec = grid.gridspec()
-
-		case "antialias":
-			o.Antialias = antialias.kernel()
-
-		case "scale":
-			o.VScale = scale.Vertical
-
 		case "start":
 			o.From = &start
 
@@ -145,10 +140,51 @@ func (o *Options) Parse() error {
 			} else {
 				png = out
 			}
+
+		case "settings":
+			if err := defaults.Load(settings); err == nil {
+				o.Width = uint(defaults.Size.Width)
+				o.Height = uint(defaults.Size.Height)
+				o.Padding = int(defaults.Padding)
+				o.Palette = defaults.Palette.palette()
+				o.FillSpec = defaults.Fill.fillspec()
+				o.GridSpec = defaults.Grid.gridspec()
+				o.Antialias = defaults.Antialias.kernel()
+				o.VScale = defaults.Scale.Vertical
+			}
 		}
 	}
 
-	flag.Visit(visitor)
+	overrides := func(a *flag.Flag) {
+		switch a.Name {
+		case "width":
+			o.Width = width
+
+		case "height":
+			o.Height = height
+
+		case "padding":
+			o.Padding = padding
+
+		case "palette":
+			o.Palette = palette.palette()
+
+		case "fill":
+			o.FillSpec = fill.fillspec()
+
+		case "grid":
+			o.GridSpec = grid.gridspec()
+
+		case "antialias":
+			o.Antialias = antialias.kernel()
+
+		case "scale":
+			o.VScale = scale.Vertical
+		}
+	}
+
+	flag.Visit(initialise)
+	flag.Visit(overrides)
 
 	o.WAV = wavfile
 	o.PNG = png

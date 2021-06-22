@@ -2,7 +2,6 @@
 
 ### IN PROGRESS
       
-- [ ] Get default settings from file
 - [ ] Add references to README
 
 - [ ] Render should take a reader parameter
@@ -17,6 +16,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Get default settings from file
 - [x] Load palette from file
 - [x] Add vscale to command line options
 - [x] Add anti-aliasing to command line options

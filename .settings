@@ -1,0 +1,27 @@
+{
+    "size": {
+        "width": 645,
+        "height": 390
+    },
+    "padding": 2,
+    "palette": "ice",
+    "fill": {
+        "fill": "solid",
+        "colour": "#00000",
+        "alpha": 255
+    },
+    "grid": {
+        "grid": "square",
+        "colour": "#008000",
+        "alpha": 255,
+        "size": "~64",
+        "wh": "~64x48",
+        "overlay": false
+    },
+    "antialias": {
+        "type": "vertical"
+    },
+    "scale": {
+        "vertical": 1.0
+    }
+}
