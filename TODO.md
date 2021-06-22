@@ -1,13 +1,6 @@
 ## v0.0
 
 ### IN PROGRESS
-
-- [ ] Load palette from file
-      - 'fire' palette
-      - 'green' palette
-      - 'amber' palette
-      - 'blues' palette
-      - 'inverted' palette
       
 - [ ] Get default settings from file
 - [ ] Add references to README
@@ -24,6 +17,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Load palette from file
 - [x] Add vscale to command line options
 - [x] Add anti-aliasing to command line options
 - [x] Add fill to command line options

@@ -35,7 +35,7 @@ debug: build
 	              --height 390     \
 	              --width 641      \
 	              --padding 0      \
-	              --palette 'fire' \
+	              --palette './runtime/amber.png' \
 	              --fill 'solid:#0000ffff' \
 	              --grid 'rectangular:#800000ff:~32x128:overlay' \
 	              --antialias 'soft' \
