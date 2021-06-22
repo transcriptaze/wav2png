@@ -17,10 +17,7 @@ var defaults = settings{
 		height: 390,
 	},
 
-	// Palettes: Palettes{
-	// 	Selected: "palette1",
-	// 	Palettes: map[string][]byte{},
-	// },
+	Palette: "ice",
 
 	Fill: Fill{
 		Fill:   "solid",
@@ -58,6 +55,7 @@ type Options struct {
 	From    *time.Duration
 	To      *time.Duration
 
+	Palette   wav2png.Palette
 	FillSpec  wav2png.FillSpec
 	GridSpec  wav2png.GridSpec
 	Antialias wav2png.Kernel
@@ -70,6 +68,7 @@ func NewOptions() Options {
 		Height:  uint(defaults.Size.height),
 		Padding: int(defaults.Padding),
 
+		Palette:   defaults.Palette.palette(),
 		FillSpec:  defaults.Fill.fillspec(),
 		GridSpec:  defaults.Grid.gridspec(),
 		Antialias: defaults.Antialias.kernel(),
@@ -83,6 +82,8 @@ func (o *Options) Parse() error {
 	var out string
 	var start time.Duration
 	var end time.Duration
+
+	palette := defaults.Palette
 	grid := defaults.Grid
 	fill := defaults.Fill
 	antialias := defaults.Antialias
@@ -92,6 +93,7 @@ func (o *Options) Parse() error {
 	flag.UintVar(&o.Height, "height", 390, "Image height (pixels)")
 	flag.UintVar(&o.Width, "width", 645, "Image width (pixels)")
 	flag.IntVar(&o.Padding, "padding", 0, "Image padding (pixels)")
+	flag.Var(&palette, "palette", "name of built-in palette or PNG file")
 	flag.Var(&grid, "grid", "'grid' specification")
 	flag.Var(&fill, "fill", "'fill' specification")
 	flag.Var(&antialias, "antialias", "'antialias' specification")
@@ -112,6 +114,9 @@ func (o *Options) Parse() error {
 
 	visitor := func(a *flag.Flag) {
 		switch a.Name {
+		case "palette":
+			o.Palette = palette.palette()
+
 		case "fill":
 			o.FillSpec = fill.fillspec()
 

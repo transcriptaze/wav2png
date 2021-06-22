@@ -6,8 +6,8 @@ import (
 )
 
 type settings struct {
-	Size Size `json:"size"`
-	// Palettes   Palettes  `json:"palettes"`
+	Size      Size      `json:"size"`
+	Palette   Palette   `json:"palette"`
 	Fill      Fill      `json:"fill"`
 	Padding   Padding   `json:"padding"`
 	Grid      Grid      `json:"grid"`

@@ -23,11 +23,11 @@ type audio struct {
 	samples    []float32
 }
 
-var cache = struct {
-	palette wav2png.Palette
-}{
-	palette: wav2png.Ice,
-}
+//var cache = struct {
+//	palette wav2png.Palette
+//}{
+//	palette: wav2png.Ice,
+//}
 
 func main() {
 	options := options.NewOptions()
@@ -76,6 +76,7 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 	gridspec := options.GridSpec
 	kernel := options.Antialias
 	vscale := options.VScale
+	palette := options.Palette
 
 	w := width
 	h := height
@@ -109,7 +110,7 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	grid := wav2png.Grid(gridspec, width, height, padding)
-	waveform := wav2png.Render(duration, samples, fs, w, h, cache.palette, vscale)
+	waveform := wav2png.Render(duration, samples, fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
 	origin := image.Pt(0, 0)
