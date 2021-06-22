@@ -2,8 +2,6 @@
 
 ### IN PROGRESS
       
-- [ ] Add references to README
-
 - [ ] Render should take a reader parameter
 - [ ] Grid
       -- horizontal lines start 1 pixel above/below 0
@@ -16,6 +14,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Add references to README
 - [x] Get default settings from file
 - [x] Load palette from file
 - [x] Add vscale to command line options
