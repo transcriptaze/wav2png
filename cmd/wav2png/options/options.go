@@ -39,8 +39,7 @@ var defaults = settings{
 	},
 
 	Antialias: Antialias{
-		Type:   "vertical",
-		Kernel: wav2png.Vertical,
+		Type: "vertical",
 	},
 
 	Scale: Scale{
@@ -73,7 +72,7 @@ func NewOptions() Options {
 
 		FillSpec:  defaults.Fill.fillspec(),
 		GridSpec:  defaults.Grid.gridspec(),
-		Antialias: defaults.Antialias.Kernel,
+		Antialias: defaults.Antialias.kernel(),
 		VScale:    defaults.Scale.Vertical,
 
 		Debug: false,
@@ -86,6 +85,7 @@ func (o *Options) Parse() error {
 	var end time.Duration
 	grid := defaults.Grid
 	fill := defaults.Fill
+	antialias := defaults.Antialias
 
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
 	flag.UintVar(&o.Height, "height", 390, "Image height (pixels)")
@@ -93,6 +93,7 @@ func (o *Options) Parse() error {
 	flag.IntVar(&o.Padding, "padding", 0, "Image padding (pixels)")
 	flag.Var(&grid, "grid", "'grid' specification")
 	flag.Var(&fill, "fill", "'fill' specification")
+	flag.Var(&antialias, "antialias", "'antialias' specification")
 	flag.DurationVar(&start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
@@ -114,6 +115,9 @@ func (o *Options) Parse() error {
 
 		case "grid":
 			o.GridSpec = grid.gridspec()
+
+		case "antialias":
+			o.Antialias = antialias.kernel()
 
 		case "start":
 			o.From = &start

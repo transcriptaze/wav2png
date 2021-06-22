@@ -2,7 +2,7 @@
 
 ### IN PROGRESS
 
-- [ ] Add anti-aliasing to command line options
+- [ ] Add vscale to command line options
 - [ ] Load palette from file
       - 'fire' palette
       - 'green' palette
@@ -26,6 +26,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Add anti-aliasing to command line options
 - [x] Add fill to command line options
 - [x] Add grid to command line options
 - [x] Convert PCM16 to float32 symmetrically

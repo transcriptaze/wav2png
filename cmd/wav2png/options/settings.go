@@ -3,8 +3,6 @@ package options
 import (
 	"fmt"
 	"image/color"
-
-	"github.com/transcriptaze/wav2png/wav2png"
 )
 
 type settings struct {
@@ -23,11 +21,6 @@ type Size struct {
 }
 
 type Padding int
-
-type Antialias struct {
-	Type   string `json:"type"`
-	Kernel wav2png.Kernel
-}
 
 type Scale struct {
 	Horizontal float64 `json:"horizontal"`
