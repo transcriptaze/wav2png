@@ -36,6 +36,12 @@ type Extension struct {
 	SubFormatGUID      []byte
 }
 
+type Fact struct {
+	ChunkID      string
+	Length       uint32
+	SampleFrames uint32
+}
+
 type Data struct {
 	ChunkID string
 	Length  uint32

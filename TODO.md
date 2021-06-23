@@ -2,15 +2,16 @@
 
 ### IN PROGRESS
       
-- [ ] Render should take a reader parameter
-- [ ] Grid
-      -- horizontal lines start 1 pixel above/below 0
 - [ ] Select channel to render
       - 1
       - 2
       - 1+2
-- [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
+- [ ] Rework WAV decoder to read chunks and *then* decide what to do with them
 - [ ] Platform executables
+- [ ] Render should take a reader parameter
+- [ ] Grid
+      -- horizontal lines start 1 pixel above/below 0
+- [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
 - [ ] README
 - [ ] github workflow
 

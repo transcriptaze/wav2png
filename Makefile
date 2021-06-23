@@ -64,3 +64,7 @@ noise-float32: build
 	./bin/wav2png --debug --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise-float32.wav
 	open ./runtime/noise-float32.png
 
+# stereo  WAV file
+chirp: build
+	./bin/wav2png --debug -out ./runtime ./samples/chirp.wav
+	open ./runtime/chirp.png
