@@ -2,7 +2,6 @@
 
 ### IN PROGRESS
       
-- [ ] Calculate duration in wav2png.Render
 - [ ] Rework WAV decoder to read chunks and *then* decide what to do with them
 - [ ] Platform executables
 - [ ] Render should take a reader parameter
@@ -12,6 +11,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Calculate duration in wav2png.Render
 - [x] Select channel to render
 - [x] Add references to README
 - [x] Get default settings from file

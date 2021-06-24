@@ -101,11 +101,9 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 		}
 	}
 
-	duration, _ := seconds(float64(len(samples[start:end])) / fs)
-
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	grid := wav2png.Grid(gridspec, width, height, padding)
-	waveform := wav2png.Render(duration, samples[start:end], fs, w, h, palette, vscale)
+	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
 	origin := image.Pt(0, 0)
@@ -174,12 +172,6 @@ func mix(wav audio, channels ...int) []float32 {
 	}
 
 	return samples
-}
-
-func seconds(g float64) (time.Duration, *time.Duration) {
-	t := time.Duration(g * float64(time.Second))
-
-	return t, &t
 }
 
 func usage() {
