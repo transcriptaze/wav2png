@@ -80,13 +80,14 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 		h = height - padding
 	}
 
-	start := 0
-	end := wav.length
 	fs := wav.sampleRate
+	samples := mix(wav)
+	start := 0
+	end := len(samples)
 
 	if options.From != nil {
 		v := int(math.Floor(options.From.Seconds() * fs))
-		if v > 0 && v <= len(wav.samples) {
+		if v > 0 && v <= len(samples) {
 			start = v
 		}
 	}
@@ -95,17 +96,16 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 		v := int(math.Floor(options.To.Seconds() * fs))
 		if v < start {
 			end = start
-		} else if v <= len(wav.samples) {
+		} else if v <= len(samples) {
 			end = v
 		}
 	}
 
-	samples := wav.samples[0][start:end]
-	duration, _ := seconds(float64(len(samples)) / fs)
+	duration, _ := seconds(float64(len(samples[start:end])) / fs)
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	grid := wav2png.Grid(gridspec, width, height, padding)
-	waveform := wav2png.Render(duration, samples, fs, w, h, palette, vscale)
+	waveform := wav2png.Render(duration, samples[start:end], fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
 	origin := image.Pt(0, 0)
@@ -157,6 +157,10 @@ func write(img *image.NRGBA, file string) error {
 	defer f.Close()
 
 	return png.Encode(f, img)
+}
+
+func mix(wav audio) []float32 {
+	return wav.samples[0]
 }
 
 func seconds(g float64) (time.Duration, *time.Duration) {

@@ -7,6 +7,7 @@
       - 2
       - 1+2
 - [ ] Rework WAV decoder to read chunks and *then* decide what to do with them
+- [ ] Calculate duration in wav2png.Render
 - [ ] Platform executables
 - [ ] Render should take a reader parameter
 - [ ] Grid
