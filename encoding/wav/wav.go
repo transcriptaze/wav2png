@@ -8,7 +8,8 @@ import (
 type WAV struct {
 	Header  Header
 	Format  Format
-	Samples []float32
+	Samples [][]float32
+	frames  int
 }
 
 type Header struct {
@@ -48,7 +49,15 @@ type Data struct {
 	Audio   []byte
 }
 
+func (w *WAV) Frames() int {
+	return w.frames
+}
+
 func (w *WAV) Duration() time.Duration {
+	if w.frames > 0 {
+		return time.Duration(float64(w.frames) * float64(time.Second) / float64(w.Format.SampleRate))
+	}
+
 	d := float64(len(w.Samples)) / float64(w.Format.SampleRate)
 
 	return time.Duration(d * float64(time.Second))
@@ -59,6 +68,11 @@ func (f Format) String() string {
 	case 1:
 		if f.BitsPerSample == 16 {
 			return "16-bit signed PCM"
+		}
+
+	case 3:
+		if f.BitsPerSample == 32 {
+			return "32-bit floating point PCM"
 		}
 
 	case 65534:

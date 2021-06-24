@@ -24,13 +24,13 @@ func Decode(r io.Reader) (*WAV, error) {
 		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk")
 	}
 
-	var samples []float32
+	data := []float32{}
 	switch format.Format {
 	case 1:
 		if audio, err := data16S(r); err != nil {
 			return nil, err
 		} else {
-			samples = audio
+			data = audio
 		}
 
 	case 3:
@@ -44,7 +44,7 @@ func Decode(r io.Reader) (*WAV, error) {
 		if audio, err := dataF32(r); err != nil {
 			return nil, err
 		} else {
-			samples = audio
+			data = audio
 		}
 
 	case 65534:
@@ -57,17 +57,35 @@ func Decode(r io.Reader) (*WAV, error) {
 		if audio, err := dataWFX(r); err != nil {
 			return nil, err
 		} else {
-			samples = audio
+			data = audio
 		}
 
 	default:
 		return nil, fmt.Errorf("Unsupported WAV file format")
 	}
 
+	channels := int(format.Channels)
+	samples := make([][]float32, channels)
+	N := len(data) / channels
+	for i := 0; i < channels; i++ {
+		samples[i] = make([]float32, N)
+	}
+
+	frame := 0
+	ix := 0
+	for ix < len(data) {
+		for i := 0; i < channels; i++ {
+			samples[i][frame] = data[ix]
+			ix++
+		}
+		frame++
+	}
+
 	return &WAV{
 		Header:  *header,
 		Format:  *format,
 		Samples: samples,
+		frames:  frame,
 	}, nil
 }
 
@@ -250,7 +268,6 @@ func data16S(r io.Reader) ([]float32, error) {
 func dataF32(r io.Reader) ([]float32, error) {
 	var chunkID = make([]byte, 4)
 	var length uint32
-	var data []float32
 
 	for {
 		if _, err := r.Read(chunkID); err != nil {
@@ -278,7 +295,7 @@ func dataF32(r io.Reader) ([]float32, error) {
 		return nil, err
 	}
 
-	data = make([]float32, length/4)
+	data := make([]float32, length/4)
 	if err := binary.Read(r, binary.LittleEndian, data); err != nil {
 		return nil, err
 	}

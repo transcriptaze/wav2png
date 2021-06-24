@@ -20,14 +20,8 @@ type audio struct {
 	channels   int
 	duration   time.Duration
 	length     int
-	samples    []float32
+	samples    [][]float32
 }
-
-//var cache = struct {
-//	palette wav2png.Palette
-//}{
-//	palette: wav2png.Ice,
-//}
 
 func main() {
 	options := options.NewOptions()
@@ -50,6 +44,7 @@ func main() {
 		fmt.Printf("   File:        %v\n", options.WAV)
 		fmt.Printf("   Format:      %v\n", w.format)
 		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
+		fmt.Printf("   Channels:    %v\n", w.channels)
 		fmt.Printf("   Duration:    %v\n", w.duration)
 		fmt.Printf("   Samples:     %v\n", w.length)
 		fmt.Printf("   PNG:         %v\n", options.PNG)
@@ -86,7 +81,7 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 	}
 
 	start := 0
-	end := len(wav.samples)
+	end := wav.length
 	fs := wav.sampleRate
 
 	if options.From != nil {
@@ -105,7 +100,7 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 		}
 	}
 
-	samples := wav.samples[start:end]
+	samples := wav.samples[0][start:end]
 	duration, _ := seconds(float64(len(samples)) / fs)
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
@@ -148,7 +143,7 @@ func read(wavfile string) (*audio, error) {
 		format:     fmt.Sprintf("%v", w.Format),
 		channels:   int(w.Format.Channels),
 		duration:   w.Duration(),
-		length:     len(w.Samples),
+		length:     w.Frames(),
 		samples:    w.Samples,
 	}, nil
 }
