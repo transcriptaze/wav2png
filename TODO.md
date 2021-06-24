@@ -2,12 +2,8 @@
 
 ### IN PROGRESS
       
-- [ ] Select channel to render
-      - 1
-      - 2
-      - 1+2
-- [ ] Rework WAV decoder to read chunks and *then* decide what to do with them
 - [ ] Calculate duration in wav2png.Render
+- [ ] Rework WAV decoder to read chunks and *then* decide what to do with them
 - [ ] Platform executables
 - [ ] Render should take a reader parameter
 - [ ] Grid
@@ -16,6 +12,7 @@
 - [ ] README
 - [ ] github workflow
 
+- [x] Select channel to render
 - [x] Add references to README
 - [x] Get default settings from file
 - [x] Load palette from file

@@ -66,5 +66,5 @@ noise-float32: build
 
 # stereo  WAV file
 chirp: build
-	./bin/wav2png --debug -out ./runtime ./samples/chirp.wav
+	./bin/wav2png --debug --mix 1+2 --out ./runtime ./samples/chirp.wav
 	open ./runtime/chirp.png

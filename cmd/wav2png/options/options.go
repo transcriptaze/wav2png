@@ -45,15 +45,17 @@ type Options struct {
 	Height  uint
 	Width   uint
 	Padding int
-	Debug   bool
 	From    *time.Duration
 	To      *time.Duration
+	Mix     Mix
 
 	Palette   wav2png.Palette
 	FillSpec  wav2png.FillSpec
 	GridSpec  wav2png.GridSpec
 	Antialias wav2png.Kernel
 	VScale    float64
+
+	Debug bool
 }
 
 func NewOptions() Options {
@@ -91,6 +93,7 @@ func (o *Options) Parse() error {
 	var padding int
 	var start time.Duration
 	var end time.Duration
+	var mix Mix
 
 	palette := defaults.Palette
 	grid := defaults.Grid
@@ -110,6 +113,7 @@ func (o *Options) Parse() error {
 	flag.Var(&scale, "scale", "vertical scaling")
 	flag.DurationVar(&start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
+	flag.Var(&mix, "mix", "channel mix")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
 	flag.Parse()
 
@@ -124,12 +128,6 @@ func (o *Options) Parse() error {
 
 	initialise := func(a *flag.Flag) {
 		switch a.Name {
-		case "start":
-			o.From = &start
-
-		case "end":
-			o.To = &end
-
 		case "out":
 			info, err := os.Stat(out)
 			if err != nil && !os.IsNotExist(err) {
@@ -152,6 +150,15 @@ func (o *Options) Parse() error {
 				o.Antialias = defaults.Antialias.kernel()
 				o.VScale = defaults.Scale.Vertical
 			}
+
+		case "start":
+			o.From = &start
+
+		case "end":
+			o.To = &end
+
+		case "mix":
+			o.Mix = mix
 		}
 	}
 

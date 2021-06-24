@@ -42,9 +42,9 @@ func main() {
 	if options.Debug {
 		fmt.Println()
 		fmt.Printf("   File:        %v\n", options.WAV)
+		fmt.Printf("   Channels:    %v\n", w.channels)
 		fmt.Printf("   Format:      %v\n", w.format)
 		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
-		fmt.Printf("   Channels:    %v\n", w.channels)
 		fmt.Printf("   Duration:    %v\n", w.duration)
 		fmt.Printf("   Samples:     %v\n", w.length)
 		fmt.Printf("   PNG:         %v\n", options.PNG)
@@ -81,7 +81,7 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 	}
 
 	fs := wav.sampleRate
-	samples := mix(wav)
+	samples := mix(wav, options.Mix.Channels()...)
 	start := 0
 	end := len(samples)
 
@@ -159,8 +159,21 @@ func write(img *image.NRGBA, file string) error {
 	return png.Encode(f, img)
 }
 
-func mix(wav audio) []float32 {
-	return wav.samples[0]
+func mix(wav audio, channels ...int) []float32 {
+	L := wav.length
+	N := float64(len(channels))
+	samples := make([]float32, L)
+
+	for i := 0; i < L; i++ {
+		sample := 0.0
+		for _, ch := range channels {
+			sample += float64(wav.samples[ch-1][i])
+		}
+
+		samples[i] = float32(sample / N)
+	}
+
+	return samples
 }
 
 func seconds(g float64) (time.Duration, *time.Duration) {
