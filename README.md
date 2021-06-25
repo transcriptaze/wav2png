@@ -57,10 +57,12 @@ Command line:
 ```
 wav2png [--debug] [options] [--out <path>] <wav>
 
+  <wav>         WAV file to render.
+
   --out <path>  File path for PNG file - if <path> is a directory, the WAV file name is
                 used. Defaults to the WAV file base path.
 
-  <wav>         WAV file to render.
+  --debug       Displays occasionally useful diagnostic information.
 
 Options:
   --settings <file>      JSON file with the default settings for the height, width, etc. Defaults to .settings.json if
