@@ -80,7 +80,6 @@ func decodex(r io.Reader) (*WAV, error) {
 	}
 
 	return &WAV{
-		Header:  *header,
 		Format:  *format,
 		Samples: samples,
 		frames:  frame,

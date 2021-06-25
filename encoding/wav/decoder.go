@@ -25,11 +25,6 @@ func Decode(r io.Reader) (*WAV, error) {
 	} else if chunk.ID != "RIFF" {
 		return nil, fmt.Errorf("Invalid RIFF header chunk ID (%s)", chunk.ID)
 	} else {
-		w.Header = Header{
-			ChunkID: chunk.ID,
-			Length:  chunk.length,
-		}
-
 		b = bytes.NewBuffer(chunk.data)
 	}
 
@@ -38,8 +33,6 @@ func Decode(r io.Reader) (*WAV, error) {
 		return nil, err
 	} else if string(format) != "WAVE" {
 		return nil, fmt.Errorf("Invalid WAV header format (%s)", string(format))
-	} else {
-		w.Header.Format = string(format)
 	}
 
 	// ... read remaining chunks

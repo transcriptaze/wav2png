@@ -12,11 +12,6 @@ var PCM16 []byte
 
 func TestDecode(t *testing.T) {
 	expected := WAV{
-		Header: Header{
-			ChunkID: "RIFF",
-			Length:  236,
-			Format:  "WAVE",
-		},
 		Format: Format{
 			ChunkID:       "fmt ",
 			Length:        16,
@@ -42,10 +37,6 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("Error decoding WAV file (%v)", err)
 	} else if w == nil {
 		t.Fatalf("Failed to decode WAV file (%v)", w)
-	}
-
-	if !reflect.DeepEqual(w.Header, expected.Header) {
-		t.Errorf("Invalid WAV header\n   expected:%+v\n   got:     %+v", expected.Header, w.Header)
 	}
 
 	if !reflect.DeepEqual(w.Format, expected.Format) {

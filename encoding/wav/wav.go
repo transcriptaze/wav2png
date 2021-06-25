@@ -8,7 +8,6 @@ import (
 const PCM_FLOAT = "0300000000001000800000aa00389b71"
 
 type WAV struct {
-	Header  Header
 	Format  Format
 	Fact    *Fact
 	Samples [][]float32
