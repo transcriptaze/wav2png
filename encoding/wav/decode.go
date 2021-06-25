@@ -7,9 +7,7 @@ import (
 	"io"
 )
 
-const PCM_FLOAT = "0300000000001000800000aa00389b71"
-
-func Decode(r io.Reader) (*WAV, error) {
+func decodex(r io.Reader) (*WAV, error) {
 	header, err := decodeHeader(r)
 	if err != nil {
 		return nil, err
