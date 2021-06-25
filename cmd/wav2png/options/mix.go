@@ -13,8 +13,8 @@ func (m Mix) String() string {
 }
 
 func (m *Mix) Set(s string) error {
-	ss := strings.ToLower(s)
-	match := regexp.MustCompile(`^(1|2|1\+2)$`).FindStringSubmatch(ss)
+	ss := strings.ToUpper(s)
+	match := regexp.MustCompile(`^(L|R|L\+R)$`).FindStringSubmatch(ss)
 
 	if match != nil && len(match) > 1 {
 		*m = Mix(match[1])
@@ -26,13 +26,13 @@ func (m *Mix) Set(s string) error {
 
 func (m Mix) Channels() []int {
 	switch m {
-	case "1":
+	case "L":
 		return []int{1}
-	case "2":
+	case "R":
 		return []int{2}
-	case "1+2":
+	case "L+R":
 		return []int{1, 2}
 	}
 
-	return []int{1}
+	return []int{1, 2}
 }

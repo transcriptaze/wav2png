@@ -1,6 +1,12 @@
+DIST ?= development
+
 all: test      \
 	 benchmark \
      coverage
+
+clean:
+	go clean
+	rm -rf bin/*
 
 format: 
 	go fmt ./...
@@ -26,9 +32,15 @@ vet: test
 lint: vet
 	golint ./...
 
-clean:
-	go clean
-	rm -rf bin/*
+build-all: build test
+	mkdir -p dist/$(DIST)/windows
+	mkdir -p dist/$(DIST)/darwin
+	mkdir -p dist/$(DIST)/linux
+	env GOOS=linux   GOARCH=amd64  go build -o dist/$(DIST)/linux   ./...
+	env GOOS=darwin  GOARCH=amd64  go build -o dist/$(DIST)/darwin  ./...
+	env GOOS=windows GOARCH=amd64  go build -o dist/$(DIST)/windows ./...
+
+release: build-all
 
 debug: build
 	./bin/wav2png --debug          \
@@ -46,9 +58,11 @@ debug: build
 	              --out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
-run: build
-	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav
-	open ./runtime/entangled.png
+run: build test
+	./bin/wav2png --out runtime ./samples/noise.wav
+	./bin/wav2png --out runtime ./samples/noise-float32.wav
+	./bin/wav2png --out runtime ./samples/entangled.wav
+	./bin/wav2png --out runtime ./samples/chirp.wav
 
 entangled: build
 	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav
@@ -66,5 +80,5 @@ noise-float32: build
 
 # stereo  WAV file
 chirp: build
-	./bin/wav2png --debug --mix 1+2 --out ./runtime ./samples/chirp.wav
+	./bin/wav2png --debug --mix L+R --out ./runtime ./samples/chirp.wav
 	open ./runtime/chirp.png

@@ -162,6 +162,10 @@ func mix(wav audio, channels ...int) []float32 {
 	N := float64(len(channels))
 	samples := make([]float32, L)
 
+	if len(wav.samples) < 2 {
+		return wav.samples[0]
+	}
+
 	for i := 0; i < L; i++ {
 		sample := 0.0
 		for _, ch := range channels {
