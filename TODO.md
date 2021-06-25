@@ -1,12 +1,7 @@
-## v0.0
+## v1.0
 
-### IN PROGRESS
-      
-- [ ] Grid
-      -- check 'fit' is being used
-      -- horizontal lines start 1 pixel above/below 0
-- [ ] v1.0.0 release + update W2P
-
+- [x] 'version' command
+- [x] v1.0.0 release + update W2P
 - [x] README
 - [x] Platform executables
 - [x] github workflow

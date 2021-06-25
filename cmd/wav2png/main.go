@@ -14,6 +14,8 @@ import (
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
+const VERSION = "v1.0.0"
+
 type audio struct {
 	sampleRate float64
 	format     string
@@ -24,6 +26,11 @@ type audio struct {
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		version()
+		os.Exit(0)
+	}
+
 	options := options.NewOptions()
 	if err := options.Parse(); err != nil {
 		usage()
@@ -179,7 +186,13 @@ func mix(wav audio, channels ...int) []float32 {
 }
 
 func usage() {
-	println()
-	println("   Usage: waveform [--debug] [--height <height>] [--width <width>] [--padding <padding>] [--out <filepath>] <filename>")
-	println()
+	fmt.Println()
+	fmt.Println("   Usage: waveform [--debug] [--height <height>] [--width <width>] [--padding <padding>] [--out <filepath>] <filename>")
+	fmt.Println()
+}
+
+func version() {
+	fmt.Println()
+	fmt.Printf("   wav2png  %v\n", VERSION)
+	fmt.Println()
 }

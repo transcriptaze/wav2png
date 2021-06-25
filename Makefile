@@ -33,18 +33,21 @@ lint: vet
 	golint ./...
 
 build-all: build test
-	mkdir -p dist/$(DIST)/windows
-	mkdir -p dist/$(DIST)/darwin
-	mkdir -p dist/$(DIST)/linux
-	env GOOS=linux   GOARCH=amd64  go build -o dist/$(DIST)/linux   ./...
-	env GOOS=darwin  GOARCH=amd64  go build -o dist/$(DIST)/darwin  ./...
-	env GOOS=windows GOARCH=amd64  go build -o dist/$(DIST)/windows ./...
+	mkdir -p dist/windows/wav2png
+	mkdir -p dist/darwin/wav2png
+	mkdir -p dist/linux/wav2png
+	env GOOS=linux   GOARCH=amd64  go build -o dist/linux/wav2png   ./...
+	env GOOS=darwin  GOARCH=amd64  go build -o dist/darwin/wav2png  ./...
+	env GOOS=windows GOARCH=amd64  go build -o dist/windows/wav2png ./...
 
 release: build-all
+	find . -name ".DS_Store" -delete
+	tar --directory=dist/linux  --exclude=".DS_Store" -cvzf dist/wav2png_$(DIST)-linux.tar.gz  wav2png
+	tar --directory=dist/darwin --exclude=".DS_Store" -cvzf dist/wav2png_$(DIST)-darwin.tar.gz wav2png
+	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	./bin/wav2png --debug --height 381 --width 641 --padding 0 --grid 'square:#ff0000ff:=64' -out ./runtime ./samples/noise.wav
-	open ./runtime/noise.png
+	./bin/wav2png version
 
 run: build test
 	./bin/wav2png --out runtime ./samples/noise.wav
