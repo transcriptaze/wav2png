@@ -43,7 +43,7 @@ build-all: build test
 release: build-all
 
 debug: build
-	./bin/wav2png --debug --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise.wav
+	./bin/wav2png --debug --height 381 --width 641 --padding 0 --grid 'square:#ff0000ff:=64' -out ./runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
 run: build test

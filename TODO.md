@@ -3,8 +3,9 @@
 ### IN PROGRESS
       
 - [ ] Grid
+      -- check 'fit' is being used
       -- horizontal lines start 1 pixel above/below 0
-- [ ] Optimize antialias to use NGRBA.Pix and NRGBA.Stride values
+- [ ] v1.0.0 release + update W2P
 
 - [x] README
 - [x] Platform executables

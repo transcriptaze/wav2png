@@ -54,11 +54,11 @@ func Render(pcm []float32, fs float64, width, height int, palette Palette, volum
 }
 
 func Antialias(img *image.NRGBA, kernel Kernel) *image.NRGBA {
-	w := img.Bounds().Max.X - img.Bounds().Min.X
-	h := img.Bounds().Max.Y - img.Bounds().Min.Y
+	w := img.Bounds().Dx()
+	h := img.Bounds().Dy()
 	out := image.NewNRGBA(image.Rectangle{
-		Min: image.Point{X: 0, Y: 0},
-		Max: image.Point{X: w, Y: h},
+		Min: image.Pt(0, 0),
+		Max: image.Pt(w, h),
 	})
 
 	N := uint32(0)
@@ -77,16 +77,16 @@ func Antialias(img *image.NRGBA, kernel Kernel) *image.NRGBA {
 
 			for i, row := range kernel {
 				for j, k := range row {
-					u := img.At(x+j-1, y+i-1)
+					u := img.NRGBAAt(x+j-1, y+i-1)
 
-					r += k * uint32(u.(color.NRGBA).R)
-					g += k * uint32(u.(color.NRGBA).G)
-					b += k * uint32(u.(color.NRGBA).B)
-					a += k * uint32(u.(color.NRGBA).A)
+					r += k * uint32(u.R)
+					g += k * uint32(u.G)
+					b += k * uint32(u.B)
+					a += k * uint32(u.A)
 				}
 			}
 
-			out.Set(x, y, color.NRGBA{R: uint8(r / N), G: uint8(g / N), B: uint8(b / N), A: uint8(a / N)})
+			out.SetNRGBA(x, y, color.NRGBA{R: uint8(r / N), G: uint8(g / N), B: uint8(b / N), A: uint8(a / N)})
 		}
 	}
 
