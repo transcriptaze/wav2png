@@ -14,12 +14,6 @@ type WAV struct {
 	frames  int
 }
 
-type Header struct {
-	ChunkID string
-	Length  uint32
-	Format  string
-}
-
 type Format struct {
 	ChunkID       string
 	Length        uint32
@@ -29,7 +23,7 @@ type Format struct {
 	ByteRate      uint32
 	BlockAlign    uint16
 	BitsPerSample uint16
-	Extension     Extension
+	Extension     *Extension
 }
 
 type Extension struct {
@@ -56,13 +50,7 @@ func (w *WAV) Frames() int {
 }
 
 func (w *WAV) Duration() time.Duration {
-	if w.frames > 0 {
-		return time.Duration(float64(w.frames) * float64(time.Second) / float64(w.Format.SampleRate))
-	}
-
-	d := float64(len(w.Samples)) / float64(w.Format.SampleRate)
-
-	return time.Duration(d * float64(time.Second))
+	return time.Duration(float64(w.frames) * float64(time.Second) / float64(w.Format.SampleRate))
 }
 
 func (f Format) String() string {

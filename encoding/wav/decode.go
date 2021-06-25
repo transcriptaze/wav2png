@@ -7,116 +7,110 @@ import (
 	"io"
 )
 
-func decodex(r io.Reader) (*WAV, error) {
-	header, err := decodeHeader(r)
-	if err != nil {
-		return nil, err
-	} else if header == nil {
-		return nil, fmt.Errorf("Invalid WAV 'RIFF' chunk")
-	}
-
-	format, err := decodeFmt(r)
-	if err != nil {
-		return nil, err
-	} else if format == nil {
-		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk")
-	}
-
-	data := []float32{}
-	switch format.Format {
-	case 1:
-		if audio, err := data16S(r); err != nil {
-			return nil, err
-		} else {
-			data = audio
-		}
-
-	case 3:
-		fact, err := decodeFact(r)
-		if err != nil {
-			return nil, err
-		} else if fact == nil {
-			return nil, fmt.Errorf("Invalid WAV 'fact ' subchunk")
-		}
-
-		if audio, err := dataF32(r); err != nil {
-			return nil, err
-		} else {
-			data = audio
-		}
-
-	case 65534:
-		if fmt.Sprintf("%0x", format.Extension.SubFormatGUID) != PCM_FLOAT {
-			return nil, fmt.Errorf("Unsupported WAV file extension format %0x", format.Extension.SubFormatGUID)
-		} else if format.BitsPerSample != 32 {
-			return nil, fmt.Errorf("Unsupported sample format (float%v)", format.BitsPerSample)
-		}
-
-		if audio, err := dataWFX(r); err != nil {
-			return nil, err
-		} else {
-			data = audio
-		}
-
-	default:
-		return nil, fmt.Errorf("Unsupported WAV file format")
-	}
-
-	channels := int(format.Channels)
-	samples := make([][]float32, channels)
-	N := len(data) / channels
-	for i := 0; i < channels; i++ {
-		samples[i] = make([]float32, N)
-	}
-
-	frame := 0
-	ix := 0
-	for ix < len(data) {
-		for i := 0; i < channels; i++ {
-			samples[i][frame] = data[ix]
-			ix++
-		}
-		frame++
-	}
-
-	return &WAV{
-		Format:  *format,
-		Samples: samples,
-		frames:  frame,
-	}, nil
+type chunk struct {
+	ID     string
+	length uint32
+	data   []byte
 }
 
-func decodeHeader(r io.Reader) (*Header, error) {
+func Decode(r io.Reader) (*WAV, error) {
+	var b *bytes.Buffer
+	var w = WAV{}
+
+	// ... parse WAV header
+	if chunk, err := getChunk(r); err != nil {
+		return nil, err
+	} else if chunk == nil {
+		return nil, fmt.Errorf("Invalid RIFF header chunk (%v)", chunk)
+	} else if chunk.ID != "RIFF" {
+		return nil, fmt.Errorf("Invalid RIFF header chunk ID (%s)", chunk.ID)
+	} else {
+		b = bytes.NewBuffer(chunk.data)
+
+		format := make([]byte, 4)
+		if _, err := b.Read(format); err != nil {
+			return nil, err
+		} else if string(format) != "WAVE" {
+			return nil, fmt.Errorf("Invalid WAV header format (%s)", string(format))
+		}
+	}
+
+	// ... read remaining chunks
+	chunks := map[string]*chunk{}
+	for {
+		chunk, err := getChunk(b)
+		if err != nil {
+			if err != io.EOF {
+				return nil, err
+			}
+			break
+		}
+
+		if chunk != nil {
+			chunks[chunk.ID] = chunk
+		}
+	}
+
+	// ... extract 'fmt '
+	if chunk, ok := chunks["fmt "]; !ok {
+		return nil, fmt.Errorf("Invalid WAV file - missing 'fmt ' subchunk")
+	} else if format, err := parseFMT(*chunk); err != nil {
+		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk (%v)", err)
+	} else if format == nil {
+		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk (%v)", format)
+	} else {
+		w.Format = *format
+	}
+
+	// ... extract 'fact'
+	if chunk, ok := chunks["fact"]; ok {
+		if fact, err := parseFact(*chunk); err != nil {
+			return nil, fmt.Errorf("Invalid WAV file 'fact' subchunk (%v)", err)
+		} else {
+			w.Fact = fact
+		}
+	}
+
+	// ... extract 'data'
+	if chunk, ok := chunks["data"]; !ok {
+		return nil, fmt.Errorf("Invalid WAV file - missing 'data' subchunk")
+	} else if data, err := parseData(w.Format, *chunk); err != nil {
+		return nil, fmt.Errorf("Invalid WAV data' subchunk (%v)", err)
+	} else {
+		frames, samples := split(data, int(w.Format.Channels))
+
+		w.Samples = samples
+		w.frames = frames
+	}
+
+	return &w, nil
+}
+
+func getChunk(r io.Reader) (*chunk, error) {
 	var chunkID = make([]byte, 4)
 	var length uint32
-	var format = make([]byte, 4)
 
 	if _, err := r.Read(chunkID); err != nil {
 		return nil, err
-	} else if string(chunkID) != "RIFF" {
-		return nil, fmt.Errorf("Invalid RIFF chunk ID (%s)", string(chunkID))
 	}
 
 	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
 		return nil, err
 	}
 
-	if _, err := r.Read(format); err != nil {
-		return nil, err
-	} else if string(format) != "WAVE" {
-		return nil, fmt.Errorf("Invalid RIFF chunk format (%s)", string(format))
+	data := make([]byte, length)
+	if _, err := io.ReadFull(r, data); err != nil {
+		return nil, fmt.Errorf("Error reading chunk '%s' from WAV file (%s)", string(chunkID), err)
 	}
 
-	return &Header{
-		ChunkID: string(chunkID),
-		Length:  length,
-		Format:  string(format),
+	return &chunk{
+		ID:     string(chunkID),
+		length: length,
+		data:   data,
 	}, nil
 }
 
-func decodeFmt(r io.Reader) (*Format, error) {
-	var chunkID = make([]byte, 4)
-	var length uint32
+func parseFMT(ch chunk) (*Format, error) {
 	var format uint16
 	var channels uint16
 	var sampleRate uint32
@@ -126,19 +120,9 @@ func decodeFmt(r io.Reader) (*Format, error) {
 	var extensionSize uint16
 	var validBitsPerSample uint16
 	var channelMask uint32
-	var guid = make([]byte, 16)
+	var extension *Extension
 
-	if _, err := r.Read(chunkID); err != nil {
-		return nil, err
-	} else if string(chunkID) != "fmt " {
-		return nil, fmt.Errorf("Invalid 'fmt ' chunk ID (%s)", string(chunkID))
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
-		return nil, err
-	} else if length != 16 && length != 40 {
-		return nil, fmt.Errorf("Invalid 'fmt ' length %v - expected 16 (16-bit PCM) or 40 (32-bit floating point PCM)", length)
-	}
+	r := bytes.NewBuffer(ch.data)
 
 	if err := binary.Read(r, binary.LittleEndian, &format); err != nil {
 		return nil, err
@@ -185,145 +169,101 @@ func decodeFmt(r io.Reader) (*Format, error) {
 			return nil, err
 		}
 
+		guid := make([]byte, 16)
 		if err := binary.Read(r, binary.LittleEndian, &guid); err != nil {
 			return nil, err
+		}
+
+		extension = &Extension{
+			Length:             extensionSize,
+			ValidBitsPerSample: validBitsPerSample,
+			ChannelMask:        channelMask,
+			SubFormatGUID:      guid,
 		}
 	}
 
 	return &Format{
-		ChunkID:       string(chunkID),
-		Length:        length,
+		ChunkID:       ch.ID,
+		Length:        ch.length,
 		Format:        format,
 		Channels:      channels,
 		SampleRate:    sampleRate,
 		ByteRate:      byteRate,
 		BlockAlign:    blockAlign,
 		BitsPerSample: bitsPerSample,
-		Extension: Extension{
-			Length:             extensionSize,
-			ValidBitsPerSample: validBitsPerSample,
-			ChannelMask:        channelMask,
-			SubFormatGUID:      guid,
-		},
+		Extension:     extension,
 	}, nil
 }
 
-func decodeFact(r io.Reader) (*Fact, error) {
-	var chunkID = make([]byte, 4)
-	var length uint32
+func parseFact(ch chunk) (*Fact, error) {
 	var sampleFrames uint32
 
-	if _, err := r.Read(chunkID); err != nil {
-		return nil, err
-	} else if string(chunkID) != "fact" {
-		return nil, fmt.Errorf("Invalid 'fact ' chunk ID (%s)", string(chunkID))
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
-		return nil, err
-	} else if length != 4 {
-		return nil, fmt.Errorf("Invalid 'fact' length %v - expected 4", length)
-	}
-
+	r := bytes.NewBuffer(ch.data)
 	if err := binary.Read(r, binary.LittleEndian, &sampleFrames); err != nil {
 		return nil, err
 	}
 
 	return &Fact{
-		ChunkID:      string(chunkID),
-		Length:       length,
+		ChunkID:      ch.ID,
+		Length:       ch.length,
 		SampleFrames: sampleFrames,
 	}, nil
 }
 
-func data16S(r io.Reader) ([]float32, error) {
-	var chunkID = make([]byte, 4)
-	var length uint32
-	var data []byte
-
-	if _, err := r.Read(chunkID); err != nil {
-		return nil, err
-	} else if string(chunkID) != "data" {
-		return nil, fmt.Errorf("Invalid 'data' chunk ID (%s)", string(chunkID))
-	}
-
-	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
-		return nil, err
-	}
-
-	data = make([]byte, length)
-	N, err := io.ReadFull(r, data)
-	if err != nil {
-		return nil, err
-	} else if N != int(length) {
-		return nil, fmt.Errorf("Invalid 'data' length %v (expected %v)", N, length)
-	}
-
-	return transcode(data)
-}
-
-func dataF32(r io.Reader) ([]float32, error) {
-	var chunkID = make([]byte, 4)
-	var length uint32
-
-	for {
-		if _, err := r.Read(chunkID); err != nil {
+func parseData(f Format, ch chunk) ([]float32, error) {
+	switch f.Format {
+	case 1:
+		if audio, err := parsePCM16(ch.data); err != nil {
 			return nil, err
+		} else {
+			return audio, nil
 		}
 
-		if string(chunkID) != "data" {
-			fmt.Printf("   discarding chunk ID '%s'\n", string(chunkID))
-
-			if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
-				return nil, err
-			}
-
-			chunk := make([]byte, length)
-			if _, err := io.ReadFull(r, chunk); err != nil {
-				return nil, err
-			}
-			continue
+	case 3:
+		if audio, err := parsePCM32f(ch.data); err != nil {
+			return nil, err
+		} else {
+			return audio, nil
 		}
 
-		break
+	case 65534:
+		if fmt.Sprintf("%0x", f.Extension.SubFormatGUID) != PCM_FLOAT {
+			return nil, fmt.Errorf("Unsupported WAV file extension format %0x", f.Extension.SubFormatGUID)
+		} else if f.BitsPerSample != 32 {
+			return nil, fmt.Errorf("Unsupported sample format (float%v)", f.BitsPerSample)
+		}
+
+		if audio, err := parseWFX(ch.data); err != nil {
+			return nil, err
+		} else {
+			return audio, nil
+		}
 	}
 
-	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
-		return nil, err
-	}
-
-	data := make([]float32, length/4)
-	if err := binary.Read(r, binary.LittleEndian, data); err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return nil, fmt.Errorf("Unsupported WAV file format")
 }
 
-func dataWFX(r io.Reader) ([]float32, error) {
-	var chunkID = make([]byte, 4)
-	var length uint32
-	var data []float32
-
-	if _, err := r.Read(chunkID); err != nil {
-		return nil, err
-	} else if string(chunkID) != "data" {
-		return nil, fmt.Errorf("Invalid 'data' chunk ID (%s)", string(chunkID))
+func split(data []float32, channels int) (int, [][]float32) {
+	samples := make([][]float32, channels)
+	N := len(data) / channels
+	for i := 0; i < channels; i++ {
+		samples[i] = make([]float32, N)
 	}
 
-	if err := binary.Read(r, binary.LittleEndian, &length); err != nil {
-		return nil, err
+	frames := 0
+	ix := 0
+	for ix < len(data) {
+		for i := 0; i < channels; i++ {
+			samples[i][frames] = data[ix]
+			ix++
+		}
+		frames++
 	}
 
-	data = make([]float32, length/4)
-	if err := binary.Read(r, binary.LittleEndian, data); err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return frames, samples
 }
 
-func transcode(data []byte) ([]float32, error) {
+func parsePCM16(data []byte) ([]float32, error) {
 	N := len(data) / 2
 	samples := make([]float32, N)
 	r := bytes.NewReader(data)
@@ -339,4 +279,24 @@ func transcode(data []byte) ([]float32, error) {
 	}
 
 	return samples, nil
+}
+
+func parsePCM32f(b []byte) ([]float32, error) {
+	data := make([]float32, len(b)/4)
+	r := bytes.NewBuffer(b)
+	if err := binary.Read(r, binary.LittleEndian, data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func parseWFX(b []byte) ([]float32, error) {
+	data := make([]float32, len(b)/4)
+	r := bytes.NewBuffer(b)
+	if err := binary.Read(r, binary.LittleEndian, data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
