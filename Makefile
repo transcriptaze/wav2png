@@ -61,12 +61,12 @@ debug: build
 run: build test
 	./bin/wav2png --out runtime ./samples/noise.wav
 	./bin/wav2png --out runtime ./samples/noise-float32.wav
-	./bin/wav2png --out runtime ./samples/entangled.wav
+	./bin/wav2png --out runtime ./samples/acoustic.wav
 	./bin/wav2png --out runtime ./samples/chirp.wav
 
-entangled: build
-	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/entangled.wav
-	open ./runtime/entangled.png
+acoustic: build
+	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/acoustic.wav
+	open ./runtime/acoustic.png
 
 # 16-bit signed integer PCM WAV file
 noise: build
