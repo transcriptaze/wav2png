@@ -1,35 +1,12 @@
-## v1.0
+## v1.x
 
-- [x] 'version' command
-- [x] v1.0.0 release + update W2P
-- [x] README
-- [x] Platform executables
-- [x] github workflow
-- [x] Rework WAV decoder to read chunks and *then* decide what to do with them
-- [x] Calculate duration in wav2png.Render
-- [x] Select channel to render
-- [x] Add references to README
-- [x] Get default settings from file
-- [x] Load palette from file
-- [x] Add vscale to command line options
-- [x] Add anti-aliasing to command line options
-- [x] Add fill to command line options
-- [x] Add grid to command line options
-- [x] Convert PCM16 to float32 symmetrically
-- [x] from/to
-- [x] float32 WAV file
-- [x] Grid spec
-- [x] Set background colour
-- [x] Move WAV decoding to cmd
-- [x] Replace WAV decoder (cf. https://github.com/go-audio/wav/issues/8)
-- [x] FillSpec
-- [x] GridSpec
-- [x] Split fill/grid
-- [x] Fix offsets for odd heights
-- [x] Negative height to invert
-- [x] Normalize to 16 bit PCM
-- [x] Anti-alias full image
-- [x] Check anti-aliasing
+### IN PROGRESS
+
+- [ ] wav2mp4
+      - [x] window
+      - [x] FPS
+      - [ ] cursor
+      - [ ] cursor ease-in/out
 
 ### TODO
 
@@ -38,8 +15,8 @@
 3. Add support for other audio formats
 4. SVG out
 5. Spectrogram
-6. MP4
-7. Load anti-aliasing kernel from file
+6. Load anti-aliasing kernel from file
+7. WAV decoding for large files (mmap ?)
 
 ### NOTES
 

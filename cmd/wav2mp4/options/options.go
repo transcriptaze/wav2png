@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -42,7 +43,7 @@ var defaults = settings{
 
 type Options struct {
 	WAV     string
-	PNG     string
+	MP4     string
 	Height  uint
 	Width   uint
 	Padding int
@@ -55,6 +56,10 @@ type Options struct {
 	GridSpec  wav2png.GridSpec
 	Antialias wav2png.Kernel
 	VScale    float64
+
+	Window time.Duration
+	Frames string
+	FPS    float64
 
 	Debug bool
 }
@@ -69,7 +74,11 @@ func NewOptions() Options {
 		GridSpec:  defaults.Grid.gridspec(),
 		Antialias: defaults.Antialias.Kernel(),
 		VScale:    defaults.Scale.Vertical,
-		Debug:     false,
+
+		Window: 30 * time.Second,
+		FPS:    30.0,
+
+		Debug: false,
 	}
 }
 
@@ -94,6 +103,8 @@ func (o *Options) Parse() error {
 	var padding int
 	var start time.Duration
 	var end time.Duration
+	var window time.Duration
+	var fps float64
 	var mix Mix
 
 	palette := defaults.Palette
@@ -114,6 +125,8 @@ func (o *Options) Parse() error {
 	flag.Var(&scale, "scale", "vertical scaling")
 	flag.DurationVar(&start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
+	flag.DurationVar(&window, "window", 30*time.Second, "frame sample 'window'")
+	flag.Float64Var(&fps, "fps", 30.0, "frame rate")
 	flag.Var(&mix, "mix", "channel mix")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
 	flag.Parse()
@@ -125,7 +138,7 @@ func (o *Options) Parse() error {
 	wavfile := path.Clean(flag.Arg(0))
 	filename := path.Base(wavfile)
 	ext := path.Ext(filename)
-	png := strings.TrimSuffix(filename, ext) + ".png"
+	mp4 := strings.TrimSuffix(filename, ext) + ".mp4"
 
 	initialise := func(a *flag.Flag) {
 		switch a.Name {
@@ -135,9 +148,9 @@ func (o *Options) Parse() error {
 				fmt.Printf("\n   ERROR: %v\n\n", err)
 				os.Exit(1)
 			} else if err == nil && info.IsDir() {
-				png = path.Join(out, png)
+				mp4 = path.Join(out, mp4)
 			} else {
-				png = out
+				mp4 = out
 			}
 
 		case "settings":
@@ -160,6 +173,13 @@ func (o *Options) Parse() error {
 
 		case "mix":
 			o.Mix = mix
+
+		case "window":
+			o.Window = window
+
+		case "fps":
+			o.FPS = fps
+
 		}
 	}
 
@@ -195,7 +215,8 @@ func (o *Options) Parse() error {
 	flag.Visit(overrides)
 
 	o.WAV = wavfile
-	o.PNG = png
+	o.MP4 = mp4
+	o.Frames = filepath.Join(filepath.Dir(mp4), "frames")
 
 	return nil
 }

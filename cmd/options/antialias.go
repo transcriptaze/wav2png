@@ -52,7 +52,7 @@ func (a *Antialias) Set(s string) error {
 	return nil
 }
 
-func (a Antialias) kernel() wav2png.Kernel {
+func (a Antialias) Kernel() wav2png.Kernel {
 	switch a.Type {
 	case "none":
 		return wav2png.None
