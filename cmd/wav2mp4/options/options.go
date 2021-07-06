@@ -20,7 +20,7 @@ var defaults = settings{
 	},
 	Padding: Padding(2),
 	Palette: "ice",
-	Fill: Fill{
+	Fill: options.Fill{
 		Fill:   "solid",
 		Colour: "#000000",
 		Alpha:  255,
@@ -70,7 +70,7 @@ func NewOptions() Options {
 		Height:    uint(defaults.Size.Height),
 		Padding:   int(defaults.Padding),
 		Palette:   defaults.Palette.palette(),
-		FillSpec:  defaults.Fill.fillspec(),
+		FillSpec:  defaults.Fill.FillSpec(),
 		GridSpec:  defaults.Grid.gridspec(),
 		Antialias: defaults.Antialias.Kernel(),
 		VScale:    defaults.Scale.Vertical,
@@ -89,7 +89,7 @@ func (o *Options) Parse() error {
 		o.Height = uint(defaults.Size.Height)
 		o.Padding = int(defaults.Padding)
 		o.Palette = defaults.Palette.palette()
-		o.FillSpec = defaults.Fill.fillspec()
+		o.FillSpec = defaults.Fill.FillSpec()
 		o.GridSpec = defaults.Grid.gridspec()
 		o.Antialias = defaults.Antialias.Kernel()
 		o.VScale = defaults.Scale.Vertical
@@ -159,7 +159,7 @@ func (o *Options) Parse() error {
 				o.Height = uint(defaults.Size.Height)
 				o.Padding = int(defaults.Padding)
 				o.Palette = defaults.Palette.palette()
-				o.FillSpec = defaults.Fill.fillspec()
+				o.FillSpec = defaults.Fill.FillSpec()
 				o.GridSpec = defaults.Grid.gridspec()
 				o.Antialias = defaults.Antialias.Kernel()
 				o.VScale = defaults.Scale.Vertical
@@ -198,7 +198,7 @@ func (o *Options) Parse() error {
 			o.Palette = palette.palette()
 
 		case "fill":
-			o.FillSpec = fill.fillspec()
+			o.FillSpec = fill.FillSpec()
 
 		case "grid":
 			o.GridSpec = grid.gridspec()

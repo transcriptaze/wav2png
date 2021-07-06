@@ -44,7 +44,7 @@ func (f *Fill) Set(s string) error {
 	return nil
 }
 
-func (f *Fill) fillspec() wav2png.FillSpec {
+func (f *Fill) FillSpec() wav2png.FillSpec {
 	colour := color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00}
 
 	red := uint8(0)

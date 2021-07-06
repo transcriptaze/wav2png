@@ -7,6 +7,7 @@
       - [x] FPS
       - [ ] cursor
       - [ ] cursor ease-in/out
+      - [ ] README
 
 ### TODO
 

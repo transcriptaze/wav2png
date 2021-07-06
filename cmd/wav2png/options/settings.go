@@ -12,7 +12,7 @@ import (
 type settings struct {
 	Size      Size              `json:"size,omitempty"`
 	Palette   Palette           `json:"palette,omitempty"`
-	Fill      Fill              `json:"fill,omitempty"`
+	Fill      options.Fill      `json:"fill,omitempty"`
 	Padding   Padding           `json:"padding,omitempty"`
 	Grid      Grid              `json:"grid,omitempty"`
 	Antialias options.Antialias `json:"antialias,omitempty"`
