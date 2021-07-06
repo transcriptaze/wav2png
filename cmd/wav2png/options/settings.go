@@ -10,18 +10,13 @@ import (
 )
 
 type settings struct {
-	Size      Size              `json:"size,omitempty"`
+	Size      options.Size              `json:"size,omitempty"`
 	Palette   Palette           `json:"palette,omitempty"`
 	Fill      options.Fill      `json:"fill,omitempty"`
 	Padding   Padding           `json:"padding,omitempty"`
 	Grid      options.Grid      `json:"grid,omitempty"`
 	Antialias options.Antialias `json:"antialias,omitempty"`
 	Scale     options.Scale     `json:"scale,omitempty"`
-}
-
-type Size struct {
-	Width  int `json:"width,omitempty"`
-	Height int `json:"height,omitempty"`
 }
 
 type Padding int

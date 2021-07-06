@@ -13,7 +13,7 @@ import (
 )
 
 var defaults = settings{
-	Size: Size{
+	Size: options.Size{
 		Width:  645,
 		Height: 390,
 	},
