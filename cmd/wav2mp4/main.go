@@ -38,11 +38,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	w, err := read(options.WAV)
+	audio, err := read(options.WAV)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
-	} else if w == nil {
+	} else if audio == nil {
 		fmt.Printf("\n   ERROR: unable to read WAV file\n")
 		os.Exit(1)
 	}
@@ -50,11 +50,11 @@ func main() {
 	if options.Debug {
 		fmt.Println()
 		fmt.Printf("   File:        %v\n", options.WAV)
-		fmt.Printf("   Channels:    %v\n", w.channels)
-		fmt.Printf("   Format:      %v\n", w.format)
-		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
-		fmt.Printf("   Duration:    %v\n", w.duration)
-		fmt.Printf("   Samples:     %v\n", w.length)
+		fmt.Printf("   Channels:    %v\n", audio.channels)
+		fmt.Printf("   Format:      %v\n", audio.format)
+		fmt.Printf("   Sample Rate: %v\n", audio.sampleRate)
+		fmt.Printf("   Duration:    %v\n", audio.duration)
+		fmt.Printf("   Samples:     %v\n", audio.length)
 		fmt.Printf("   MP4:         %v\n", options.MP4)
 		fmt.Printf("   - window:    %v\n", options.Window)
 		fmt.Printf("   - FPS:       %v\n", options.FPS)
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	from := 0 * time.Second
-	to := w.duration
+	to := audio.duration
 
 	if options.From != nil {
 		from = *options.From
@@ -77,29 +77,52 @@ func main() {
 		os.Exit(1)
 	}
 
+	w := int(options.Width)
+	h := int(options.Height)
+	padding := options.Padding
+
+	x0 := 0
+	y0 := 0
+	if padding > 0 {
+		x0 = padding
+		y0 = padding
+		w -= 2 * padding
+		h -= 2 * padding
+	}
+
+	cursor := options.Cursor.Cursor(h)
 	frames := int(math.Floor((to - from).Seconds() * options.FPS))
+
 	for frame := 0; frame < frames; frame++ {
 		start := from + seconds(float64(frame)/options.FPS)
 		end := start + options.Window
-		if end > w.duration {
-			end = w.duration
+		if end > audio.duration {
+			end = audio.duration
 			start = end - options.Window
 		}
 
 		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame+1))
 
-		fmt.Printf("FRAME %-5d  %v %v %v\n", frame+1, start, end, png)
+		if options.Debug {
+			fmt.Printf("   ... frame %-5d  %-8v %-8v %v\n", frame+1, start.Round(time.Millisecond), end.Round(time.Millisecond), png)
+		}
 
-		img, err := render(*w, start, end, options)
-
+		img, err := render(*audio, start, end, options)
 		if err != nil {
 			fmt.Printf("\n   ERROR: %v\n", err)
 			os.Exit(1)
-		}
-
-		if img == nil {
+		} else if img == nil {
 			fmt.Printf("\n   ERROR: error creating frame\n")
 			os.Exit(1)
+		}
+
+		if cursor != nil {
+			x := x0 + int(math.Round(float64(w)*float64(frame)/float64(frames)))
+			y := y0
+			cx := cursor.Bounds().Dx()
+			cy := cursor.Bounds().Dy()
+
+			draw.Draw(img, image.Rect(x, y, x+cx, y+cy), cursor, image.Pt(0, 0), draw.Over)
 		}
 
 		if err := write(img, png); err != nil {

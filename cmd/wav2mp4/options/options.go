@@ -60,6 +60,7 @@ type Options struct {
 	Window time.Duration
 	Frames string
 	FPS    float64
+	Cursor options.Cursor
 
 	Debug bool
 }
@@ -77,6 +78,7 @@ func NewOptions() Options {
 
 		Window: 30 * time.Second,
 		FPS:    30.0,
+		Cursor: "none",
 
 		Debug: false,
 	}
@@ -112,6 +114,7 @@ func (o *Options) Parse() error {
 	fill := defaults.Fill
 	antialias := defaults.Antialias
 	scale := defaults.Scale
+	cursor := options.Cursor("green")
 
 	flag.StringVar(&settings, "settings", ".settings", "JSON file with the default settings")
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
@@ -127,6 +130,7 @@ func (o *Options) Parse() error {
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
 	flag.DurationVar(&window, "window", 30*time.Second, "frame sample 'window'")
 	flag.Float64Var(&fps, "fps", 30.0, "frame rate")
+	flag.Var(&cursor, "cursor", "name of built-in cursor or PNG file")
 	flag.Var(&mix, "mix", "channel mix")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
 	flag.Parse()
@@ -180,6 +184,8 @@ func (o *Options) Parse() error {
 		case "fps":
 			o.FPS = fps
 
+		case "cursor":
+			o.Cursor = cursor
 		}
 	}
 
