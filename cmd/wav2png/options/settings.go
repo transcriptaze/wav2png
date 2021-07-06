@@ -10,7 +10,7 @@ import (
 )
 
 type settings struct {
-	Size      options.Size              `json:"size,omitempty"`
+	Size      options.Size      `json:"size,omitempty"`
 	Palette   Palette           `json:"palette,omitempty"`
 	Fill      options.Fill      `json:"fill,omitempty"`
 	Padding   Padding           `json:"padding,omitempty"`
