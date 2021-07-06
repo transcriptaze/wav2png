@@ -69,7 +69,7 @@ func (p *Palette) Set(s string) error {
 	return nil
 }
 
-func (p Palette) palette() wav2png.Palette {
+func (p Palette) Palette() wav2png.Palette {
 	if b, ok := palettes[string(p)]; ok {
 		if v := p.decode(b); v != nil {
 			return *v

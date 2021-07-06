@@ -11,7 +11,7 @@ import (
 
 type settings struct {
 	Size      options.Size      `json:"size,omitempty"`
-	Palette   Palette           `json:"palette,omitempty"`
+	Palette   options.Palette   `json:"palette,omitempty"`
 	Fill      options.Fill      `json:"fill,omitempty"`
 	Padding   options.Padding   `json:"padding,omitempty"`
 	Grid      options.Grid      `json:"grid,omitempty"`
