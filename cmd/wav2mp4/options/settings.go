@@ -13,13 +13,11 @@ type settings struct {
 	Size      options.Size      `json:"size,omitempty"`
 	Palette   Palette           `json:"palette,omitempty"`
 	Fill      options.Fill      `json:"fill,omitempty"`
-	Padding   Padding           `json:"padding,omitempty"`
+	Padding   options.Padding   `json:"padding,omitempty"`
 	Grid      options.Grid      `json:"grid,omitempty"`
 	Antialias options.Antialias `json:"antialias,omitempty"`
 	Scale     options.Scale     `json:"scale,omitempty"`
 }
-
-type Padding int
 
 func (s *settings) Load(file string) error {
 	b, err := os.ReadFile(file)

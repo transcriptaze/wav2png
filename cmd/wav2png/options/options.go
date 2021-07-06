@@ -17,7 +17,7 @@ var defaults = settings{
 		Width:  645,
 		Height: 390,
 	},
-	Padding: Padding(2),
+	Padding: options.Padding(2),
 	Palette: "ice",
 	Fill: options.Fill{
 		Fill:   "solid",
