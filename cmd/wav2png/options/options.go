@@ -48,7 +48,7 @@ type Options struct {
 	Padding int
 	From    *time.Duration
 	To      *time.Duration
-	Mix     Mix
+	Mix     options.Mix
 
 	Palette   wav2png.Palette
 	FillSpec  wav2png.FillSpec
@@ -94,7 +94,7 @@ func (o *Options) Parse() error {
 	var padding int
 	var start time.Duration
 	var end time.Duration
-	var mix Mix
+	var mix options.Mix
 
 	palette := defaults.Palette
 	grid := defaults.Grid
