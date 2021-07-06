@@ -34,7 +34,7 @@ var defaults = settings{
 	Antialias: options.Antialias{
 		Type: "vertical",
 	},
-	Scale: Scale{
+	Scale: options.Scale{
 		Horizontal: 1.0,
 		Vertical:   1.0,
 	},

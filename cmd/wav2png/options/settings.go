@@ -16,7 +16,7 @@ type settings struct {
 	Padding   Padding           `json:"padding,omitempty"`
 	Grid      options.Grid      `json:"grid,omitempty"`
 	Antialias options.Antialias `json:"antialias,omitempty"`
-	Scale     options.Scale             `json:"scale,omitempty"`
+	Scale     options.Scale     `json:"scale,omitempty"`
 }
 
 type Size struct {
