@@ -14,7 +14,7 @@ type settings struct {
 	Palette   Palette           `json:"palette,omitempty"`
 	Fill      options.Fill      `json:"fill,omitempty"`
 	Padding   Padding           `json:"padding,omitempty"`
-	Grid      Grid              `json:"grid,omitempty"`
+	Grid      options.Grid      `json:"grid,omitempty"`
 	Antialias options.Antialias `json:"antialias,omitempty"`
 	Scale     Scale             `json:"scale,omitempty"`
 }

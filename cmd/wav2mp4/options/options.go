@@ -25,7 +25,7 @@ var defaults = settings{
 		Colour: "#000000",
 		Alpha:  255,
 	},
-	Grid: Grid{
+	Grid: options.Grid{
 		Grid:   "square",
 		Colour: "#008000",
 		Alpha:  255,
@@ -71,7 +71,7 @@ func NewOptions() Options {
 		Padding:   int(defaults.Padding),
 		Palette:   defaults.Palette.palette(),
 		FillSpec:  defaults.Fill.FillSpec(),
-		GridSpec:  defaults.Grid.gridspec(),
+		GridSpec:  defaults.Grid.GridSpec(),
 		Antialias: defaults.Antialias.Kernel(),
 		VScale:    defaults.Scale.Vertical,
 
@@ -90,7 +90,7 @@ func (o *Options) Parse() error {
 		o.Padding = int(defaults.Padding)
 		o.Palette = defaults.Palette.palette()
 		o.FillSpec = defaults.Fill.FillSpec()
-		o.GridSpec = defaults.Grid.gridspec()
+		o.GridSpec = defaults.Grid.GridSpec()
 		o.Antialias = defaults.Antialias.Kernel()
 		o.VScale = defaults.Scale.Vertical
 	}
@@ -160,7 +160,7 @@ func (o *Options) Parse() error {
 				o.Padding = int(defaults.Padding)
 				o.Palette = defaults.Palette.palette()
 				o.FillSpec = defaults.Fill.FillSpec()
-				o.GridSpec = defaults.Grid.gridspec()
+				o.GridSpec = defaults.Grid.GridSpec()
 				o.Antialias = defaults.Antialias.Kernel()
 				o.VScale = defaults.Scale.Vertical
 			}
@@ -201,7 +201,7 @@ func (o *Options) Parse() error {
 			o.FillSpec = fill.FillSpec()
 
 		case "grid":
-			o.GridSpec = grid.gridspec()
+			o.GridSpec = grid.GridSpec()
 
 		case "antialias":
 			o.Antialias = antialias.Kernel()

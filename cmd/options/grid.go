@@ -100,7 +100,7 @@ func (g *Grid) Set(s string) error {
 	return nil
 }
 
-func (g Grid) gridspec() wav2png.GridSpec {
+func (g Grid) GridSpec() wav2png.GridSpec {
 	// ... overlay
 	overlay := g.Overlay
 
