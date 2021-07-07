@@ -80,6 +80,7 @@ func main() {
 	w := int(options.Width)
 	h := int(options.Height)
 	padding := options.Padding
+	duration := to - from
 
 	x0 := 0
 	y0 := 0
@@ -90,10 +91,11 @@ func main() {
 		h -= 2 * padding
 	}
 
-	cursor := options.Cursor.Cursor(h)
+	cursor := options.Cursor.Render(h)
+	fn := options.Cursor.Fn()
 	frames := int(math.Floor((to - from).Seconds() * options.FPS))
 
-	for frame := 0; frame < frames; frame++ {
+	for frame := 0; frame <= frames; frame++ {
 		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame+1))
 
 		offset := seconds((to - from - options.Window).Seconds() * float64(frame) / float64(frames))
@@ -115,12 +117,17 @@ func main() {
 		}
 
 		if cursor != nil {
-			x := x0 + int(math.Round(float64(w)*float64(frame)/float64(frames)))
-			y := y0
-			cx := cursor.Bounds().Dx()
-			cy := cursor.Bounds().Dy()
+			percentage := float64(frame) / float64(frames)
+			t := percentage * duration.Seconds()
+			x := fn(seconds(t), offset, options.Window, duration) * float64(w-1)
 
-			draw.Draw(img, image.Rect(x, y, x+cx, y+cy), cursor, image.Pt(0, 0), draw.Over)
+			cx := x0 + int(math.Round(x))
+			cy := y0
+			cw := cursor.Bounds().Dx()
+			ch := cursor.Bounds().Dy()
+			cxy := image.Pt(cw/2, 0)
+
+			draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, cxy, draw.Over)
 		}
 
 		if options.Debug {

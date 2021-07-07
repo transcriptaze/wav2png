@@ -10,9 +10,14 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
-type Cursor string
+type Cursor struct {
+	Cursor string
+}
+
+type CursorFunc func(t, offset, window, duration time.Duration) float64
 
 //go:embed cursor_green.png
 var green_cursor []byte
@@ -25,8 +30,15 @@ var cursors = map[string][]byte{
 	"red":   red_cursor,
 }
 
+var linear = func(t, offset, window, duration time.Duration) float64 {
+	dt := t - offset
+	percentage := dt.Seconds() / window.Seconds()
+
+	return percentage
+}
+
 func (c Cursor) String() string {
-	return fmt.Sprintf("%v", string(c))
+	return c.Cursor
 }
 
 func (c *Cursor) Set(s string) error {
@@ -34,7 +46,7 @@ func (c *Cursor) Set(s string) error {
 	match := regexp.MustCompile("^(none|green|red)$").FindStringSubmatch(ss)
 
 	if match != nil && len(match) > 1 {
-		*c = Cursor(match[1])
+		c.Cursor = match[1]
 		return nil
 	}
 
@@ -43,18 +55,22 @@ func (c *Cursor) Set(s string) error {
 	} else if info.Mode().IsDir() || !info.Mode().IsRegular() {
 		return fmt.Errorf("Cursor file %v is not a file", s)
 	} else {
-		*c = Cursor(s)
+		c.Cursor = s
 	}
 
 	return nil
 }
 
-func (c Cursor) Cursor(h int) *image.NRGBA {
-	if b, ok := cursors[string(c)]; ok {
+func (c Cursor) Fn() CursorFunc {
+	return linear
+}
+
+func (c Cursor) Render(h int) *image.NRGBA {
+	if b, ok := cursors[c.Cursor]; ok {
 		return c.make(b, h)
 	}
 
-	if b, err := os.ReadFile(string(c)); err == nil {
+	if b, err := os.ReadFile(c.Cursor); err == nil {
 		return c.make(b, h)
 	}
 
