@@ -94,17 +94,15 @@ func main() {
 	frames := int(math.Floor((to - from).Seconds() * options.FPS))
 
 	for frame := 0; frame < frames; frame++ {
-		start := from + seconds(float64(frame)/options.FPS)
+		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame+1))
+
+		offset := seconds((to - from - options.Window).Seconds() * float64(frame) / float64(frames))
+
+		start := from + offset
 		end := start + options.Window
 		if end > audio.duration {
 			end = audio.duration
 			start = end - options.Window
-		}
-
-		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame+1))
-
-		if options.Debug {
-			fmt.Printf("   ... frame %-5d  %-8v %-8v %v\n", frame+1, start.Round(time.Millisecond), end.Round(time.Millisecond), png)
 		}
 
 		img, err := render(*audio, start, end, options)
@@ -123,6 +121,10 @@ func main() {
 			cy := cursor.Bounds().Dy()
 
 			draw.Draw(img, image.Rect(x, y, x+cx, y+cy), cursor, image.Pt(0, 0), draw.Over)
+		}
+
+		if options.Debug {
+			fmt.Printf("   ... frame %-5d  %-8v %-8v %v\n", frame+1, start.Round(time.Millisecond), end.Round(time.Millisecond), png)
 		}
 
 		if err := write(img, png); err != nil {

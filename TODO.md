@@ -5,19 +5,20 @@
 - [ ] wav2mp4
       - [x] window
       - [x] FPS
-      - [ ] cursor
-      - [ ] cursor ease-in/out
+      - [x] cursor
+      - [ ] cursor - ease-in/out
+      - [ ] cursor - stretch middle
       - [ ] README
 
 ### TODO
 
-1. Use different 'flag' package with separate -- and - options
-2. GPU/WebGL implementation
-3. Add support for other audio formats
+1. WAV decoding for large files (mmap ?)
+2. Add support for other audio formats
+3. GPU/WebGL implementation
 4. SVG out
 5. Spectrogram
 6. Load anti-aliasing kernel from file
-7. WAV decoding for large files (mmap ?)
+7. Use different 'flag' package with separate -- and - options
 
 ### NOTES
 

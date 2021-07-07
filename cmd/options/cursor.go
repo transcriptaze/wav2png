@@ -14,9 +14,6 @@ import (
 
 type Cursor string
 
-//go:embed cursor_none.png
-var no_cursor []byte
-
 //go:embed cursor_green.png
 var green_cursor []byte
 
@@ -24,7 +21,6 @@ var green_cursor []byte
 var red_cursor []byte
 
 var cursors = map[string][]byte{
-	"none":  no_cursor,
 	"green": green_cursor,
 	"red":   red_cursor,
 }
@@ -62,7 +58,7 @@ func (c Cursor) Cursor(h int) *image.NRGBA {
 		return c.make(b, h)
 	}
 
-	return c.make(no_cursor, h)
+	return nil
 }
 
 func (c Cursor) make(b []byte, h int) *image.NRGBA {
