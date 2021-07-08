@@ -12,6 +12,8 @@
       - [ ] cursor - ease-in/out
       - [ ] cursor - stretch middle
       - [ ] README
+- [ ] Copy wav2mp4 render fixes across to wav2png
+- [ ] Rebuild webapp with wav2png fixes
 
 ### TODO
 

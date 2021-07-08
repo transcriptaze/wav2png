@@ -56,6 +56,17 @@ var centre = func(t, offset, window, duration time.Duration) (float64, float64) 
 	return 0.5, 0.0
 }
 
+var left = func(t, offset, window, duration time.Duration) (float64, float64) {
+	if t > (duration - window) {
+		percentage := (duration - t).Seconds() / window.Seconds()
+		shift := -1.0 + percentage
+
+		return 0.0, shift
+	}
+
+	return 0.0, 0.0
+}
+
 func (c Cursor) String() string {
 	return c.Cursor
 }
@@ -94,6 +105,9 @@ func (c Cursor) Fn() CursorFunc {
 	switch c.fn {
 	case "centre":
 		return centre
+
+	case "left":
+		return left
 	}
 
 	return linear
