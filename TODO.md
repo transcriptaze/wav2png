@@ -6,6 +6,9 @@
       - [x] window
       - [x] FPS
       - [x] cursor
+      - [x] cursor - centre
+      - [ ] cursor - left/right
+      - [ ] cursor - PNG file
       - [ ] cursor - ease-in/out
       - [ ] cursor - stretch middle
       - [ ] README

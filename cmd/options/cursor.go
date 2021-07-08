@@ -15,9 +15,10 @@ import (
 
 type Cursor struct {
 	Cursor string
+	fn     string
 }
 
-type CursorFunc func(t, offset, window, duration time.Duration) float64
+type CursorFunc func(t, offset, window, duration time.Duration) (float64, float64)
 
 //go:embed cursor_green.png
 var green_cursor []byte
@@ -30,11 +31,29 @@ var cursors = map[string][]byte{
 	"red":   red_cursor,
 }
 
-var linear = func(t, offset, window, duration time.Duration) float64 {
+var linear = func(t, offset, window, duration time.Duration) (float64, float64) {
 	dt := t - offset
 	percentage := dt.Seconds() / window.Seconds()
 
-	return percentage
+	return percentage, 0.0
+}
+
+var centre = func(t, offset, window, duration time.Duration) (float64, float64) {
+	if t < window/2 {
+		percentage := t.Seconds() / window.Seconds()
+		shift := 0.5 - percentage
+
+		return 0.5, shift
+	}
+
+	if t > (duration - window/2) {
+		percentage := (duration - t).Seconds() / window.Seconds()
+		shift := -0.5 + percentage
+
+		return 0.5, shift
+	}
+
+	return 0.5, 0.0
 }
 
 func (c Cursor) String() string {
@@ -42,26 +61,41 @@ func (c Cursor) String() string {
 }
 
 func (c *Cursor) Set(s string) error {
-	ss := strings.ToLower(s)
-	match := regexp.MustCompile("^(none|green|red)$").FindStringSubmatch(ss)
+	tokens := strings.Split(s, ":")
 
-	if match != nil && len(match) > 1 {
-		c.Cursor = match[1]
-		return nil
+	if len(tokens) > 0 {
+		token := tokens[0]
+		match := regexp.MustCompile("^(none|green|red)$").FindStringSubmatch(strings.ToLower(token))
+
+		if match != nil && len(match) > 1 {
+			c.Cursor = match[1]
+		} else if info, err := os.Stat(token); os.IsNotExist(err) {
+			return fmt.Errorf("Cursor %v does not exist", token)
+		} else if info.Mode().IsDir() || !info.Mode().IsRegular() {
+			return fmt.Errorf("Cursor file %v is not a file", token)
+		} else {
+			c.Cursor = token
+		}
 	}
 
-	if info, err := os.Stat(s); os.IsNotExist(err) {
-		return fmt.Errorf("Cursor %v does not exist", s)
-	} else if info.Mode().IsDir() || !info.Mode().IsRegular() {
-		return fmt.Errorf("Cursor file %v is not a file", s)
-	} else {
-		c.Cursor = s
+	if len(tokens) > 1 {
+		token := tokens[1]
+		match := regexp.MustCompile("^(linear|centre|center|left|right)$").FindStringSubmatch(strings.ToLower(token))
+
+		if match != nil && len(match) > 1 {
+			c.fn = match[1]
+		}
 	}
 
 	return nil
 }
 
 func (c Cursor) Fn() CursorFunc {
+	switch c.fn {
+	case "centre":
+		return centre
+	}
+
 	return linear
 }
 

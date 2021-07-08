@@ -107,7 +107,11 @@ func main() {
 			start = end - options.Window
 		}
 
-		img, err := render(*audio, start, end, options)
+		percentage := float64(frame) / float64(frames)
+		t := percentage * duration.Seconds()
+		x, shift := fn(seconds(t), offset, options.Window, duration)
+
+		img, err := render(*audio, start, end, options, shift)
 		if err != nil {
 			fmt.Printf("\n   ERROR: %v\n", err)
 			os.Exit(1)
@@ -117,11 +121,7 @@ func main() {
 		}
 
 		if cursor != nil {
-			percentage := float64(frame) / float64(frames)
-			t := percentage * duration.Seconds()
-			x := fn(seconds(t), offset, options.Window, duration) * float64(w-1)
-
-			cx := x0 + int(math.Round(x))
+			cx := x0 + int(math.Round(x*float64(w-1)))
 			cy := y0
 			cw := cursor.Bounds().Dx()
 			ch := cursor.Bounds().Dy()
@@ -141,7 +141,7 @@ func main() {
 	}
 }
 
-func render(wav audio, from, to time.Duration, options options.Options) (*image.NRGBA, error) {
+func render(wav audio, from, to time.Duration, options options.Options, shift float64) (*image.NRGBA, error) {
 	width := int(options.Width)
 	height := int(options.Height)
 	padding := options.Padding
@@ -154,8 +154,8 @@ func render(wav audio, from, to time.Duration, options options.Options) (*image.
 	w := width
 	h := height
 	if padding > 0 {
-		w = width - padding
-		h = height - padding
+		w = width - 2*padding
+		h = height - 2*padding
 	}
 
 	fs := wav.sampleRate
@@ -176,8 +176,16 @@ func render(wav audio, from, to time.Duration, options options.Options) (*image.
 	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
+	offset := int(math.Round(shift * float64(w)))
+	x0 := padding + offset
+	x1 := padding + w
+	if x0 < padding {
+		x0 = padding
+		x1 = padding + offset + w
+	}
+
 	origin := image.Pt(0, 0)
-	rect := image.Rect(padding, padding, w, h)
+	rect := image.Rect(x0, padding, x1, h)
 	rectg := img.Bounds()
 
 	wav2png.Fill(img, fillspec)
