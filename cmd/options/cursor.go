@@ -67,6 +67,17 @@ var left = func(t, offset, window, duration time.Duration) (float64, float64) {
 	return 0.0, 0.0
 }
 
+var right = func(t, offset, window, duration time.Duration) (float64, float64) {
+	if t < window {
+		percentage := t.Seconds() / window.Seconds()
+		shift := 1.0 - percentage
+
+		return 1.0, shift
+	}
+
+	return 1.0, 0.0
+}
+
 func (c Cursor) String() string {
 	return c.Cursor
 }
@@ -108,6 +119,9 @@ func (c Cursor) Fn() CursorFunc {
 
 	case "left":
 		return left
+
+	case "right":
+		return right
 	}
 
 	return linear

@@ -112,6 +112,41 @@ func TestLeftFn(t *testing.T) {
 		}
 	}
 }
+
+func TestRightFn(t *testing.T) {
+	cursor := Cursor{fn: "right"}
+	frames := 150
+	window := 1 * time.Second
+	duration := 5 * time.Second
+
+	tests := []struct {
+		frame int
+		x     float64
+		shift float64
+	}{
+		{0, 1.0, 1.0},
+		{29, 1.0, 0.033333333},
+		{30, 1.0, 0.0},
+		{75, 1.0, 0.0},
+		{150, 1.0, 0.0},
+	}
+
+	for _, v := range tests {
+		at := seconds(duration.Seconds() * float64(v.frame) / float64(frames))
+		offset := seconds((duration - window).Seconds() * float64(v.frame) / float64(frames))
+
+		x, shift := cursor.Fn()(at, offset, window, duration)
+
+		if math.Abs(v.x-x) > 0.000001 {
+			t.Errorf("Invalid cursor 'X' for t '%v' - expected:%.3f, got:%.3f", at, v.x, x)
+		}
+
+		if math.Abs(v.shift-shift) > 0.000001 {
+			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
+		}
+	}
+}
+
 func seconds(g float64) time.Duration {
 	return time.Duration(g * float64(time.Second))
 }
