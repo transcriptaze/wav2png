@@ -14,35 +14,35 @@ import (
 
 type Palette string
 
-//go:embed fire.png
-var fire []byte
+//go:embed palettes/fire.png
+var palette_fire []byte
 
-//go:embed aurora.png
-var aurora []byte
+//go:embed palettes/aurora.png
+var palette_aurora []byte
 
-//go:embed horizon.png
-var horizon []byte
+//go:embed palettes/horizon.png
+var palette_horizon []byte
 
-//go:embed amber.png
-var amber []byte
+//go:embed palettes/amber.png
+var palette_amber []byte
 
-//go:embed blue.png
-var blue []byte
+//go:embed palettes/blue.png
+var palette_blue []byte
 
-//go:embed green.png
-var green []byte
+//go:embed palettes/green.png
+var palette_green []byte
 
-//go:embed gold.png
-var gold []byte
+//go:embed palettes/gold.png
+var palette_gold []byte
 
 var palettes = map[string][]byte{
-	"fire":    fire,
-	"aurora":  aurora,
-	"horizon": horizon,
-	"amber":   amber,
-	"blue":    blue,
-	"green":   green,
-	"gold":    gold,
+	"fire":    palette_fire,
+	"aurora":  palette_aurora,
+	"horizon": palette_horizon,
+	"amber":   palette_amber,
+	"blue":    palette_blue,
+	"green":   palette_green,
+	"gold":    palette_gold,
 }
 
 func (p Palette) String() string {

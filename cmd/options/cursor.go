@@ -14,21 +14,25 @@ import (
 )
 
 type Cursor struct {
-	Cursor string
+	cursor string
 	fn     string
 }
 
 type CursorFunc func(t, window, duration time.Duration) (time.Duration, float64, float64)
 
-//go:embed cursor_green.png
-var green_cursor []byte
+//go:embed cursors/none.png
+var cursor_none []byte
 
-//go:embed cursor_red.png
-var red_cursor []byte
+//go:embed cursors/green.png
+var cursor_green []byte
+
+//go:embed cursors/red.png
+var cursor_red []byte
 
 var cursors = map[string][]byte{
-	"green": green_cursor,
-	"red":   red_cursor,
+	"none":  cursor_none,
+	"green": cursor_green,
+	"red":   cursor_red,
 }
 
 var linear = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
@@ -131,7 +135,18 @@ var ease = func(at, window, duration time.Duration) (time.Duration, float64, flo
 }
 
 func (c Cursor) String() string {
-	return c.Cursor
+	cursor := "none"
+	fn := c.fn
+
+	if c.cursor != "" {
+		cursor = c.cursor
+	}
+
+	if fn == "" {
+		return fmt.Sprintf("%s", cursor)
+	} else {
+		return fmt.Sprintf("%s:%s", cursor, fn)
+	}
 }
 
 func (c *Cursor) Set(s string) error {
@@ -142,13 +157,13 @@ func (c *Cursor) Set(s string) error {
 		match := regexp.MustCompile("^(none|green|red)$").FindStringSubmatch(strings.ToLower(token))
 
 		if match != nil && len(match) > 1 {
-			c.Cursor = match[1]
+			c.cursor = match[1]
 		} else if info, err := os.Stat(token); os.IsNotExist(err) {
 			return fmt.Errorf("Cursor %v does not exist", token)
 		} else if info.Mode().IsDir() || !info.Mode().IsRegular() {
 			return fmt.Errorf("Cursor file %v is not a file", token)
 		} else {
-			c.Cursor = token
+			c.cursor = token
 		}
 	}
 
@@ -186,11 +201,11 @@ func (c Cursor) Fn() CursorFunc {
 }
 
 func (c Cursor) Render(h int) *image.NRGBA {
-	if b, ok := cursors[c.Cursor]; ok {
+	if b, ok := cursors[c.cursor]; ok {
 		return c.make(b, h)
 	}
 
-	if b, err := os.ReadFile(c.Cursor); err == nil {
+	if b, err := os.ReadFile(c.cursor); err == nil {
 		return c.make(b, h)
 	}
 

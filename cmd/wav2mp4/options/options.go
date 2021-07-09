@@ -78,9 +78,7 @@ func NewOptions() Options {
 
 		Window: 30 * time.Second,
 		FPS:    30.0,
-		Cursor: options.Cursor{
-			Cursor: "none",
-		},
+		Cursor: options.Cursor{},
 
 		Debug: false,
 	}
@@ -116,9 +114,7 @@ func (o *Options) Parse() error {
 	fill := defaults.Fill
 	antialias := defaults.Antialias
 	scale := defaults.Scale
-	cursor := options.Cursor{
-		Cursor: "green",
-	}
+	cursor := options.Cursor{}
 
 	flag.StringVar(&settings, "settings", ".settings", "JSON file with the default settings")
 	flag.StringVar(&out, "out", "", "Output file (or directory)")
