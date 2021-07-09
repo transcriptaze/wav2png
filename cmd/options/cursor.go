@@ -31,82 +31,103 @@ var cursors = map[string][]byte{
 	"red":   red_cursor,
 }
 
-var linear = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-	percentage := t.Seconds() / duration.Seconds()
-	offset := t - seconds(percentage*window.Seconds())
+var linear = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+	t := at.Seconds() / duration.Seconds()
+	m := 1.0
+	c := 0.0
+	x := m*t + c
 
-	return offset, percentage, 0.0
+	percentage := at.Seconds() / duration.Seconds()
+	offset := at - seconds(percentage*window.Seconds())
+
+	return offset, x, 0.0
 }
 
-var centre = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-	percentage := t.Seconds() / duration.Seconds()
-	offset := t - seconds(percentage*window.Seconds())
+var centre = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+	t := at.Seconds() / duration.Seconds()
+	m := 0.0
+	c := 0.5
+	x := m*t + c
 
-	if t < window/2 {
-		percentage := t.Seconds() / window.Seconds()
+	percentage := at.Seconds() / duration.Seconds()
+	offset := at - seconds(percentage*window.Seconds())
+
+	if at < window/2 {
+		percentage := at.Seconds() / window.Seconds()
 		shift := 0.5 - percentage
 
-		return offset, 0.5, shift
+		return offset, x, shift
 	}
 
-	if t > (duration - window/2) {
-		percentage := (duration - t).Seconds() / window.Seconds()
+	if at > (duration - window/2) {
+		percentage := (duration - at).Seconds() / window.Seconds()
 		shift := -0.5 + percentage
 
-		return offset, 0.5, shift
+		return offset, x, shift
 	}
 
-	return offset, 0.5, 0.0
+	return offset, x, 0.0
 }
 
-var left = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-	percentage := t.Seconds() / duration.Seconds()
-	offset := t - seconds(percentage*window.Seconds())
+var left = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+	t := at.Seconds() / duration.Seconds()
+	m := 0.0
+	c := 0.0
+	x := m*t + c
 
-	if t > (duration - window) {
-		percentage := (duration - t).Seconds() / window.Seconds()
+	percentage := at.Seconds() / duration.Seconds()
+	offset := at - seconds(percentage*window.Seconds())
+
+	if at > (duration - window) {
+		percentage := (duration - at).Seconds() / window.Seconds()
 		shift := -1.0 + percentage
 
-		return offset, 0.0, shift
+		return offset, x, shift
 	}
 
-	return offset, 0.0, 0.0
+	return offset, x, 0.0
 }
 
-var right = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-	percentage := t.Seconds() / duration.Seconds()
-	offset := t - seconds(percentage*window.Seconds())
+var right = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+	t := at.Seconds() / duration.Seconds()
+	m := 0.0
+	c := 1.0
+	x := m*t + c
 
-	if t < window {
-		percentage := t.Seconds() / window.Seconds()
+	percentage := at.Seconds() / duration.Seconds()
+	offset := at - seconds(percentage*window.Seconds())
+
+	if at < window {
+		percentage := at.Seconds() / window.Seconds()
 		shift := 1.0 - percentage
 
-		return offset, 1.0, shift
+		return offset, x, shift
 	}
 
-	return offset, 1.0, 0.0
+	return offset, x, 0.0
 }
 
-var ease = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-	percentage := t.Seconds() / duration.Seconds()
-	offset := t - seconds(percentage*window.Seconds())
-	dt := duration / 5
+var ease = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+	t := at.Seconds() / duration.Seconds()
+	m := 0.0
+	c := 0.5
 
-	if t <= dt {
-		percentage := t.Seconds() / dt.Seconds()
-		cx := percentage * 0.5
+	switch {
+	case t <= 0.2:
+		m = 2.5
+		c = 0.0
 
-		return offset, cx, 0.0
+	case t >= 0.8:
+		m = 2.5
+		c = -1.5
 	}
 
-	if t >= (duration - dt) {
-		percentage := (duration - t).Seconds() / dt.Seconds()
-		cx := 1.0 - 0.5*percentage
+	x := m*t + c
 
-		return offset, cx, 0.0
-	}
+	percentage := at.Seconds() / duration.Seconds()
+	offset := at - seconds(percentage*window.Seconds())
 
-	return offset, 0.5, 0.0
+	return offset, x, 0.0
 }
 
 func (c Cursor) String() string {

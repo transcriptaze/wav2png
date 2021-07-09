@@ -166,7 +166,7 @@ func TestRightFn(t *testing.T) {
 }
 
 func TestEaseFn(t *testing.T) {
-	t.Skip()
+	//	t.Skip()
 	cursor := Cursor{fn: "ease"}
 	frames := 150
 	window := 1 * time.Second
