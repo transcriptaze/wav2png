@@ -6,8 +6,11 @@
       - [x] window
       - [x] FPS
       - [x] cursor
-      - [x] cursor - centre
-      - [x] cursor - left/right
+      - [ ] cursor - centre
+            - fix offset so that it doesn't discard first and last left/right bits
+      - [x] cursor - left
+      - [ ] cursor - right
+            - fix offset so that it doesn't discard first and last left/right bits
       - [ ] cursor - ease-in/out
       - [ ] cursor - PNG file
       - [ ] cursor - stretch middle
