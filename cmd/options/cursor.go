@@ -35,80 +35,36 @@ var cursors = map[string][]byte{
 	"red":   cursor_red,
 }
 
-var linear = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+var linear = func(at, duration time.Duration) float64 {
 	t := at.Seconds() / duration.Seconds()
 	m := 1.0
 	c := 0.0
-	x := m*t + c
 
-	percentage := at.Seconds() / duration.Seconds()
-	offset := at - seconds(percentage*window.Seconds())
-
-	return offset, x, 0.0
+	return m*t + c
 }
 
-var centre = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+var centre = func(at, duration time.Duration) float64 {
 	t := at.Seconds() / duration.Seconds()
 	m := 0.0
 	c := 0.5
-	x := m*t + c
 
-	percentage := at.Seconds() / duration.Seconds()
-	offset := at - seconds(percentage*window.Seconds())
-
-	if at < window/2 {
-		percentage := at.Seconds() / window.Seconds()
-		shift := 0.5 - percentage
-
-		return offset, x, shift
-	}
-
-	if at > (duration - window/2) {
-		percentage := (duration - at).Seconds() / window.Seconds()
-		shift := -0.5 + percentage
-
-		return offset, x, shift
-	}
-
-	return offset, x, 0.0
+	return m*t + c
 }
 
-var left = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+var left = func(at, duration time.Duration) float64 {
 	t := at.Seconds() / duration.Seconds()
 	m := 0.0
 	c := 0.0
-	x := m*t + c
 
-	percentage := at.Seconds() / duration.Seconds()
-	offset := at - seconds(percentage*window.Seconds())
-
-	if at > (duration - window) {
-		percentage := (duration - at).Seconds() / window.Seconds()
-		shift := -1.0 + percentage
-
-		return offset, x, shift
-	}
-
-	return offset, x, 0.0
+	return m*t + c
 }
 
-var right = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+var right = func(at, duration time.Duration) float64 {
 	t := at.Seconds() / duration.Seconds()
 	m := 0.0
 	c := 1.0
-	x := m*t + c
 
-	percentage := at.Seconds() / duration.Seconds()
-	offset := at - seconds(percentage*window.Seconds())
-
-	if at < window {
-		percentage := at.Seconds() / window.Seconds()
-		shift := 1.0 - percentage
-
-		return offset, x, shift
-	}
-
-	return offset, x, 0.0
+	return m*t + c
 }
 
 var ease = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
@@ -181,23 +137,96 @@ func (c *Cursor) Set(s string) error {
 
 func (c Cursor) Fn() CursorFunc {
 	switch c.fn {
-	case "centre":
-		return centre
+	case "centre", "center":
+		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+			cx := centre(t, duration)
+			start := t - seconds(cx*window.Seconds())
+			end := start + window
+			shift := 0.0
 
-	case "center":
-		return centre
+			if start < 0 {
+				shift = (0 - start).Seconds() / window.Seconds()
+				start = 0 * time.Second
+				end = start + window
+			}
+
+			if end > duration {
+				shift = (duration - (start + window)).Seconds() / window.Seconds()
+				start = duration - window
+				end = start + window
+			}
+
+			return start, cx, shift
+		}
 
 	case "left":
-		return left
+		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+			cx := left(t, duration)
+			start := t - seconds(cx*window.Seconds())
+			end := start + window
+			shift := 0.0
+
+			if start < 0 {
+				shift = (0 - start).Seconds() / window.Seconds()
+				start = 0 * time.Second
+				end = start + window
+			}
+
+			if end > duration {
+				shift = (duration - (start + window)).Seconds() / window.Seconds()
+				start = duration - window
+				end = start + window
+			}
+
+			return start, cx, shift
+		}
 
 	case "right":
-		return right
+		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+			cx := right(t, duration)
+			start := t - seconds(cx*window.Seconds())
+			end := start + window
+			shift := 0.0
+
+			if start < 0 {
+				shift = (0 - start).Seconds() / window.Seconds()
+				start = 0 * time.Second
+				end = start + window
+			}
+
+			if end > duration {
+				shift = (duration - (start + window)).Seconds() / window.Seconds()
+				start = duration - window
+				end = start + window
+			}
+
+			return start, cx, shift
+		}
 
 	case "ease":
 		return ease
 	}
 
-	return linear
+	return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+		cx := linear(t, duration)
+		start := t - seconds(cx*window.Seconds())
+		end := start + window
+		shift := 0.0
+
+		if start < 0 {
+			shift = (0 - start).Seconds() / window.Seconds()
+			start = 0 * time.Second
+			end = start + window
+		}
+
+		if end > duration {
+			shift = (duration - (start + window)).Seconds() / window.Seconds()
+			start = duration - window
+			end = start + window
+		}
+
+		return start, cx, shift
+	}
 }
 
 func (c Cursor) Render(h int) *image.NRGBA {

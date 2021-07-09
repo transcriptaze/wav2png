@@ -94,9 +94,13 @@ chirp: build
 wav2mp4: build
 	rm -f ./runtime/frames/*
 	rm -f ./runtime/chirp.mp4
-	./bin/wav2mp4 --debug --mix L+R --width 640 --padding 8 --out ./runtime/chirp.mp4 --window 1s --fps 30 --cursor red:right ./samples/chirp.wav
+	./bin/wav2mp4 --debug --mix L+R --width 640 --padding 8 --out ./runtime/debug.mp4 \
+	              --window 1s --fps 30 --cursor red:center \
+	              ./samples/debug.wav
 	cd ./runtime/frames; \
 	ffmpeg -framerate 30 -i frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 23 -y out.mp4; \
-	ffmpeg -i out.mp4 -i ../../samples/chirp.wav -c:v copy -c:a aac -y ../chirp.mp4
-	open ./runtime/chirp.mp4
-# 	open ./runtime/frames/frame-00001.png
+	ffmpeg -i out.mp4 -i ../../samples/debug.wav -c:v copy -c:a aac -y ../debug.mp4
+	open ./runtime/debug.mp4
+# 	open ./runtime/frames/frame-00075.png
+# 	./bin/wav2png --debug --mix L+R --out ./runtime ./samples/debug.wav
+# 	open ./runtime/debug.png

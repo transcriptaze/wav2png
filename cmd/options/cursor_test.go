@@ -58,15 +58,15 @@ func TestCentreFn(t *testing.T) {
 		shift  float64
 	}{
 		{0, 0 * time.Second, 0.5, 0.5},
-		{1, 27 * time.Millisecond, 0.5, 0.466666667},
-		{14, 373 * time.Millisecond, 0.5, 0.033333333},
-		{15, 400 * time.Millisecond, 0.5, 0.0},
-		{16, 427 * time.Millisecond, 0.5, 0.0},
+		{1, 0 * time.Second, 0.5, 0.466666667},
+		{14, 0 * time.Second, 0.5, 0.033333333},
+		{15, 0 * time.Second, 0.5, 0.0},
+		{16, 33 * time.Millisecond, 0.5, 0.0},
 		{75, 2 * time.Second, 0.5, 0.0},
-		{134, 3573 * time.Millisecond, 0.5, 0.0},
-		{135, 3600 * time.Millisecond, 0.5, 0.0},
-		{136, 3627 * time.Millisecond, 0.5, -0.033333333},
-		{149, 3973 * time.Millisecond, 0.5, -0.466666667},
+		{134, 3967 * time.Millisecond, 0.5, 0.0},
+		{135, 4 * time.Second, 0.5, 0.0},
+		{136, 4 * time.Second, 0.5, -0.033333333},
+		{149, 4 * time.Second, 0.5, -0.466666667},
 		{150, 4 * time.Second, 0.5, -0.5},
 	}
 
@@ -102,9 +102,9 @@ func TestLeftFn(t *testing.T) {
 		shift  float64
 	}{
 		{0, 0 * time.Second, 0.0, 0.0},
-		{75, 2 * time.Second, 0.0, 0.0},
-		{120, 3200 * time.Millisecond, 0.0, 0.0},
-		{121, 3227 * time.Millisecond, 0.0, -0.033333333},
+		{75, 2500 * time.Millisecond, 0.0, 0.0},
+		{120, 4 * time.Second, 0.0, 0.0},
+		{121, 4 * time.Second, 0.0, -0.033333333},
 		{150, 4 * time.Second, 0.0, -1.0},
 	}
 
@@ -140,9 +140,11 @@ func TestRightFn(t *testing.T) {
 		shift  float64
 	}{
 		{0, 0 * time.Second, 1.0, 1.0},
-		{29, 773 * time.Millisecond, 1.0, 0.033333333},
-		{30, 800 * time.Millisecond, 1.0, 0.0},
-		{75, 2 * time.Second, 1.0, 0.0},
+		{1, 0 * time.Second, 1.0, 0.966666667},
+		{29, 0 * time.Millisecond, 1.0, 0.033333333},
+		{30, 0 * time.Millisecond, 1.0, 0.0},
+		{31, 33 * time.Millisecond, 1.0, 0.0},
+		{75, 1500 * time.Millisecond, 1.0, 0.0},
 		{150, 4 * time.Second, 1.0, 0.0},
 	}
 

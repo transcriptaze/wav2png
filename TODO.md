@@ -6,15 +6,15 @@
       - [x] window
       - [x] FPS
       - [x] cursor
-      - [ ] cursor - centre
-            - fix offset so that it doesn't discard first and last left/right bits
       - [x] cursor - left
-      - [ ] cursor - right
-            - fix offset so that it doesn't discard first and last left/right bits
-      - [ ] cursor - ease-in/out
+      - [x] cursor - right
+      - [x] cursor - centre
+      - [ ] cursor - centre:ease
       - [ ] cursor - PNG file
       - [ ] cursor - stretch middle
       - [ ] README
+
+- [ ] Fix weird offset at centre
 - [ ] Copy wav2mp4 render fixes across to wav2png
 - [ ] Rebuild webapp with wav2png fixes
 
