@@ -100,7 +100,7 @@ func main() {
 
 		percentage := float64(frame) / float64(frames)
 		t := seconds(percentage * duration.Seconds())
-		_, x, _ := fn(t, options.Window, duration)
+		x := fn(t, duration)
 
 		window := options.Window
 		p := t - seconds(x*window.Seconds())

@@ -9,7 +9,6 @@ import (
 func TestLinearFn(t *testing.T) {
 	cursor := Cursor{fn: "linear"}
 	frames := 150
-	window := 1 * time.Second
 	duration := 5 * time.Second
 
 	tests := []struct {
@@ -29,18 +28,10 @@ func TestLinearFn(t *testing.T) {
 	for _, v := range tests {
 		at := seconds(duration.Seconds() * float64(v.frame) / float64(frames))
 
-		offset, x, shift := cursor.Fn()(at, window, duration)
-
-		if offset.Round(time.Millisecond) != v.offset.Round(time.Millisecond) {
-			t.Errorf("Invalid cursor 'offset' for t '%v' - expected:%v, got:%v", at, v.offset, offset)
-		}
+		x := cursor.Fn()(at, duration)
 
 		if math.Abs(v.x-x) > 0.000001 {
 			t.Errorf("Invalid cursor 'X' for t '%v' - expected:%.3f, got:%.3f", at, v.x, x)
-		}
-
-		if math.Abs(v.shift-shift) > 0.000001 {
-			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
 		}
 	}
 }
@@ -48,7 +39,6 @@ func TestLinearFn(t *testing.T) {
 func TestCentreFn(t *testing.T) {
 	cursor := Cursor{fn: "centre"}
 	frames := 150
-	window := 1 * time.Second
 	duration := 5 * time.Second
 
 	tests := []struct {
@@ -73,18 +63,10 @@ func TestCentreFn(t *testing.T) {
 	for _, v := range tests {
 		at := seconds(duration.Seconds() * float64(v.frame) / float64(frames))
 
-		offset, x, shift := cursor.Fn()(at, window, duration)
-
-		if offset.Round(time.Millisecond) != v.offset.Round(time.Millisecond) {
-			t.Errorf("Invalid cursor 'offset' for t '%v' - expected:%v, got:%v", at, v.offset, offset)
-		}
+		x := cursor.Fn()(at, duration)
 
 		if math.Abs(v.x-x) > 0.000001 {
 			t.Errorf("Invalid cursor 'X' for t '%v' - expected:%.3f, got:%.3f", at, v.x, x)
-		}
-
-		if math.Abs(v.shift-shift) > 0.000001 {
-			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
 		}
 	}
 }
@@ -92,7 +74,6 @@ func TestCentreFn(t *testing.T) {
 func TestLeftFn(t *testing.T) {
 	cursor := Cursor{fn: "left"}
 	frames := 150
-	window := 1 * time.Second
 	duration := 5 * time.Second
 
 	tests := []struct {
@@ -111,18 +92,10 @@ func TestLeftFn(t *testing.T) {
 	for _, v := range tests {
 		at := seconds(duration.Seconds() * float64(v.frame) / float64(frames))
 
-		offset, x, shift := cursor.Fn()(at, window, duration)
-
-		if offset.Round(time.Millisecond) != v.offset.Round(time.Millisecond) {
-			t.Errorf("Invalid cursor 'offset' for t '%v' - expected:%v, got:%v", at, v.offset, offset)
-		}
+		x := cursor.Fn()(at, duration)
 
 		if math.Abs(v.x-x) > 0.000001 {
 			t.Errorf("Invalid cursor 'X' for t '%v' - expected:%.3f, got:%.3f", at, v.x, x)
-		}
-
-		if math.Abs(v.shift-shift) > 0.000001 {
-			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
 		}
 	}
 }
@@ -130,7 +103,6 @@ func TestLeftFn(t *testing.T) {
 func TestRightFn(t *testing.T) {
 	cursor := Cursor{fn: "right"}
 	frames := 150
-	window := 1 * time.Second
 	duration := 5 * time.Second
 
 	tests := []struct {
@@ -151,18 +123,10 @@ func TestRightFn(t *testing.T) {
 	for _, v := range tests {
 		at := seconds(duration.Seconds() * float64(v.frame) / float64(frames))
 
-		offset, x, shift := cursor.Fn()(at, window, duration)
-
-		if offset.Round(time.Millisecond) != v.offset.Round(time.Millisecond) {
-			t.Errorf("Invalid cursor 'offset' for t '%v' - expected:%v, got:%v", at, v.offset, offset)
-		}
+		x := cursor.Fn()(at, duration)
 
 		if math.Abs(v.x-x) > 0.000001 {
 			t.Errorf("Invalid cursor 'X' for t '%v' - expected:%.3f, got:%.3f", at, v.x, x)
-		}
-
-		if math.Abs(v.shift-shift) > 0.000001 {
-			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
 		}
 	}
 }
@@ -170,7 +134,6 @@ func TestRightFn(t *testing.T) {
 func TestEaseFn(t *testing.T) {
 	cursor := Cursor{fn: "ease"}
 	frames := 150
-	window := 1 * time.Second
 	duration := 5 * time.Second
 
 	tests := []struct {
@@ -192,18 +155,10 @@ func TestEaseFn(t *testing.T) {
 	for _, v := range tests {
 		at := seconds(duration.Seconds() * float64(v.frame) / float64(frames))
 
-		offset, x, shift := cursor.Fn()(at, window, duration)
-
-		if offset.Round(time.Millisecond) != v.offset.Round(time.Millisecond) {
-			t.Errorf("Invalid cursor 'offset' for t '%v' - expected:%v, got:%v", at, v.offset, offset)
-		}
+		x := cursor.Fn()(at, duration)
 
 		if math.Abs(v.x-x) > 0.000001 {
 			t.Errorf("Invalid cursor 'X' for t '%v' - expected:%.3f, got:%.3f", at, v.x, x)
-		}
-
-		if math.Abs(v.shift-shift) > 0.000001 {
-			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
 		}
 	}
 }

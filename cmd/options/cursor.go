@@ -18,7 +18,7 @@ type Cursor struct {
 	fn     string
 }
 
-type CursorFunc func(t, window, duration time.Duration) (time.Duration, float64, float64)
+type CursorFunc func(t, duration time.Duration) float64
 
 //go:embed cursors/none.png
 var cursor_none []byte
@@ -133,114 +133,19 @@ func (c *Cursor) Set(s string) error {
 func (c Cursor) Fn() CursorFunc {
 	switch c.fn {
 	case "centre", "center":
-		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-			cx := centre(t, duration)
-			start := t - seconds(cx*window.Seconds())
-			end := start + window
-			shift := 0.0
-
-			if start < 0 {
-				shift = (0 - start).Seconds() / window.Seconds()
-				start = 0 * time.Second
-				end = start + window
-			}
-
-			if end > duration {
-				shift = (duration - (start + window)).Seconds() / window.Seconds()
-				start = duration - window
-				end = start + window
-			}
-
-			return start, cx, shift
-		}
+		return centre
 
 	case "left":
-		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-			cx := left(t, duration)
-			start := t - seconds(cx*window.Seconds())
-			end := start + window
-			shift := 0.0
-
-			if start < 0 {
-				shift = (0 - start).Seconds() / window.Seconds()
-				start = 0 * time.Second
-				end = start + window
-			}
-
-			if end > duration {
-				shift = (duration - (start + window)).Seconds() / window.Seconds()
-				start = duration - window
-				end = start + window
-			}
-
-			return start, cx, shift
-		}
+		return left
 
 	case "right":
-		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-			cx := right(t, duration)
-			start := t - seconds(cx*window.Seconds())
-			end := start + window
-			shift := 0.0
-
-			if start < 0 {
-				shift = (0 - start).Seconds() / window.Seconds()
-				start = 0 * time.Second
-				end = start + window
-			}
-
-			if end > duration {
-				shift = (duration - (start + window)).Seconds() / window.Seconds()
-				start = duration - window
-				end = start + window
-			}
-
-			return start, cx, shift
-		}
+		return right
 
 	case "ease":
-		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-			cx := ease(t, duration)
-			start := t - seconds(cx*window.Seconds())
-			end := start + window
-			shift := 0.0
-
-			if start < 0 {
-				shift = (0 - start).Seconds() / window.Seconds()
-				start = 0 * time.Second
-				end = start + window
-			}
-
-			if end > duration {
-				shift = (duration - (start + window)).Seconds() / window.Seconds()
-				start = duration - window
-				end = start + window
-			}
-
-			return start, cx, shift
-		}
+		return ease
 	}
 
-	return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
-		cx := linear(t, duration)
-		start := t - seconds(cx*window.Seconds())
-		end := start + window
-		shift := 0.0
-
-		if start < 0 {
-			shift = (0 - start).Seconds() / window.Seconds()
-			start = 0 * time.Second
-			end = start + window
-		}
-
-		if end > duration {
-			shift = (duration - (start + window)).Seconds() / window.Seconds()
-			start = duration - window
-			end = start + window
-		}
-
-		return start, cx, shift
-	}
+	return linear
 }
 
 func (c Cursor) Render(h int) *image.NRGBA {
