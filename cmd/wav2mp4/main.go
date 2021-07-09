@@ -99,14 +99,37 @@ func main() {
 		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame))
 
 		percentage := float64(frame) / float64(frames)
-		t := percentage * duration.Seconds()
-		offset, x, shift := fn(seconds(t), options.Window, duration)
+		t := seconds(percentage * duration.Seconds())
+		_, x, _ := fn(t, options.Window, duration)
 
-		start := from + offset
+		window := options.Window
+		p := t - seconds(x*window.Seconds())
+		q := p + window
+		shift := 0.0
+
+		if p < 0 {
+			shift = (0 - p).Seconds() / window.Seconds()
+			p = 0 * time.Second
+			q = p + window
+		}
+
+		if q > duration {
+			shift = (duration - (p + window)).Seconds() / window.Seconds()
+			p = duration - window
+			q = p + window
+		}
+
+		start := from + p
 		end := start + options.Window
 
-		if start < from || end > to {
-			panic("OOPS")
+		if start < from {
+			fmt.Printf("\n   ERROR: frame %d - invalid frame 'start' (%v)\n", frame, start)
+			os.Exit(1)
+		}
+
+		if end > to {
+			fmt.Printf("\n   ERROR: frame %d - invalid frame 'end' (%v)\n", frame, end)
+			os.Exit(1)
 		}
 
 		img, err := render(*audio, start, end, options, shift)

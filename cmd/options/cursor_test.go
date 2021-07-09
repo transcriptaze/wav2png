@@ -168,7 +168,6 @@ func TestRightFn(t *testing.T) {
 }
 
 func TestEaseFn(t *testing.T) {
-	t.Skip()
 	cursor := Cursor{fn: "ease"}
 	frames := 150
 	window := 1 * time.Second
@@ -181,12 +180,12 @@ func TestEaseFn(t *testing.T) {
 		shift  float64
 	}{
 		{0, 0 * time.Second, 0.0, 0.0},
-		{1, 27 * time.Millisecond, 0.016666666, 0.0},
-		{29, 773 * time.Millisecond, 0.483333333, 0.0},
-		{30, 800 * time.Millisecond, 0.5, 0.0},
+		{1, 17 * time.Millisecond, 0.016666666, 0.0},
+		{29, 483 * time.Millisecond, 0.483333333, 0.0},
+		{30, 500 * time.Millisecond, 0.5, 0.0},
 		{75, 2 * time.Second, 0.5, 0.0},
-		{120, 3200 * time.Millisecond, 0.5, 0.0},
-		{121, 3227 * time.Millisecond, 0.516666666, 0.0},
+		{120, 3500 * time.Millisecond, 0.5, 0.0},
+		{121, 3517 * time.Millisecond, 0.516666666, 0.0},
 		{150, 4 * time.Second, 1.0, 0.0},
 	}
 
@@ -207,6 +206,4 @@ func TestEaseFn(t *testing.T) {
 			t.Errorf("Invalid 'shift' for t '%v' - expected:%.3f, got:%.3f", at, v.shift, shift)
 		}
 	}
-
-	t.Errorf("OOPS")
 }

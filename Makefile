@@ -95,7 +95,7 @@ wav2mp4: build
 	rm -f ./runtime/frames/*
 	rm -f ./runtime/chirp.mp4
 	./bin/wav2mp4 --debug --mix L+R --width 640 --padding 8 --out ./runtime/debug.mp4 \
-	              --window 1s --fps 30 --cursor red:center \
+	              --window 1s --fps 30 --cursor red:ease \
 	              ./samples/debug.wav
 	cd ./runtime/frames; \
 	ffmpeg -framerate 30 -i frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 23 -y out.mp4; \

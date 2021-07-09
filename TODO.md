@@ -9,12 +9,13 @@
       - [x] cursor - left
       - [x] cursor - right
       - [x] cursor - centre
-      - [ ] cursor - centre:ease
+      - [x] cursor - ease
+      - [ ] cursor - centre:ease with smooth function
       - [ ] cursor - PNG file
       - [ ] cursor - stretch middle
       - [ ] README
 
-- [ ] Fix weird offset at centre
+- [ ] Debug possibly weird offset at centre
 - [ ] Copy wav2mp4 render fixes across to wav2png
 - [ ] Rebuild webapp with wav2png fixes
 

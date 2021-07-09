@@ -67,7 +67,7 @@ var right = func(at, duration time.Duration) float64 {
 	return m*t + c
 }
 
-var ease = func(at, window, duration time.Duration) (time.Duration, float64, float64) {
+var ease = func(at, duration time.Duration) float64 {
 	t := at.Seconds() / duration.Seconds()
 	m := 0.0
 	c := 0.5
@@ -82,12 +82,7 @@ var ease = func(at, window, duration time.Duration) (time.Duration, float64, flo
 		c = -1.5
 	}
 
-	x := m*t + c
-
-	percentage := at.Seconds() / duration.Seconds()
-	offset := at - seconds(percentage*window.Seconds())
-
-	return offset, x, 0.0
+	return m*t + c
 }
 
 func (c Cursor) String() string {
@@ -204,7 +199,26 @@ func (c Cursor) Fn() CursorFunc {
 		}
 
 	case "ease":
-		return ease
+		return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+			cx := ease(t, duration)
+			start := t - seconds(cx*window.Seconds())
+			end := start + window
+			shift := 0.0
+
+			if start < 0 {
+				shift = (0 - start).Seconds() / window.Seconds()
+				start = 0 * time.Second
+				end = start + window
+			}
+
+			if end > duration {
+				shift = (duration - (start + window)).Seconds() / window.Seconds()
+				start = duration - window
+				end = start + window
+			}
+
+			return start, cx, shift
+		}
 	}
 
 	return func(t, window, duration time.Duration) (time.Duration, float64, float64) {
