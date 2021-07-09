@@ -18,7 +18,7 @@ type Cursor struct {
 	fn     string
 }
 
-type CursorFunc func(t, offset, window, duration time.Duration) (float64, float64)
+type CursorFunc func(t, window, duration time.Duration) (time.Duration, float64, float64)
 
 //go:embed cursor_green.png
 var green_cursor []byte
@@ -31,51 +31,82 @@ var cursors = map[string][]byte{
 	"red":   red_cursor,
 }
 
-var linear = func(t, offset, window, duration time.Duration) (float64, float64) {
-	dt := t - offset
-	percentage := dt.Seconds() / window.Seconds()
+var linear = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+	percentage := t.Seconds() / duration.Seconds()
+	offset := t - seconds(percentage*window.Seconds())
 
-	return percentage, 0.0
+	return offset, percentage, 0.0
 }
 
-var centre = func(t, offset, window, duration time.Duration) (float64, float64) {
+var centre = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+	percentage := t.Seconds() / duration.Seconds()
+	offset := t - seconds(percentage*window.Seconds())
+
 	if t < window/2 {
 		percentage := t.Seconds() / window.Seconds()
 		shift := 0.5 - percentage
 
-		return 0.5, shift
+		return offset, 0.5, shift
 	}
 
 	if t > (duration - window/2) {
 		percentage := (duration - t).Seconds() / window.Seconds()
 		shift := -0.5 + percentage
 
-		return 0.5, shift
+		return offset, 0.5, shift
 	}
 
-	return 0.5, 0.0
+	return offset, 0.5, 0.0
 }
 
-var left = func(t, offset, window, duration time.Duration) (float64, float64) {
+var left = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+	percentage := t.Seconds() / duration.Seconds()
+	offset := t - seconds(percentage*window.Seconds())
+
 	if t > (duration - window) {
 		percentage := (duration - t).Seconds() / window.Seconds()
 		shift := -1.0 + percentage
 
-		return 0.0, shift
+		return offset, 0.0, shift
 	}
 
-	return 0.0, 0.0
+	return offset, 0.0, 0.0
 }
 
-var right = func(t, offset, window, duration time.Duration) (float64, float64) {
+var right = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+	percentage := t.Seconds() / duration.Seconds()
+	offset := t - seconds(percentage*window.Seconds())
+
 	if t < window {
 		percentage := t.Seconds() / window.Seconds()
 		shift := 1.0 - percentage
 
-		return 1.0, shift
+		return offset, 1.0, shift
 	}
 
-	return 1.0, 0.0
+	return offset, 1.0, 0.0
+}
+
+var ease = func(t, window, duration time.Duration) (time.Duration, float64, float64) {
+	percentage := t.Seconds() / duration.Seconds()
+	offset := t - seconds(percentage*window.Seconds())
+	dt := duration / 5
+
+	if t <= dt {
+		percentage := t.Seconds() / dt.Seconds()
+		cx := percentage * 0.5
+
+		return offset, cx, 0.0
+	}
+
+	if t >= (duration - dt) {
+		percentage := (duration - t).Seconds() / dt.Seconds()
+		cx := 1.0 - 0.5*percentage
+
+		return offset, cx, 0.0
+	}
+
+	return offset, 0.5, 0.0
 }
 
 func (c Cursor) String() string {
@@ -102,7 +133,7 @@ func (c *Cursor) Set(s string) error {
 
 	if len(tokens) > 1 {
 		token := tokens[1]
-		match := regexp.MustCompile("^(linear|centre|center|left|right)$").FindStringSubmatch(strings.ToLower(token))
+		match := regexp.MustCompile("^(linear|centre|center|left|right|ease)$").FindStringSubmatch(strings.ToLower(token))
 
 		if match != nil && len(match) > 1 {
 			c.fn = match[1]
@@ -117,11 +148,17 @@ func (c Cursor) Fn() CursorFunc {
 	case "centre":
 		return centre
 
+	case "center":
+		return centre
+
 	case "left":
 		return left
 
 	case "right":
 		return right
+
+	case "ease":
+		return ease
 	}
 
 	return linear
@@ -154,4 +191,8 @@ func (c Cursor) make(b []byte, h int) *image.NRGBA {
 	}
 
 	return img
+}
+
+func seconds(g float64) time.Duration {
+	return time.Duration(g * float64(time.Second))
 }

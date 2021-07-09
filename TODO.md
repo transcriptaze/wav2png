@@ -8,8 +8,8 @@
       - [x] cursor
       - [x] cursor - centre
       - [x] cursor - left/right
-      - [ ] cursor - PNG file
       - [ ] cursor - ease-in/out
+      - [ ] cursor - PNG file
       - [ ] cursor - stretch middle
       - [ ] README
 - [ ] Copy wav2mp4 render fixes across to wav2png

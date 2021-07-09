@@ -98,7 +98,11 @@ func main() {
 	for frame := 0; frame <= frames; frame++ {
 		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame+1))
 
-		offset := seconds((to - from - options.Window).Seconds() * float64(frame) / float64(frames))
+		percentage := float64(frame) / float64(frames)
+		t := percentage * duration.Seconds()
+		offset, x, shift := fn(seconds(t), options.Window, duration)
+
+		//		offset := seconds((to - from - options.Window).Seconds() * float64(frame) / float64(frames))
 
 		start := from + offset
 		end := start + options.Window
@@ -106,10 +110,6 @@ func main() {
 			end = audio.duration
 			start = end - options.Window
 		}
-
-		percentage := float64(frame) / float64(frames)
-		t := percentage * duration.Seconds()
-		x, shift := fn(seconds(t), offset, options.Window, duration)
 
 		img, err := render(*audio, start, end, options, shift)
 		if err != nil {
