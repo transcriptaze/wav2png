@@ -7,6 +7,7 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
+	"math"
 	"os"
 	"regexp"
 	"strings"
@@ -67,7 +68,7 @@ var right = func(at, duration time.Duration) float64 {
 	return m*t + c
 }
 
-var ease = func(at, duration time.Duration) float64 {
+var piecewise = func(at, duration time.Duration) float64 {
 	t := at.Seconds() / duration.Seconds()
 	m := 0.0
 	c := 0.5
@@ -83,6 +84,18 @@ var ease = func(at, duration time.Duration) float64 {
 	}
 
 	return m*t + c
+}
+
+// plot erf^(-1)(0.99999*(2s -1))/3.12341; -2 < s < 2
+var erf = func(at, duration time.Duration) float64 {
+	t := at.Seconds() / duration.Seconds()
+	a := 0.9999
+	k := math.Erfinv(a)
+
+	v := 2.0*t - 1.0
+	x := math.Erfinv(a*v) / k
+
+	return 0.5 * (x + 1.0)
 }
 
 func (c Cursor) String() string {
@@ -120,7 +133,7 @@ func (c *Cursor) Set(s string) error {
 
 	if len(tokens) > 1 {
 		token := tokens[1]
-		match := regexp.MustCompile("^(linear|centre|center|left|right|ease)$").FindStringSubmatch(strings.ToLower(token))
+		match := regexp.MustCompile("^(linear|sweep||centre|center|left|right|ease|erf)$").FindStringSubmatch(strings.ToLower(token))
 
 		if match != nil && len(match) > 1 {
 			c.fn = match[1]
@@ -132,6 +145,9 @@ func (c *Cursor) Set(s string) error {
 
 func (c Cursor) Fn() CursorFunc {
 	switch c.fn {
+	case "linear", "sweep":
+		return linear
+
 	case "centre", "center":
 		return centre
 
@@ -142,7 +158,10 @@ func (c Cursor) Fn() CursorFunc {
 		return right
 
 	case "ease":
-		return ease
+		return piecewise
+
+	case "erf":
+		return erf
 	}
 
 	return linear
