@@ -57,9 +57,9 @@ type Options struct {
 	Antialias wav2png.Kernel
 	VScale    float64
 
-	Window time.Duration
+	Window *time.Duration
 	Frames string
-	FPS    float64
+	FPS    *float64
 	Cursor options.Cursor
 
 	Debug bool
@@ -76,8 +76,6 @@ func NewOptions() Options {
 		Antialias: defaults.Antialias.Kernel(),
 		VScale:    defaults.Scale.Vertical,
 
-		Window: 30 * time.Second,
-		FPS:    30.0,
 		Cursor: options.Cursor{},
 
 		Debug: false,
@@ -179,10 +177,10 @@ func (o *Options) Parse() error {
 			o.Mix = mix
 
 		case "window":
-			o.Window = window
+			o.Window = &window
 
 		case "fps":
-			o.FPS = fps
+			o.FPS = &fps
 
 		case "cursor":
 			o.Cursor = cursor
@@ -223,6 +221,14 @@ func (o *Options) Parse() error {
 	o.WAV = wavfile
 	o.MP4 = mp4
 	o.Frames = filepath.Join(filepath.Dir(mp4), "frames")
+
+	if o.Window == nil {
+		return fmt.Errorf("'window' is a required parameter")
+	}
+
+	if o.FPS == nil {
+		return fmt.Errorf("'fps' is a required parameter")
+	}
 
 	return nil
 }
