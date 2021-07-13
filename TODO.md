@@ -12,7 +12,7 @@
       - [x] cursor - ease
       - [x] cursor - centre:ease with smooth function
       - [x] cursor - PNG file
-      - [ ] cursor - stretch middle
+      - [x] cursor - stretch middle
       - [ ] README
 
 - [ ] Debug possibly weird offset at centre

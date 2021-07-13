@@ -189,11 +189,40 @@ func (c Cursor) make(b []byte, h int) *image.NRGBA {
 	dh := cursor.Bounds().Dy()
 	img := image.NewNRGBA(image.Rect(0, 0, dw, h))
 
-	for y := 0; y < h; y += dh {
-		draw.Draw(img, image.Rect(0, y, dw, y+dh), cursor, image.Pt(0, 0), draw.Over)
+	// ... one row only?
+	if dh < 2 {
+		for y := 0; y < h; y++ {
+			draw.Draw(img, image.Rect(0, y, dw, y+dh), cursor, image.Pt(0, 0), draw.Over)
+		}
+
+		return img
 	}
 
-	fmt.Printf(">>> %v\n", img.Bounds())
+	// ... odd number of rows?
+	if dh%2 != 0 {
+		draw.Draw(img, image.Rect(0, 0, dw, dh/2), cursor, image.Pt(0, 0), draw.Over)
+		draw.Draw(img, image.Rect(0, h-dh/2+1, dw, h), cursor, image.Pt(0, dh/2+1), draw.Over)
+
+		for y := dh / 2; y <= h-dh/2; y++ {
+			draw.Draw(img, image.Rect(0, y, dw, y+1), cursor, image.Pt(0, dh/2), draw.Over)
+		}
+
+		return img
+	}
+
+	// ... even number of rows!
+
+	draw.Draw(img, image.Rect(0, 0, dw, dh/2-1), cursor, image.Pt(0, 0), draw.Over)
+	draw.Draw(img, image.Rect(0, h-dh/2+1, dw, h), cursor, image.Pt(0, dh/2+1), draw.Over)
+
+	for y := dh/2 - 1; y < h/2; y++ {
+		draw.Draw(img, image.Rect(0, y, dw, y+1), cursor, image.Pt(0, dh/2-1), draw.Over)
+	}
+
+	for y := h / 2; y <= h-dh/2; y++ {
+		draw.Draw(img, image.Rect(0, y, dw, y+1), cursor, image.Pt(0, dh/2), draw.Over)
+	}
+
 	return img
 }
 
