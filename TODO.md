@@ -1,25 +1,12 @@
-## v1.x
+## v1.1
 
-### IN PROGRESS
-
-- [ ] wav2mp4
-      - [x] window
-      - [x] FPS
-      - [x] cursor
-      - [x] cursor - left
-      - [x] cursor - right
-      - [x] cursor - centre
-      - [x] cursor - ease
-      - [x] cursor - centre:ease with smooth function
-      - [x] cursor - PNG file
-      - [x] cursor - stretch middle
-      - [ ] README
-
+- [x] wav2mp4
+- [x] Copy wav2mp4 render fixes across to wav2png
 - [ ] Debug possibly weird offset at centre
-- [ ] Copy wav2mp4 render fixes across to wav2png
-- [ ] Rebuild webapp with wav2png fixes
 
 ### TODO
+
+- [ ] Rebuild webapp with wav2png fixes
 
 1. WAV decoding for large files (mmap ?)
 2. Add support for other audio formats

@@ -47,8 +47,8 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-# 	./bin/wav2mp4 --fps 30    --cursor ./samples/cursors/gradient.png:erf ./samples/debug.wav
-	./bin/wav2mp4 --window 1s --cursor ./samples/cursors/gradient.png:erf ./samples/debug.wav
+	./bin/wav2png --debug --mix L+R --out ./runtime ./samples/debug.wav
+	open ./runtime/debug.png
 
 version: build
 	./bin/wav2png version

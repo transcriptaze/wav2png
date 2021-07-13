@@ -42,28 +42,39 @@ func main() {
 		os.Exit(1)
 	}
 
-	w, err := read(options.WAV)
+	audio, err := read(options.WAV)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
-	} else if w == nil {
+	} else if audio == nil {
 		fmt.Printf("\n   ERROR: unable to read WAV file\n")
 		os.Exit(1)
+	}
+
+	from := 0 * time.Second
+	to := audio.duration
+
+	if options.From != nil {
+		from = *options.From
+	}
+
+	if options.To != nil {
+		to = *options.To
 	}
 
 	if options.Debug {
 		fmt.Println()
 		fmt.Printf("   File:        %v\n", options.WAV)
-		fmt.Printf("   Channels:    %v\n", w.channels)
-		fmt.Printf("   Format:      %v\n", w.format)
-		fmt.Printf("   Sample Rate: %v\n", w.sampleRate)
-		fmt.Printf("   Duration:    %v\n", w.duration)
-		fmt.Printf("   Samples:     %v\n", w.length)
+		fmt.Printf("   Channels:    %v\n", audio.channels)
+		fmt.Printf("   Format:      %v\n", audio.format)
+		fmt.Printf("   Sample Rate: %v\n", audio.sampleRate)
+		fmt.Printf("   Duration:    %v\n", audio.duration)
+		fmt.Printf("   Samples:     %v\n", audio.length)
 		fmt.Printf("   PNG:         %v\n", options.PNG)
 		fmt.Println()
 	}
 
-	img, err := render(*w, options)
+	img, err := render(*audio, from, to, options)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
@@ -75,7 +86,7 @@ func main() {
 	}
 }
 
-func render(wav audio, options options.Options) (*image.NRGBA, error) {
+func render(wav audio, from, to time.Duration, options options.Options) (*image.NRGBA, error) {
 	width := int(options.Width)
 	height := int(options.Height)
 	padding := options.Padding
@@ -88,29 +99,21 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 	w := width
 	h := height
 	if padding > 0 {
-		w = width - padding
-		h = height - padding
+		w = width - 2*padding
+		h = height - 2*padding
 	}
 
 	fs := wav.sampleRate
 	samples := mix(wav, options.Mix.Channels()...)
-	start := 0
-	end := len(samples)
 
-	if options.From != nil {
-		v := int(math.Floor(options.From.Seconds() * fs))
-		if v > 0 && v <= len(samples) {
-			start = v
-		}
+	start := int(math.Floor(from.Seconds() * fs))
+	if start < 0 || start > len(samples) {
+		return nil, fmt.Errorf("Start position not in range %v-%v", from, wav.duration)
 	}
 
-	if options.To != nil {
-		v := int(math.Floor(options.To.Seconds() * fs))
-		if v < start {
-			end = start
-		} else if v <= len(samples) {
-			end = v
-		}
+	end := int(math.Floor(to.Seconds() * fs))
+	if end < 0 || end < start || end > len(samples) {
+		return nil, fmt.Errorf("End position not in range %v-%v", from, wav.duration)
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
@@ -118,8 +121,16 @@ func render(wav audio, options options.Options) (*image.NRGBA, error) {
 	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
+	offset := 0
+	x0 := padding + offset
+	x1 := padding + w
+	if x0 < padding {
+		x0 = padding
+		x1 = padding + offset + w
+	}
+
 	origin := image.Pt(0, 0)
-	rect := image.Rect(padding, padding, w, h)
+	rect := image.Rect(x0, padding, x1, h)
 	rectg := img.Bounds()
 
 	wav2png.Fill(img, fillspec)
