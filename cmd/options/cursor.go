@@ -193,6 +193,7 @@ func (c Cursor) make(b []byte, h int) *image.NRGBA {
 		draw.Draw(img, image.Rect(0, y, dw, y+dh), cursor, image.Pt(0, 0), draw.Over)
 	}
 
+	fmt.Printf(">>> %v\n", img.Bounds())
 	return img
 }
 

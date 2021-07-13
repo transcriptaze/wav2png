@@ -142,13 +142,12 @@ func main() {
 		}
 
 		if cursor != nil {
-			cx := x0 + int(math.Round(x*float64(w-1)))
-			cy := y0
 			cw := cursor.Bounds().Dx()
 			ch := cursor.Bounds().Dy()
-			cxy := image.Pt(cw/2, 0)
+			cx := x0 + int(math.Round(x*float64(w-1))) - cw/2
+			cy := y0
 
-			draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, cxy, draw.Over)
+			draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, image.Pt(0, 0), draw.Over)
 		}
 
 		if options.Debug {
