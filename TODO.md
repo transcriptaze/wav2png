@@ -11,7 +11,7 @@
       - [x] cursor - centre
       - [x] cursor - ease
       - [x] cursor - centre:ease with smooth function
-      - [ ] cursor - PNG file
+      - [x] cursor - PNG file
       - [ ] cursor - stretch middle
       - [ ] README
 
