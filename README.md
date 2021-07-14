@@ -13,11 +13,13 @@ An online version implemented by compiling this library to WASM can be found [he
 The command line version includes two utilities:
 
 - `wav2png`, which renders a WAV file to a single PNG image
-- `wav2mp4`, which renders a WAV file to a set of PNG frames that can be used with ffmpeg to create an MP4 rendering of the WAV file
+- `wav2mp4`, which renders a WAV file to a set of PNG frames that can be used with _ffmpeg_ to create an MP4
+   rendering of the WAV file
 
 ## Raison d'être
 
-wav2png was initially created as a Go utility library to render an audio file as an anti-aliased waveform for a WASM project - it just seemed like a good idea to add a standalone command line version.
+wav2png was initially created as a Go utility library to render an audio file as an anti-aliased waveform for a
+WASM project - it just seemed like a good idea to add a standalone command line version.
 
 ## Releases
 
@@ -160,16 +162,16 @@ wav2mp4 [--debug] [options] [--out <path>] --window <duration> --fps <frame rate
   <wav>                  WAV file to render.
 
   --out <path>           File path for MP4 file - if <path> is a directory, the WAV file name is
-                         used and defaults to the WAV file base path. wav2mp4 generates a set of ffmpeg frames 
-                         files in the 'frames' subdirectory of the out file directory. 
+                         used and defaults to the WAV file base path. wav2mp4 generates a set of ffmpeg
+                         frames files in the 'frames' subdirectory of the out file directory. 
 
   --window <duration>    The interval allotted to a single frame, in Go time format e.g. --window 1s.
                          The window interval must be less than the duration of the MP4.
 
   --fps <frame rate>     Frame rate for the MP4 in frames per second e.g. --fps 30
 
-  --cursor <cursorspec>  Cursor to indicate for the current play position. A cursor is specified by the image
-                         source and dynamic:
+  --cursor <cursorspec>  Cursor to indicate for the current play position. A cursor is specified by the 
+                         image source and dynamic:
 
                          --cursor <image>:<dynamic>
 
@@ -179,16 +181,16 @@ wav2mp4 [--debug] [options] [--out <path>] --window <duration> --fps <frame rate
                          - blue (internal 'blue' cursor)
                          - a PNG file with a custom cursor image
 
-                         The cursor 'dynamic' defaults to 'sweep' if not specified, but may be one of the 
-                         following:
+                         The cursor 'dynamic' defaults to 'sweep' if not specified, but may be one of
+                         the following:
                          - sweep  Moves linearly from left to right over the duration of the MP4
                          - left   Fixed on left side
                          - right  Fixed on right side
                          - center Fixed in center of frame
-                         - ease   Migrates from the left to center of the frame, before moving to the right
-                                  side to finish
-                         - erf    Moves 'sigmoidally' from left to right over the duration of the MP4, with
-                                  the sigmoid defined by the inverse error function
+                         - ease   Migrates from the left to center of the frame, before moving to the
+                                  right side to finish
+                         - erf    Moves 'sigmoidally' from left to right over the duration of the MP4, 
+                                  with the sigmoid defined by the inverse error function
 
   --debug                Displays occasionally useful diagnostic information.
 
@@ -203,15 +205,15 @@ Options:
   --height <pixels>      Height (in pixels) of the PNG image. Valid values are in the range 32 to 8192, 
                          defaults to 395px.
   
-  --padding <pixels>     Padding (in pixels) between the border of the PNG and the extent of the rendered
-                         waveform. Valid values are -16 to +32, defaults to 2px.
+  --padding <pixels>     Padding (in pixels) between the border of the PNG and the extent of the 
+                         rendered waveform. Valid values are -16 to +32, defaults to 2px.
 
-  --palette <palette>    Palette used to colour the waveform. May be the name of one of the internal colour
-                         palettes or a user provided PNG file. Defaults to 'ice'
+  --palette <palette>    Palette used to colour the waveform. May be the name of one of the internal 
+                         colour palettes or a user provided PNG file. Defaults to 'ice'
   
   --fill <fillspec>      Fill specification for the background colour, in the form type:colour 
-                         e.g. solid:#0000ffff. Currently the only fill type supported is 'solid', defaults
-                         to solid:#000000ff.
+                         e.g. solid:#0000ffff. Currently the only fill type supported is 'solid', 
+                         defaults to solid:#000000ff.
 
   --grid <gridspec>      Grid specification for an optional rectilinear grid, in the form 
                          type:colour:size:overlay, e.g.
@@ -223,11 +225,12 @@ Options:
                          - ~  approximate
                          - =  exact
                          - ≥  at least
-               - ≤  at most
+                         - ≤  at most
                          - >  greater than
                          - <  less than
 
-                         If gridspec includes :overlay, the grid is rendered 'in front' of the waveform.
+                         If gridspec includes :overlay, the grid is rendered 'in front' of the 
+                         waveform.
 
                          The default gridspec is 'square:#008000ff:~64'
 
@@ -239,8 +242,8 @@ Options:
 
                          The default kernel is 'vertical'.
 
-  --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The valid 
-                         range is 0.2 to 5.0, defaults to 1.0.
+  --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The 
+                         valid range is 0.2 to 5.0, defaults to 1.0.
 
   --mix  <mixspec>       Specifies how to combine channels from a stereo WAV file. Valid values are:
                          - 'L'    Renders the left channel only
@@ -249,11 +252,11 @@ Options:
                          
                          Defaults to 'L+R'.
 
-  --start <time>         The start time of the segment of audio to render, in Go time format (e.g. 10s or
-                         1m5s). Defaults to 0s.
+  --start <time>         The start time of the segment of audio to render, in Go time format (e.g. 10s
+                         or 1m5s). Defaults to 0s.
 
-  --end <time>           The end time of the segment of audio to render, in Go time format (e.g. 10s or 
-                         1m5s). Defaults to the end of the audio.
+  --end <time>           The end time of the segment of audio to render, in Go time format (e.g. 10s
+                         or 1m5s). Defaults to the end of the audio.
 
 
 Example:
