@@ -17,16 +17,20 @@ const (
 )
 
 func Render(pcm []float32, fs float64, width, height int, palette Palette, volume float64) *image.NRGBA {
+	pps := float64(width) / float64(len(pcm))
 	duration := seconds(float64(len(pcm)) / fs)
-	l := int(math.Ceil(fs * duration.Seconds()))
-	buffer := make([]float32, l/int(width))
+	l := int(math.Round(math.Ceil(fs*duration.Seconds()) / float64(width)))
+	buffer := make([]float32, l)
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := palette.realize()
 
-	x := uint(0)
-	offset := 0
-	for N := copy(buffer, pcm[offset:]); N > 0; N = copy(buffer, pcm[offset:]) {
-		offset += N
+	x := 0.0
+	offset := x / pps
+	start := int(math.Round(offset))
+
+	for start < len(pcm) {
+		end := int(math.Round(offset + 1.0/pps))
+		N := copy(buffer, pcm[start:end])
 
 		sum := make([]int, height)
 		u := vscale(0, -int(height))
@@ -43,11 +47,13 @@ func Render(pcm []float32, fs float64, width, height int, palette Palette, volum
 			if sum[y] > 0 {
 				l := len(colours)
 				i := ceil((l-1)*sum[y], N)
-				waveform.Set(int(x+1), int(y), colours[i])
+				waveform.Set(int(x+1.0), int(y), colours[i])
 			}
 		}
 
-		x++
+		x += 1.0
+		offset = x / pps
+		start = int(math.Round(offset))
 	}
 
 	return waveform

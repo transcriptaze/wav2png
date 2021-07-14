@@ -2,7 +2,8 @@
 
 - [x] wav2mp4
 - [x] Copy wav2mp4 render fixes across to wav2png
-- [ ] Debug possibly weird offset at centre
+- [x] Debug possibly weird offset at centre
+- [ ] Add PNG's to README
 
 ### TODO
 

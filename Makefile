@@ -47,7 +47,7 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	./bin/wav2png --debug --mix L+R --out ./runtime ./samples/debug.wav
+	./bin/wav2png --debug --antialias none --out ./runtime ./samples/debug.wav
 	open ./runtime/debug.png
 
 version: build
@@ -81,7 +81,7 @@ run: build test
 	open ./runtime/chirp.png
 
 acoustic: build
-	./bin/wav2png --height 256 --width 1024 --padding 4 -out ./runtime ./samples/acoustic.wav
+	./bin/wav2png --height 480 --width 800 --padding 4  --palette horizon -out ./runtime ./samples/acoustic.wav
 	open ./runtime/acoustic.png
 
 # 16-bit signed integer PCM WAV file
@@ -91,25 +91,22 @@ noise: build
 
 # float32 WAV format file
 noise-float32: build
-	./bin/wav2png --debug --height 390 --width 641 --padding 0 -out ./runtime ./samples/noise-float32.wav
+	./bin/wav2png --debug --height 390 --width 641 --padding 0  -out ./runtime ./samples/noise-float32.wav
 	open ./runtime/noise-float32.png
 
 # stereo  WAV file
 chirp: build
-	./bin/wav2png --debug --mix L+R --out ./runtime ./samples/chirp.wav
+	./bin/wav2png --debug --mix L+R --palette aurora --out ./runtime ./samples/chirp.wav
 	open ./runtime/chirp.png
 
 # wav2mp4
 wav2mp4: build
 	rm -f ./runtime/frames/*
 	rm -f ./runtime/chirp.mp4
-	./bin/wav2mp4 --debug --mix L+R --width 640 --height 390 --padding 8 --out ./runtime/debug.mp4 \
+	./bin/wav2mp4 --debug --mix L+R --width 640 --height 390 --padding 8 -palette ice --out ./runtime/chirp.mp4 \
 	              --window 1s --fps 30 --cursor ./samples/cursors/gradient.png:erf \
-	              ./samples/debug.wav
+	              ./samples/chirp.wav
 	cd ./runtime/frames; \
 	ffmpeg -framerate 30 -i frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 23 -y out.mp4; \
-	ffmpeg -i out.mp4 -i ../../samples/debug.wav -c:v copy -c:a aac -y ../debug.mp4
-	open ./runtime/debug.mp4
-# 	open ./runtime/frames/frame-00075.png
-# 	./bin/wav2png --debug --mix L+R --out ./runtime ./samples/debug.wav
-# 	open ./runtime/debug.png
+	ffmpeg -i out.mp4 -i ../../samples/chirp.wav -c:v copy -c:a aac -y ../chirp.mp4
+	open ./runtime/chirp.mp4
