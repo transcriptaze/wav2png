@@ -257,6 +257,12 @@ Example:
   ffmpeg -i out.mp4    -i ./samples/chirp.wav -c:v copy -c:a aac -y ../chirp.mp4
 ```
 
+### Samples
+
+![acoustic](https://github.com/transcriptaze/wav2png/blob/master/samples/acoustic.png)
+![chirp](https://github.com/transcriptaze/wav2png/blob/master/samples/chirp.png)
+![wav2mp4](https://github.com/transcriptaze/wav2png/blob/master/samples/chirp.mp4)
+
 ## References
 
 1. [Audio File Format Specifications](http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html)
