@@ -69,25 +69,28 @@ wav2png [--debug] [options] [--out <path>] <wav>
   --debug       Displays occasionally useful diagnostic information.
 
 Options:
-  --settings <file>      JSON file with the default settings for the height, width, etc. Defaults to .settings.json if
-                         not specified, falling back to internal default values if .settings.json does not exist.
+  --settings <file>      JSON file with the default settings for the height, width, etc. Defaults to 
+                         .settings.json if not specified, falling back to internal default values if 
+                         .settings.json does not exist.
 
-  --width <pixels>       Width (in pixels) of the PNG image. Valid values are in the range 32 to 8192, defaults to 
-                         645px.
+  --width <pixels>       Width (in pixels) of the PNG image. Valid values are in the range 32 to 8192, 
+                         defaults to 645px.
 
-  --height <pixels>      Height (in pixels) of the PNG image. Valid values are in the range 32 to 8192, defaults to 
-                         395px.
+  --height <pixels>      Height (in pixels) of the PNG image. Valid values are in the range 32 to 8192, 
+                         defaults to 395px.
   
-  --padding <pixels>     Padding (in pixels) between the border of the PNG and the extent of the rendered waveform.
-                         Valid values are -16 to +32, defaults to 2px.
+  --padding <pixels>     Padding (in pixels) between the border of the PNG and the extent of the rendered
+                         waveform. Valid values are -16 to +32, defaults to 2px.
 
-  --palette <palette>    Palette used to colour the waveform. May be the name of one of the internal colour palettes
-                         or a user provided PNG file. Defaults to 'ice'
+  --palette <palette>    Palette used to colour the waveform. May be the name of one of the internal colour
+                         palettes or a user provided PNG file. Defaults to 'ice'
   
-  --fill <fillspec>      Fill specification for the background colour, in the form type:colour e.g. solid:#0000ffff.
-                         Currently the only fill type supported is 'solid', defaults to solid:#000000ff.
+  --fill <fillspec>      Fill specification for the background colour, in the form type:colour 
+                         e.g. solid:#0000ffff. Currently the only fill type supported is 'solid', defaults
+                         to solid:#000000ff.
 
-  --grid <gridspec>      Grid specification for an optional rectilinear grid, in the form type:colour:size:overlay, e.g.
+  --grid <gridspec>      Grid specification for an optional rectilinear grid, in the form 
+                         type:colour:size:overlay, e.g.
                          - none
                          - square:#008000ff:~64
                          - rectangle:#008000ff:~64x48:overlay
@@ -112,8 +115,8 @@ Options:
 
                          The default kernel is 'vertical'.
 
-  --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The valid range
-                         is 0.2 to 5.0, defaults to 1.0.
+  --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The valid 
+                         range is 0.2 to 5.0, defaults to 1.0.
 
   --mix  <mixspec>       Specifies how to combine channels from a stereo WAV file. Valid values are:
                          - 'L'    Renders the left channel only
@@ -122,30 +125,30 @@ Options:
                          
                          Defaults to 'L+R'.
 
-  --start <time>         The start time of the segment of audio to render, in Go time format (e.g. 10s or 1m5s).
-                         Defaults to 0s.
+  --start <time>         The start time of the segment of audio to render, in Go time format (e.g. 10s or
+                         1m5s). Defaults to 0s.
 
-  --end <time>           The end time of the segment of audio to render, in Go time format (e.g. 10s or 1m5s).
-                         Defaults to the end of the audio.
+  --end <time>           The end time of the segment of audio to render, in Go time format (e.g. 10s or
+                         1m5s). Defaults to the end of the audio.
 
 
 Example:
 
 wav2png --debug                                        \
-	    --settings 'settings.json'                     \
-	    --height 390                                   \
-	    --width 641                                    \
-	    --padding 0                                    \
-	    --palette 'amber.png'                          \
-	    --fill 'solid:#0000ffff'                       \
-	    --grid 'rectangular:#800000ff:~32x128:overlay' \
-	    --antialias 'soft'                             \
-	    --scale 0.5                                    \
-	    --start 0.5s                                   \
-	    --end 1.5s                                     \
-	    --mix 'L+R'                                    \
-	    --out example.png                              \
-	    example.wav
+	      --settings 'settings.json'                     \
+	      --height 390                                   \
+	      --width 641                                    \
+	      --padding 0                                    \
+	      --palette 'amber.png'                          \
+	      --fill 'solid:#0000ffff'                       \
+	      --grid 'rectangular:#800000ff:~32x128:overlay' \
+	      --antialias 'soft'                             \
+	      --scale 0.5                                    \
+	      --start 0.5s                                   \
+	      --end 1.5s                                     \
+	      --mix 'L+R'                                    \
+	      --out example.png                              \
+	      example.wav
 ```
 
 ## wav2mp4
@@ -165,49 +168,53 @@ wav2mp4 [--debug] [options] [--out <path>] --window <duration> --fps <frame rate
 
   --fps <frame rate>     Frame rate for the MP4 in frames per second e.g. --fps 30
 
-  --cursor <cursorspec>  Cursor to indicate for the current play position. A cursor is specified by the image source
-                         and dynamic:
+  --cursor <cursorspec>  Cursor to indicate for the current play position. A cursor is specified by the image
+                         source and dynamic:
 
                          --cursor <image>:<dynamic>
 
                          where image may be:
                          - none
-                         - red
-                         - blue
+                         - red  (internal 'red' cursor)
+                         - blue (internal 'blue' cursor)
                          - a PNG file with a custom cursor image
 
-                         The cursor 'dynamic' defaults to 'sweep' if not specified, but may be one of the following:
+                         The cursor 'dynamic' defaults to 'sweep' if not specified, but may be one of the 
+                         following:
                          - sweep  Moves linearly from left to right over the duration of the MP4
                          - left   Fixed on left side
                          - right  Fixed on right side
                          - center Fixed in center of frame
-                         - ease   Migrates from the left to center of the frame, before moving to the right side to
-                                  finish
-                         - erf    Moves 'sigmoidally' from left to right over the duration of the MP4, with the 
-                                  sigmoid defined by the inverse error function
+                         - ease   Migrates from the left to center of the frame, before moving to the right
+                                  side to finish
+                         - erf    Moves 'sigmoidally' from left to right over the duration of the MP4, with
+                                  the sigmoid defined by the inverse error function
 
   --debug                Displays occasionally useful diagnostic information.
 
 Options:
-  --settings <file>      JSON file with the default settings for the height, width, etc. Defaults to .settings.json if
-                         not specified, falling back to internal default values if .settings.json does not exist.
+  --settings <file>      JSON file with the default settings for the height, width, etc. Defaults to 
+                         .settings.json if not specified, falling back to internal default values if 
+                         .settings.json does not exist.
 
-  --width <pixels>       Width (in pixels) of the PNG image. Valid values are in the range 32 to 8192, defaults to 
-                         645px.
+  --width <pixels>       Width (in pixels) of the PNG image. Valid values are in the range 32 to 8192, 
+                         defaults to 645px.
 
-  --height <pixels>      Height (in pixels) of the PNG image. Valid values are in the range 32 to 8192, defaults to 
-                         395px.
+  --height <pixels>      Height (in pixels) of the PNG image. Valid values are in the range 32 to 8192, 
+                         defaults to 395px.
   
-  --padding <pixels>     Padding (in pixels) between the border of the PNG and the extent of the rendered waveform.
-                         Valid values are -16 to +32, defaults to 2px.
+  --padding <pixels>     Padding (in pixels) between the border of the PNG and the extent of the rendered
+                         waveform. Valid values are -16 to +32, defaults to 2px.
 
-  --palette <palette>    Palette used to colour the waveform. May be the name of one of the internal colour palettes
-                         or a user provided PNG file. Defaults to 'ice'
+  --palette <palette>    Palette used to colour the waveform. May be the name of one of the internal colour
+                         palettes or a user provided PNG file. Defaults to 'ice'
   
-  --fill <fillspec>      Fill specification for the background colour, in the form type:colour e.g. solid:#0000ffff.
-                         Currently the only fill type supported is 'solid', defaults to solid:#000000ff.
+  --fill <fillspec>      Fill specification for the background colour, in the form type:colour 
+                         e.g. solid:#0000ffff. Currently the only fill type supported is 'solid', defaults
+                         to solid:#000000ff.
 
-  --grid <gridspec>      Grid specification for an optional rectilinear grid, in the form type:colour:size:overlay, e.g.
+  --grid <gridspec>      Grid specification for an optional rectilinear grid, in the form 
+                         type:colour:size:overlay, e.g.
                          - none
                          - square:#008000ff:~64
                          - rectangle:#008000ff:~64x48:overlay
@@ -232,8 +239,8 @@ Options:
 
                          The default kernel is 'vertical'.
 
-  --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The valid range
-                         is 0.2 to 5.0, defaults to 1.0.
+  --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The valid 
+                         range is 0.2 to 5.0, defaults to 1.0.
 
   --mix  <mixspec>       Specifies how to combine channels from a stereo WAV file. Valid values are:
                          - 'L'    Renders the left channel only
@@ -242,11 +249,11 @@ Options:
                          
                          Defaults to 'L+R'.
 
-  --start <time>         The start time of the segment of audio to render, in Go time format (e.g. 10s or 1m5s).
-                         Defaults to 0s.
+  --start <time>         The start time of the segment of audio to render, in Go time format (e.g. 10s or
+                         1m5s). Defaults to 0s.
 
-  --end <time>           The end time of the segment of audio to render, in Go time format (e.g. 10s or 1m5s).
-                         Defaults to the end of the audio.
+  --end <time>           The end time of the segment of audio to render, in Go time format (e.g. 10s or 
+                         1m5s). Defaults to the end of the audio.
 
 
 Example:
@@ -260,8 +267,8 @@ Example:
 ### Samples
 
 ![acoustic](https://github.com/transcriptaze/wav2png/blob/master/samples/acoustic.png)
+
 ![chirp](https://github.com/transcriptaze/wav2png/blob/master/samples/chirp.png)
-![wav2mp4](https://github.com/transcriptaze/wav2png/blob/master/samples/chirp.mp4)
 
 ## References
 
