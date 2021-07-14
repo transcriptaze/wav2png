@@ -121,16 +121,13 @@ func render(wav audio, from, to time.Duration, options options.Options) (*image.
 	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
-	offset := 0
-	x0 := padding + offset
-	x1 := padding + w
-	if x0 < padding {
-		x0 = padding
-		x1 = padding + offset + w
-	}
+	x0 := padding
+	y0 := padding
+	x1 := x0 + w
+	y1 := y0 + h
 
 	origin := image.Pt(0, 0)
-	rect := image.Rect(x0, padding, x1, h)
+	rect := image.Rect(x0, y0, x1, y1)
 	rectg := img.Bounds()
 
 	wav2png.Fill(img, fillspec)

@@ -7,8 +7,6 @@
 
 ### TODO
 
-- [ ] Rebuild webapp with wav2png fixes
-
 1. WAV decoding for large files (mmap ?)
 2. Add support for other audio formats
 3. GPU/WebGL implementation
