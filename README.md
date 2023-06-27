@@ -269,11 +269,11 @@ Example:
 
 ### Samples
 
-![acoustic](https://github.com/transcriptaze/wav2png/blob/master/samples/acoustic.png)
+![acoustic](acoustic.png)
 
-![chirp](https://github.com/transcriptaze/wav2png/blob/master/samples/chirp.png)
+![chirp](samples/chirp.png)
 
-## References
+## References & Related Projects
 
 1. [Audio File Format Specifications](http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html)
 2. [SoX](http://sox.sourceforge.net)
@@ -284,4 +284,4 @@ Example:
 7. [BBC](https://github.com/bbc/audiowaveform)
 8. [BBC CLI](https://github.com/marc7806/bbc-audiowaveform-cli-wrapper)
 9. [stackoverflow](https://stackoverflow.com/questions/4468157/how-can-i-create-a-waveform-image-of-an-mp3-in-linux)
-
+10. [github:waveform](https://github.com/andrewrk/waveform)

@@ -1,9 +1,12 @@
-## v1.1
+## v1.x
 
-- [x] wav2mp4
-- [x] Copy wav2mp4 render fixes across to wav2png
-- [x] Debug possibly weird offset at centre
-- [x] Add PNG's to README
+- [ ] https://graphicriver.net/item/waveform-artist-mp3-to-waveform-poster/20644757
+- [ ] wav2mp4 does not seperate L/R audio with --mix option
+- [ ] wav2mp4 does not trim audio to size either
+
+- [ ] [smoothstep cursor](https://iquilezles.org/www/articles/smoothstepintegral/smoothstepintegral.htm)
+- [ ] [exponential step cursor](https://iquilezles.org/www/articles/functions/functions.htm)
+- [ ] https://sound.stackexchange.com/questions/52076/whats-the-terminology-of-these-two-waveforms
 
 ### TODO
 
