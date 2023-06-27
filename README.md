@@ -269,7 +269,7 @@ Example:
 
 ### Samples
 
-![acoustic](acoustic.png)
+![acoustic](samples/acoustic.png)
 
 ![chirp](samples/chirp.png)
 
