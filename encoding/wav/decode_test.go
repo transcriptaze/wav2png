@@ -11,7 +11,10 @@ import (
 //go:embed PCM16.wav
 var PCM16 []byte
 
-func TestDecode(t *testing.T) {
+//go:embed PCM24.wav
+var PCM24 []byte
+
+func TestDecodePCM16(t *testing.T) {
 	expected := WAV{
 		Format: Format{
 			ChunkID:       "fmt ",
@@ -39,6 +42,62 @@ func TestDecode(t *testing.T) {
 
 	if !reflect.DeepEqual(w.Format, expected.Format) {
 		t.Errorf("Invalid WAV 'fmt ' chunk \n   expected:%#v\n   got:     %#v", expected.Format, w.Format)
+	}
+
+	if len(w.Samples) != len(expected.Samples) {
+		t.Errorf("Invalid WAV 'data' chunk \n   expected:%#v\n   got:     %#v", len(expected.Samples), len(w.Samples))
+	} else if !reflect.DeepEqual(w.Samples[0][0:10], expected.Samples[0][0:10]) {
+		t.Errorf("Invalid WAV 'data' chunk \n   expected:%#v\n   got:     %#v", expected.Samples[0][0:10], w.Samples[0][0:10])
+	}
+
+	if w.frames != expected.frames {
+		t.Errorf("Invalid WAV 'data' chunk frames \n   expected:%#v\n   got:     %#v", expected.frames, w.frames)
+	}
+}
+
+func TestDecodePCM24(t *testing.T) {
+	expected := WAV{
+		Format: Format{
+			ChunkID:       "fmt ",
+			Length:        40,
+			Format:        WAVE_FORMAT_EXTENSIBLE,
+			Channels:      1,
+			SampleRate:    8000,
+			ByteRate:      24000,
+			BlockAlign:    3,
+			BitsPerSample: 24,
+			Extension: &Extension{
+				Length:             22,
+				ValidBitsPerSample: 24,
+				ChannelMask:        0x04,
+				SubFormatGUID:      []byte{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71},
+			},
+		},
+		Samples: [][]float32{
+			[]float32{0.02557379, 0.23468024, 0.45156866, 0.60516363, 0.69390875, 0.6950379, 0.61889654, 0.465149, 0.26052862, 0.021240294},
+		},
+
+		frames: 100,
+	}
+
+	w, err := Decode(bytes.NewReader(PCM24))
+	if err != nil {
+		t.Fatalf("Error decoding WAV file (%v)", err)
+	} else if w == nil {
+		t.Fatalf("Failed to decode WAV file (%v)", w)
+	}
+
+	if w.Format.ChunkID != expected.Format.ChunkID ||
+		w.Format.Length != expected.Format.Length ||
+		w.Format.Format != expected.Format.Format ||
+		w.Format.Channels != expected.Format.Channels ||
+		w.Format.SampleRate != expected.Format.SampleRate ||
+		w.Format.ByteRate != expected.Format.ByteRate ||
+		w.Format.BlockAlign != expected.Format.BlockAlign ||
+		w.Format.BitsPerSample != expected.Format.BitsPerSample {
+		t.Errorf("Invalid WAV 'fmt ' chunk \n   expected:%#v\n   got:     %#v", expected.Format, w.Format)
+	} else if w.Format.Extension == nil || !reflect.DeepEqual(*w.Format.Extension, *expected.Format.Extension) {
+		t.Errorf("Invalid WAV 'fmt ' chunk \n   expected:%#v\n   got:     %#v", expected.Format.Extension, w.Format.Extension)
 	}
 
 	if len(w.Samples) != len(expected.Samples) {

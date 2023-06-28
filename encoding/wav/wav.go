@@ -5,7 +5,14 @@ import (
 	"time"
 )
 
-const PCM_FLOAT = "0300000000001000800000aa00389b71"
+const WAVE_FORMAT_PCM uint16 = 0x0001
+const WAVE_FORMAT_IEEE_FLOAT uint16 = 0x0003
+const WAVE_FORMAT_ALAW uint16 = 0x0006
+const WAVE_FORMAT_MULAW uint16 = 0x0007
+const WAVE_FORMAT_EXTENSIBLE uint16 = 0xFFFE
+
+const GUID_PCM = "0100000000001000800000aa00389b71"
+const GUID_IEEE_FLOAT = "0300000000001000800000aa00389b71"
 
 type WAV struct {
 	Format  Format
@@ -54,23 +61,18 @@ func (w *WAV) Duration() time.Duration {
 }
 
 func (f Format) String() string {
-	switch f.Format {
-	case 1:
-		if f.BitsPerSample == 16 {
-			return "16-bit signed PCM"
-		}
+	switch {
+	case f.Format == WAVE_FORMAT_PCM && f.BitsPerSample == 16:
+		return "16-bit signed PCM"
 
-	case 3:
-		if f.BitsPerSample == 32 {
-			return "32-bit floating point PCM"
-		}
+	case f.Format == WAVE_FORMAT_IEEE_FLOAT && f.BitsPerSample == 32:
+		return "32-bit floating point PCM"
 
-	case 65534:
-		if fmt.Sprintf("%0x", f.Extension.SubFormatGUID) == PCM_FLOAT {
-			if f.BitsPerSample == 32 {
-				return "32-bit floating point PCM"
-			}
-		}
+	case f.Format == WAVE_FORMAT_EXTENSIBLE && fmt.Sprintf("%0x", f.Extension.SubFormatGUID) == GUID_PCM && f.BitsPerSample == 24:
+		return "24-bit floating point PCM"
+
+	case f.Format == WAVE_FORMAT_EXTENSIBLE && fmt.Sprintf("%0x", f.Extension.SubFormatGUID) == GUID_IEEE_FLOAT && f.BitsPerSample == 32:
+		return "32-bit floating point PCM"
 	}
 
 	return "unknown"

@@ -148,11 +148,11 @@ func parseFMT(ch chunk) (*Format, error) {
 
 	if err := binary.Read(r, binary.LittleEndian, &bitsPerSample); err != nil {
 		return nil, err
-	} else if bitsPerSample != 16 && bitsPerSample != 32 {
-		return nil, fmt.Errorf("Invalid 'fmt ' bits per sample %v - expected 16 (16-bit PCM) or 32 (32-bit PCM)", bitsPerSample)
+	} else if bitsPerSample != 16 && bitsPerSample != 24 && bitsPerSample != 32 {
+		return nil, fmt.Errorf("Invalid 'fmt ' bits per sample %v - expected 16,24 or 32", bitsPerSample)
 	}
 
-	if format == 65534 {
+	if format == 0xFFFE {
 		if err := binary.Read(r, binary.LittleEndian, &extensionSize); err != nil {
 			return nil, err
 		} else if extensionSize != 22 {
@@ -161,8 +161,8 @@ func parseFMT(ch chunk) (*Format, error) {
 
 		if err := binary.Read(r, binary.LittleEndian, &validBitsPerSample); err != nil {
 			return nil, err
-		} else if validBitsPerSample != 32 {
-			return nil, fmt.Errorf("Invalid 'valid bits per sample' extension field %v - expected 32 (32-bit floating point PCM)", validBitsPerSample)
+		} else if validBitsPerSample != 24 && validBitsPerSample != 32 {
+			return nil, fmt.Errorf("Invalid 'valid bits per sample' extension field %v - expected 24 or 32", validBitsPerSample)
 		}
 
 		if err := binary.Read(r, binary.LittleEndian, &channelMask); err != nil {
@@ -211,28 +211,29 @@ func parseFact(ch chunk) (*Fact, error) {
 }
 
 func parseData(f Format, ch chunk) ([]float32, error) {
-	switch f.Format {
-	case 1:
+	switch {
+	case f.Format == WAVE_FORMAT_PCM:
 		if audio, err := parsePCM16(ch.data); err != nil {
 			return nil, err
 		} else {
 			return audio, nil
 		}
 
-	case 3:
+	case f.Format == WAVE_FORMAT_IEEE_FLOAT:
 		if audio, err := parsePCM32f(ch.data); err != nil {
 			return nil, err
 		} else {
 			return audio, nil
 		}
 
-	case 65534:
-		if fmt.Sprintf("%0x", f.Extension.SubFormatGUID) != PCM_FLOAT {
-			return nil, fmt.Errorf("Unsupported WAV file extension format %0x", f.Extension.SubFormatGUID)
-		} else if f.BitsPerSample != 32 {
-			return nil, fmt.Errorf("Unsupported sample format (float%v)", f.BitsPerSample)
+	case f.Format == WAVE_FORMAT_EXTENSIBLE && fmt.Sprintf("%0x", f.Extension.SubFormatGUID) == GUID_PCM && f.BitsPerSample == 24:
+		if audio, err := parsePCM24(ch.data); err != nil {
+			return nil, err
+		} else {
+			return audio, nil
 		}
 
+	case f.Format == WAVE_FORMAT_EXTENSIBLE && fmt.Sprintf("%0x", f.Extension.SubFormatGUID) == GUID_IEEE_FLOAT && f.BitsPerSample == 32:
 		if audio, err := parseWFX(ch.data); err != nil {
 			return nil, err
 		} else {
@@ -240,7 +241,7 @@ func parseData(f Format, ch chunk) ([]float32, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Unsupported WAV file format")
+	return nil, fmt.Errorf("unsupported WAV file format")
 }
 
 func split(data []float32, channels int) (int, [][]float32) {
@@ -281,6 +282,23 @@ func parsePCM16(data []byte) ([]float32, error) {
 	return samples, nil
 }
 
+func parsePCM24(data []byte) ([]float32, error) {
+	N := len(data) / 3
+	samples := make([]float32, N)
+	r := bytes.NewReader(data)
+
+	for i := 0; i < N; i++ {
+		var sample int24
+		if err := binary.Read(r, binary.LittleEndian, &sample); err != nil {
+			return nil, err
+		} else {
+			samples[i] = sample.ToFloat()
+		}
+	}
+
+	return samples, nil
+}
+
 func parsePCM32f(b []byte) ([]float32, error) {
 	data := make([]float32, len(b)/4)
 	r := bytes.NewBuffer(b)
@@ -299,4 +317,14 @@ func parseWFX(b []byte) ([]float32, error) {
 	}
 
 	return data, nil
+}
+
+func toInt24(data []byte) int32 {
+	i24 := uint32(data[0])<<16 | uint32(data[1])<<8 | uint32(data[2])
+
+	// 	if sign != 0 {
+	// 	i24  |= 0xFF000000
+	// }
+
+	return int32(i24)
 }

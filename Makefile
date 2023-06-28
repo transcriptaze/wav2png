@@ -26,13 +26,15 @@ coverage: build
 	go clean -testcache
 	go test -cover ./...
 
-vet: test
+vet: 
 	go vet ./...
 
-lint: vet
-	golint ./...
+lint:
+	env GOOS=darwin  GOARCH=amd64 staticcheck ./...
+	env GOOS=linux   GOARCH=amd64 staticcheck ./...
+	env GOOS=windows GOARCH=amd64 staticcheck ./...
 
-build-all: build test
+build-all: test vet lint
 	mkdir -p dist/windows/wav2png
 	mkdir -p dist/darwin/wav2png
 	mkdir -p dist/linux/wav2png
@@ -47,8 +49,10 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	./bin/wav2png --debug --antialias none --out ./runtime ./samples/debug.wav
-	open ./runtime/debug.png
+	go clean -testcache
+	go test ./encoding/wav/... -run TestDecodePCM24
+	go test ./encoding/wav/... -run TestInt24ToInt32
+	go test ./encoding/wav/... -run TestInt24ToFloat
 
 version: build
 	./bin/wav2png version
