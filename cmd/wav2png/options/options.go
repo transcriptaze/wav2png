@@ -38,6 +38,7 @@ var defaults = settings{
 		Horizontal: 1.0,
 		Vertical:   1.0,
 	},
+	Style: "default",
 }
 
 type Options struct {
@@ -56,6 +57,8 @@ type Options struct {
 	Antialias wav2png.Kernel
 	VScale    float64
 
+	Style string
+
 	Debug bool
 }
 
@@ -69,6 +72,7 @@ func NewOptions() Options {
 		GridSpec:  defaults.Grid.GridSpec(),
 		Antialias: defaults.Antialias.Kernel(),
 		VScale:    defaults.Scale.Vertical,
+		Style:     defaults.Style,
 		Debug:     false,
 	}
 }
@@ -84,6 +88,7 @@ func (o *Options) Parse() error {
 		o.GridSpec = defaults.Grid.GridSpec()
 		o.Antialias = defaults.Antialias.Kernel()
 		o.VScale = defaults.Scale.Vertical
+		o.Style = defaults.Style
 	}
 
 	// ... override default settings with command line options
@@ -95,6 +100,7 @@ func (o *Options) Parse() error {
 	var start time.Duration
 	var end time.Duration
 	var mix options.Mix
+	var style string
 
 	palette := defaults.Palette
 	grid := defaults.Grid
@@ -115,6 +121,7 @@ func (o *Options) Parse() error {
 	flag.DurationVar(&start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
 	flag.Var(&mix, "mix", "channel mix")
+	flag.StringVar(&style, "style", "", "render style")
 	flag.BoolVar(&o.Debug, "debug", false, "Displays diagnostic information")
 	flag.Parse()
 
@@ -188,6 +195,9 @@ func (o *Options) Parse() error {
 
 		case "scale":
 			o.VScale = scale.Vertical
+
+		case "style":
+			o.Style = style
 		}
 	}
 

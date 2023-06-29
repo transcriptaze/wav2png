@@ -49,10 +49,8 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	go clean -testcache
-	go test ./encoding/wav/... -run TestDecodePCM24
-	go test ./encoding/wav/... -run TestInt24ToInt32
-	go test ./encoding/wav/... -run TestInt24ToFloat
+	./bin/wav2png --debug --width 640 --height 480 --padding 0 --style columns --out ./runtime ./samples/noise.wav
+	open ./runtime/noise.png
 
 version: build
 	./bin/wav2png version

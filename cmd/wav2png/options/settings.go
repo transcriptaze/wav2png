@@ -15,6 +15,7 @@ type settings struct {
 	Grid      options.Grid      `json:"grid,omitempty"`
 	Antialias options.Antialias `json:"antialias,omitempty"`
 	Scale     options.Scale     `json:"scale,omitempty"`
+	Style     string            `json:"style"`
 }
 
 func (s *settings) Load(file string) error {
