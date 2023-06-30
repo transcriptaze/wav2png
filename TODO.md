@@ -1,6 +1,10 @@
 # TODO
 
-- [ ] 24 bit WAV files
+- [ ] Columns renderer
+      - [ ] Refactor default renderer out as 'lines'
+      - [ ] --style <JSON> argument
+
+- [x] 24 bit WAV files
 - [ ] wav2mp4 does not seperate L/R audio with --mix option
 - [ ] wav2mp4 does not trim audio to size either
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/transcriptaze/wav2png/cmd/wav2png/options"
 	"github.com/transcriptaze/wav2png/encoding/wav"
+	"github.com/transcriptaze/wav2png/styles"
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
@@ -71,7 +72,13 @@ func main() {
 		fmt.Printf("   Duration:    %v\n", audio.duration)
 		fmt.Printf("   Samples:     %v\n", audio.length)
 		fmt.Printf("   PNG:         %v\n", options.PNG)
+		fmt.Printf("   Style:       %v\n", options.Style)
 		fmt.Println()
+	}
+
+	if _, err := styles.Load(options.Style); err != nil {
+		fmt.Printf("\n   ERROR: %v\n", err)
+		os.Exit(1)
 	}
 
 	img, err := render(*audio, from, to, options)
