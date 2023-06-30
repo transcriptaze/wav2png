@@ -51,8 +51,9 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	./bin/wav2png --debug --width 640 --height 480 --padding 0 --style lines --out ./runtime ./samples/noise.wav
-	open ./runtime/noise.png
+#	./bin/wav2png --debug --width 640 --height 480 --padding 0 --style lines --out ./runtime ./samples/noise.wav
+#	open ./runtime/noise.png
+	go test ./wav2png/renderers/...
 
 version: build
 	./bin/wav2png version

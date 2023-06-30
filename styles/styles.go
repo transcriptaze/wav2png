@@ -20,5 +20,5 @@ func Load(style string) (any, error) {
 	} else {
 	}
 
-	return nil,nil 
+	return nil, nil
 }

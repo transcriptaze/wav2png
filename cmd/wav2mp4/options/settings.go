@@ -5,11 +5,12 @@ import (
 	"os"
 
 	"github.com/transcriptaze/wav2png/cmd/options"
+	"github.com/transcriptaze/wav2png/styles/palettes"
 )
 
 type settings struct {
 	Size      options.Size      `json:"size,omitempty"`
-	Palette   options.Palette   `json:"palette,omitempty"`
+	Palette   palettes.Palette  `json:"palette,omitempty"`
 	Fill      options.Fill      `json:"fill,omitempty"`
 	Padding   options.Padding   `json:"padding,omitempty"`
 	Grid      options.Grid      `json:"grid,omitempty"`

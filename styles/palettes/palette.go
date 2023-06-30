@@ -1,4 +1,4 @@
-package options
+package palettes
 
 import (
 	"bytes"
@@ -44,6 +44,8 @@ var palettes = map[string][]byte{
 	"green":   palette_green,
 	"gold":    palette_gold,
 }
+
+var Fire = Palette("fire").Palette()
 
 func (p Palette) String() string {
 	return fmt.Sprintf("%v", string(p))
