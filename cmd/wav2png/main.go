@@ -3,16 +3,15 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/draw"
 	"image/png"
-	"math"
 	"os"
 	"time"
 
 	"github.com/transcriptaze/wav2png/cmd/wav2png/options"
+	"github.com/transcriptaze/wav2png/encoding"
 	"github.com/transcriptaze/wav2png/encoding/wav"
 	"github.com/transcriptaze/wav2png/styles"
-	"github.com/transcriptaze/wav2png/wav2png"
+	"github.com/transcriptaze/wav2png/wav2png/renderers/lines"
 )
 
 const VERSION = "v1.1.0"
@@ -47,13 +46,10 @@ func main() {
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
-	} else if audio == nil {
-		fmt.Printf("\n   ERROR: unable to read WAV file\n")
-		os.Exit(1)
 	}
 
 	from := 0 * time.Second
-	to := audio.duration
+	to := audio.Duration
 
 	if options.From != nil {
 		from = *options.From
@@ -66,11 +62,11 @@ func main() {
 	if options.Debug {
 		fmt.Println()
 		fmt.Printf("   File:        %v\n", options.WAV)
-		fmt.Printf("   Channels:    %v\n", audio.channels)
-		fmt.Printf("   Format:      %v\n", audio.format)
-		fmt.Printf("   Sample Rate: %v\n", audio.sampleRate)
-		fmt.Printf("   Duration:    %v\n", audio.duration)
-		fmt.Printf("   Samples:     %v\n", audio.length)
+		fmt.Printf("   Channels:    %v\n", audio.Channels)
+		fmt.Printf("   Format:      %v\n", audio.Format)
+		fmt.Printf("   Sample Rate: %v\n", audio.SampleRate)
+		fmt.Printf("   Duration:    %v\n", audio.Duration)
+		fmt.Printf("   Samples:     %v\n", audio.Length)
 		fmt.Printf("   PNG:         %v\n", options.PNG)
 		fmt.Printf("   Style:       %v\n", options.Style)
 		fmt.Println()
@@ -81,7 +77,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	img, err := render(*audio, from, to, options)
+	img, err := render(audio, from, to, options)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
@@ -93,83 +89,42 @@ func main() {
 	}
 }
 
-func render(wav audio, from, to time.Duration, options options.Options) (*image.NRGBA, error) {
-	width := int(options.Width)
-	height := int(options.Height)
-	padding := options.Padding
-	fillspec := options.FillSpec
-	gridspec := options.GridSpec
-	kernel := options.Antialias
-	vscale := options.VScale
-	palette := options.Palette
-
-	w := width
-	h := height
-	if padding > 0 {
-		w = width - 2*padding
-		h = height - 2*padding
+func render(audio encoding.Audio, from, to time.Duration, options options.Options) (*image.NRGBA, error) {
+	renderer := lines.Lines{
+		Width:     int(options.Width),
+		Height:    int(options.Height),
+		Padding:   options.Padding,
+		Palette:   options.Palette,
+		FillSpec:  options.FillSpec,
+		GridSpec:  options.GridSpec,
+		AntiAlias: options.Antialias,
+		VScale:    options.VScale,
+		Channels:  options.Mix.Channels(),
 	}
 
-	fs := wav.sampleRate
-	samples := mix(wav, options.Mix.Channels()...)
-
-	start := int(math.Floor(from.Seconds() * fs))
-	if start < 0 || start > len(samples) {
-		return nil, fmt.Errorf("Start position not in range %v-%v", from, wav.duration)
-	}
-
-	end := int(math.Floor(to.Seconds() * fs))
-	if end < 0 || end < start || end > len(samples) {
-		return nil, fmt.Errorf("End position not in range %v-%v", from, wav.duration)
-	}
-
-	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	grid := wav2png.Grid(gridspec, width, height, padding)
-	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
-	antialiased := wav2png.Antialias(waveform, kernel)
-
-	x0 := padding
-	y0 := padding
-	x1 := x0 + w
-	y1 := y0 + h
-
-	origin := image.Pt(0, 0)
-	rect := image.Rect(x0, y0, x1, y1)
-	rectg := img.Bounds()
-
-	wav2png.Fill(img, fillspec)
-
-	if gridspec.Overlay() {
-		draw.Draw(img, rect, antialiased, origin, draw.Over)
-		draw.Draw(img, rectg, grid, origin, draw.Over)
-	} else {
-		draw.Draw(img, rectg, grid, origin, draw.Over)
-		draw.Draw(img, rect, antialiased, origin, draw.Over)
-	}
-
-	return img, nil
+	return renderer.Render(audio, from, to)
 }
 
-func read(wavfile string) (*audio, error) {
+func read(wavfile string) (encoding.Audio, error) {
 	file, err := os.Open(wavfile)
 	if err != nil {
-		return nil, err
+		return encoding.Audio{}, err
 	}
 
 	defer file.Close()
 
 	w, err := wav.Decode(file)
 	if err != nil {
-		return nil, err
+		return encoding.Audio{}, err
 	}
 
-	return &audio{
-		sampleRate: float64(w.Format.SampleRate),
-		format:     fmt.Sprintf("%v", w.Format),
-		channels:   int(w.Format.Channels),
-		duration:   w.Duration(),
-		length:     w.Frames(),
-		samples:    w.Samples,
+	return encoding.Audio{
+		SampleRate: float64(w.Format.SampleRate),
+		Format:     fmt.Sprintf("%v", w.Format),
+		Channels:   int(w.Format.Channels),
+		Duration:   w.Duration(),
+		Length:     w.Frames(),
+		Samples:    w.Samples,
 	}, nil
 }
 
@@ -182,27 +137,6 @@ func write(img *image.NRGBA, file string) error {
 	defer f.Close()
 
 	return png.Encode(f, img)
-}
-
-func mix(wav audio, channels ...int) []float32 {
-	L := wav.length
-	N := float64(len(channels))
-	samples := make([]float32, L)
-
-	if len(wav.samples) < 2 {
-		return wav.samples[0]
-	}
-
-	for i := 0; i < L; i++ {
-		sample := 0.0
-		for _, ch := range channels {
-			sample += float64(wav.samples[ch-1][i])
-		}
-
-		samples[i] = float32(sample / N)
-	}
-
-	return samples
 }
 
 func usage() {
