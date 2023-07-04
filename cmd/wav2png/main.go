@@ -16,15 +16,6 @@ import (
 
 const VERSION = "v1.1.0"
 
-type audio struct {
-	sampleRate float64
-	format     string
-	channels   int
-	duration   time.Duration
-	length     int
-	samples    [][]float32
-}
-
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "version" {
 		version()

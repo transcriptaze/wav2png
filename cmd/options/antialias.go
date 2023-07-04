@@ -33,7 +33,7 @@ func (a *Antialias) Set(s string) error {
 	ss := strings.ToLower(s)
 	match := regexp.MustCompile("^(none|horizontal|vertical|soft)$").FindStringSubmatch(ss)
 
-	if match != nil && len(match) > 1 {
+	if len(match) > 1 {
 		switch match[1] {
 		case "none":
 			a.Type = "none"

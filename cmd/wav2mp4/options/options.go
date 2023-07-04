@@ -134,7 +134,7 @@ func (o *Options) Parse() error {
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
-		return fmt.Errorf("Missing WAV file")
+		return fmt.Errorf("missing WAV file")
 	}
 
 	wavfile := path.Clean(flag.Arg(0))

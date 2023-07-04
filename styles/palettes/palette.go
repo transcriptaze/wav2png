@@ -55,7 +55,7 @@ func (p *Palette) Set(s string) error {
 	ss := strings.ToLower(s)
 	match := regexp.MustCompile("^(ice|fire|aurora|horizon|amber|blue|green|gold)$").FindStringSubmatch(ss)
 
-	if match != nil && len(match) > 1 {
+	if len(match) > 1 {
 		*p = Palette(match[1])
 		return nil
 	}

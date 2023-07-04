@@ -14,7 +14,7 @@ func PaletteFromPng(png image.Image) (*Palette, error) {
 
 	bounds := png.Bounds()
 	if bounds.Empty() {
-		return nil, fmt.Errorf("Cannot create palette from empty PNG")
+		return nil, fmt.Errorf("cannot create palette from empty PNG")
 	}
 
 	h := bounds.Size().Y

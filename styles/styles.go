@@ -17,7 +17,6 @@ func Load(style string) (any, error) {
 		return nil, err
 	} else if err := json.Unmarshal(bytes, &v); err != nil {
 		return nil, err
-	} else {
 	}
 
 	return nil, nil

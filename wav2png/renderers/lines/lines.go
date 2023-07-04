@@ -36,12 +36,12 @@ func (l Lines) Render(audio encoding.Audio, from, to time.Duration) (*image.NRGB
 
 	start := int(math.Floor(from.Seconds() * fs))
 	if start < 0 || start > len(samples) {
-		return nil, fmt.Errorf("Start position not in range %v-%v", from, audio.Duration)
+		return nil, fmt.Errorf("start position not in range %v-%v", from, audio.Duration)
 	}
 
 	end := int(math.Floor(to.Seconds() * fs))
 	if end < 0 || end < start || end > len(samples) {
-		return nil, fmt.Errorf("End position not in range %v-%v", from, audio.Duration)
+		return nil, fmt.Errorf("end position not in range %v-%v", from, audio.Duration)
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, l.Width, l.Height))

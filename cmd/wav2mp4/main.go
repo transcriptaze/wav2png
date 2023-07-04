@@ -132,7 +132,7 @@ func main() {
 		if q > duration {
 			shift = (duration - (p + window)).Seconds() / window.Seconds()
 			p = duration - window
-			q = p + window
+			// q = p + window
 		}
 
 		start := from + p
@@ -199,12 +199,12 @@ func render(wav audio, from, to time.Duration, options options.Options, shift fl
 
 	start := int(math.Floor(from.Seconds() * fs))
 	if start < 0 || start > len(samples) {
-		return nil, fmt.Errorf("Start position not in range %v-%v", from, wav.duration)
+		return nil, fmt.Errorf("start position not in range %v-%v", from, wav.duration)
 	}
 
 	end := int(math.Floor(to.Seconds() * fs))
 	if end < 0 || end < start || end > len(samples) {
-		return nil, fmt.Errorf("End position not in range %v-%v", from, wav.duration)
+		return nil, fmt.Errorf("end position not in range %v-%v", from, wav.duration)
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))

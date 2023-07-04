@@ -47,7 +47,7 @@ func (g *Grid) Set(s string) error {
 	ss := strings.ToLower(s)
 	match := regexp.MustCompile("^(none|square|rectangular).*").FindStringSubmatch(ss)
 
-	if match != nil && len(match) > 1 {
+	if len(match) > 1 {
 		switch match[1] {
 		case "none":
 			g.Grid = "none"
@@ -56,20 +56,20 @@ func (g *Grid) Set(s string) error {
 			g.Grid = "square"
 
 			match = regexp.MustCompile("^square:(#[[:xdigit:]]{8}).*").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				color := colour(match[1])
 				g.Colour = fmt.Sprintf("#%02x%02x%02x", color.R, color.G, color.B)
 				g.Alpha = color.A
 			}
 
 			match = regexp.MustCompile("^square:#[[:xdigit:]]{8}:([~=≥≤><]?[0-9]+).*").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				fit, size := size(match[1])
 				g.Size = fmt.Sprintf("%v%v", fit, size)
 			}
 
 			match = regexp.MustCompile("^square:#[[:xdigit:]]{8}:[~=≥≤><]?[0-9]+:(overlay)").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				g.Overlay = true
 			}
 
@@ -77,20 +77,20 @@ func (g *Grid) Set(s string) error {
 			g.Grid = "rectangular"
 
 			match = regexp.MustCompile("^rectangular:(#[[:xdigit:]]{8}).*").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				color := colour(match[1])
 				g.Colour = fmt.Sprintf("#%02x%02x%02x", color.R, color.G, color.B)
 				g.Alpha = color.A
 			}
 
 			match = regexp.MustCompile("^rectangular:#[[:xdigit:]]{8}:([~=≥≤><]?[0-9]+x[0-9]+).*").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				fit, w, h := wh(match[1])
 				g.WH = fmt.Sprintf("%v%vx%v", fit, w, h)
 			}
 
 			match = regexp.MustCompile("^rectangular:#[[:xdigit:]]{8}:[~=≥≤><]?[0-9]+x[0-9]+:(overlay)").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				g.Overlay = true
 			}
 
@@ -127,7 +127,7 @@ func (g Grid) GridSpec() wav2png.GridSpec {
 		width := uint(64)
 		height := uint(48)
 
-		if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)x([0-9]+)`).FindStringSubmatch(g.WH); matched != nil && len(matched) == 4 {
+		if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)x([0-9]+)`).FindStringSubmatch(g.WH); len(matched) == 4 {
 			switch matched[1] {
 			case "~":
 				fit = wav2png.Approximate
@@ -159,7 +159,7 @@ func (g Grid) GridSpec() wav2png.GridSpec {
 	fit := wav2png.Approximate
 	size := uint(64)
 
-	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)`).FindStringSubmatch(g.Size); matched != nil && len(matched) == 3 {
+	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)`).FindStringSubmatch(g.Size); len(matched) == 3 {
 		switch matched[1] {
 		case "~":
 			fit = wav2png.Approximate
@@ -187,7 +187,7 @@ func size(s string) (wav2png.Fit, uint) {
 	fit := wav2png.Approximate
 	size := uint(64)
 
-	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)`).FindStringSubmatch(s); matched != nil && len(matched) == 3 {
+	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)`).FindStringSubmatch(s); len(matched) == 3 {
 		switch matched[1] {
 		case "~":
 			fit = wav2png.Approximate
@@ -216,7 +216,7 @@ func wh(s string) (wav2png.Fit, uint, uint) {
 	width := uint(64)
 	height := uint(48)
 
-	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)x([0-9]+)`).FindStringSubmatch(s); matched != nil && len(matched) == 4 {
+	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)x([0-9]+)`).FindStringSubmatch(s); len(matched) == 4 {
 		switch matched[1] {
 		case "~":
 			fit = wav2png.Approximate

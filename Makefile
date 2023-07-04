@@ -1,6 +1,6 @@
 DIST ?= development
 
-.DEFAULT_GOAL := debug
+.DEFAULT_GOAL := lint
 
 all: test      \
 	 benchmark \

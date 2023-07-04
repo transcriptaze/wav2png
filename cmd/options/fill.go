@@ -27,13 +27,13 @@ func (f *Fill) Set(s string) error {
 	ss := strings.ToLower(s)
 	match := regexp.MustCompile("^(solid).*").FindStringSubmatch(ss)
 
-	if match != nil && len(match) > 1 {
+	if len(match) > 1 {
 		switch match[1] {
 		case "solid":
 			f.Fill = "solid"
 
 			match = regexp.MustCompile("^solid:(#[[:xdigit:]]{8}).*").FindStringSubmatch(ss)
-			if match != nil && len(match) > 1 {
+			if len(match) > 1 {
 				color := colour(match[1])
 				f.Colour = fmt.Sprintf("#%02x%02x%02x", color.R, color.G, color.B)
 				f.Alpha = color.A

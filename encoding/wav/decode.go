@@ -21,9 +21,9 @@ func Decode(r io.Reader) (*WAV, error) {
 	if chunk, err := getChunk(r); err != nil {
 		return nil, err
 	} else if chunk == nil {
-		return nil, fmt.Errorf("Invalid RIFF header chunk (%v)", chunk)
+		return nil, fmt.Errorf("invalid RIFF header chunk (%v)", chunk)
 	} else if chunk.ID != "RIFF" {
-		return nil, fmt.Errorf("Invalid RIFF header chunk ID (%s)", chunk.ID)
+		return nil, fmt.Errorf("invalid RIFF header chunk ID (%s)", chunk.ID)
 	} else {
 		b = bytes.NewBuffer(chunk.data)
 
@@ -31,7 +31,7 @@ func Decode(r io.Reader) (*WAV, error) {
 		if _, err := b.Read(format); err != nil {
 			return nil, err
 		} else if string(format) != "WAVE" {
-			return nil, fmt.Errorf("Invalid WAV header format (%s)", string(format))
+			return nil, fmt.Errorf("invalid WAV header format (%s)", string(format))
 		}
 	}
 
@@ -53,11 +53,11 @@ func Decode(r io.Reader) (*WAV, error) {
 
 	// ... extract 'fmt '
 	if chunk, ok := chunks["fmt "]; !ok {
-		return nil, fmt.Errorf("Invalid WAV file - missing 'fmt ' subchunk")
+		return nil, fmt.Errorf("invalid WAV file - missing 'fmt ' subchunk")
 	} else if format, err := parseFMT(*chunk); err != nil {
-		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk (%v)", err)
+		return nil, fmt.Errorf("invalid WAV 'fmt ' subchunk (%v)", err)
 	} else if format == nil {
-		return nil, fmt.Errorf("Invalid WAV 'fmt ' subchunk (%v)", format)
+		return nil, fmt.Errorf("invalid WAV 'fmt ' subchunk (%v)", format)
 	} else {
 		w.Format = *format
 	}
@@ -65,7 +65,7 @@ func Decode(r io.Reader) (*WAV, error) {
 	// ... extract 'fact'
 	if chunk, ok := chunks["fact"]; ok {
 		if fact, err := parseFact(*chunk); err != nil {
-			return nil, fmt.Errorf("Invalid WAV file 'fact' subchunk (%v)", err)
+			return nil, fmt.Errorf("invalid WAV file 'fact' subchunk (%v)", err)
 		} else {
 			w.Fact = fact
 		}
@@ -73,9 +73,9 @@ func Decode(r io.Reader) (*WAV, error) {
 
 	// ... extract 'data'
 	if chunk, ok := chunks["data"]; !ok {
-		return nil, fmt.Errorf("Invalid WAV file - missing 'data' subchunk")
+		return nil, fmt.Errorf("invalid WAV file - missing 'data' subchunk")
 	} else if data, err := parseData(w.Format, *chunk); err != nil {
-		return nil, fmt.Errorf("Invalid WAV data' subchunk (%v)", err)
+		return nil, fmt.Errorf("invalid WAV data' subchunk (%v)", err)
 	} else {
 		frames, samples := split(data, int(w.Format.Channels))
 
@@ -100,7 +100,7 @@ func getChunk(r io.Reader) (*chunk, error) {
 
 	data := make([]byte, length)
 	if _, err := io.ReadFull(r, data); err != nil {
-		return nil, fmt.Errorf("Error reading chunk '%s' from WAV file (%s)", string(chunkID), err)
+		return nil, fmt.Errorf("error reading chunk '%s' from WAV file (%s)", string(chunkID), err)
 	}
 
 	return &chunk{
@@ -127,7 +127,7 @@ func parseFMT(ch chunk) (*Format, error) {
 	if err := binary.Read(r, binary.LittleEndian, &format); err != nil {
 		return nil, err
 	} else if format != 1 && format != 3 && format != 65534 {
-		return nil, fmt.Errorf("Invalid 'fmt ' format %v - expected 1 (16-bit PCM), 3 (32-bit float PCM)  or 65534 (extensible)", format)
+		return nil, fmt.Errorf("invalid 'fmt ' format %v - expected 1 (16-bit PCM), 3 (32-bit float PCM)  or 65534 (extensible)", format)
 	}
 
 	if err := binary.Read(r, binary.LittleEndian, &channels); err != nil {
@@ -149,20 +149,20 @@ func parseFMT(ch chunk) (*Format, error) {
 	if err := binary.Read(r, binary.LittleEndian, &bitsPerSample); err != nil {
 		return nil, err
 	} else if bitsPerSample != 16 && bitsPerSample != 24 && bitsPerSample != 32 {
-		return nil, fmt.Errorf("Invalid 'fmt ' bits per sample %v - expected 16,24 or 32", bitsPerSample)
+		return nil, fmt.Errorf("invalid 'fmt ' bits per sample %v - expected 16,24 or 32", bitsPerSample)
 	}
 
 	if format == 0xFFFE {
 		if err := binary.Read(r, binary.LittleEndian, &extensionSize); err != nil {
 			return nil, err
 		} else if extensionSize != 22 {
-			return nil, fmt.Errorf("Invalid extension size %v - expected 22 (extensible)", extensionSize)
+			return nil, fmt.Errorf("invalid extension size %v - expected 22 (extensible)", extensionSize)
 		}
 
 		if err := binary.Read(r, binary.LittleEndian, &validBitsPerSample); err != nil {
 			return nil, err
 		} else if validBitsPerSample != 24 && validBitsPerSample != 32 {
-			return nil, fmt.Errorf("Invalid 'valid bits per sample' extension field %v - expected 24 or 32", validBitsPerSample)
+			return nil, fmt.Errorf("invalid 'valid bits per sample' extension field %v - expected 24 or 32", validBitsPerSample)
 		}
 
 		if err := binary.Read(r, binary.LittleEndian, &channelMask); err != nil {
@@ -319,12 +319,3 @@ func parseWFX(b []byte) ([]float32, error) {
 	return data, nil
 }
 
-func toInt24(data []byte) int32 {
-	i24 := uint32(data[0])<<16 | uint32(data[1])<<8 | uint32(data[2])
-
-	// 	if sign != 0 {
-	// 	i24  |= 0xFF000000
-	// }
-
-	return int32(i24)
-}

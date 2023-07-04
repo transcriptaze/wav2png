@@ -16,7 +16,7 @@ func (m *Mix) Set(s string) error {
 	ss := strings.ToUpper(s)
 	match := regexp.MustCompile(`^(L|R|L\+R)$`).FindStringSubmatch(ss)
 
-	if match != nil && len(match) > 1 {
+	if len(match) > 1 {
 		*m = Mix(match[1])
 		return nil
 	}
