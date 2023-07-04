@@ -1,6 +1,6 @@
 DIST ?= development
 
-.DEFAULT_GOAL := lint
+.DEFAULT_GOAL := debug
 
 all: test      \
 	 benchmark \
@@ -51,10 +51,10 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	./bin/wav2png --debug --width 640 --height 480 --padding 0 --style lines --out ./runtime ./samples/noise.wav
-	diff -b ./runtime/noise.png ./runtime/reference.png
+#	./bin/wav2png --debug --width 640 --height 480 --padding 0 --style lines --out ./runtime ./samples/noise.wav
+# 	diff -b ./runtime/noise.png ./runtime/reference.png
 #	open ./runtime/noise.png
-# 	go test ./wav2png/renderers/...
+	go test ./wav2png/renderers/...
 
 version: build
 	./bin/wav2png version

@@ -1,4 +1,4 @@
-package lines
+package columns
 
 import (
 	"bytes"
@@ -28,7 +28,7 @@ var black = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xff}
 var green = color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff}
 
 func TestRender(t *testing.T) {
-	renderer := Lines{
+	renderer := Columns{
 		Width:     640,
 		Height:    480,
 		Padding:   0,

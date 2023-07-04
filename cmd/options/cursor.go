@@ -120,7 +120,7 @@ func (c *Cursor) Set(s string) error {
 		token := tokens[0]
 		match := regexp.MustCompile("^(none|green|red)$").FindStringSubmatch(strings.ToLower(token))
 
-		if  len(match) > 1 {
+		if len(match) > 1 {
 			c.cursor = match[1]
 		} else if info, err := os.Stat(token); os.IsNotExist(err) {
 			return fmt.Errorf("Cursor %v does not exist", token)
@@ -135,7 +135,7 @@ func (c *Cursor) Set(s string) error {
 		token := tokens[1]
 		match := regexp.MustCompile("^(linear|sweep||centre|center|left|right|ease|erf)$").FindStringSubmatch(strings.ToLower(token))
 
-		if  len(match) > 1 {
+		if len(match) > 1 {
 			c.fn = match[1]
 		}
 	}

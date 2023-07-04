@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"math"
 	"os"
 	"time"
 
@@ -90,10 +91,14 @@ func render(audio encoding.Audio, from, to time.Duration, options options.Option
 		GridSpec:  options.GridSpec,
 		AntiAlias: options.Antialias,
 		VScale:    options.VScale,
-		Channels:  options.Mix.Channels(),
 	}
 
-	return renderer.Render(audio, from, to)
+	fs := audio.SampleRate
+	samples := mix(audio, options.Mix.Channels()...)
+	start := int(math.Floor(from.Seconds() * fs))
+	end := int(math.Floor(to.Seconds() * fs))
+
+	return renderer.Render(samples[start:end], fs)
 }
 
 func read(wavfile string) (encoding.Audio, error) {
@@ -128,6 +133,27 @@ func write(img *image.NRGBA, file string) error {
 	defer f.Close()
 
 	return png.Encode(f, img)
+}
+
+func mix(wav encoding.Audio, channels ...int) []float32 {
+	L := wav.Length
+	N := float64(len(channels))
+	samples := make([]float32, L)
+
+	if len(wav.Samples) < 2 {
+		return wav.Samples[0]
+	}
+
+	for i := 0; i < L; i++ {
+		sample := 0.0
+		for _, ch := range channels {
+			sample += float64(wav.Samples[ch-1][i])
+		}
+
+		samples[i] = float32(sample / N)
+	}
+
+	return samples
 }
 
 func usage() {

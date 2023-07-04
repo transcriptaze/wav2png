@@ -1,4 +1,4 @@
-package lines
+package columns
 
 import (
 	"image"
@@ -7,7 +7,7 @@ import (
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
-type Lines struct {
+type Columns struct {
 	Width     int
 	Height    int
 	Padding   int
@@ -18,10 +18,10 @@ type Lines struct {
 	VScale    float64
 }
 
-func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
-	width := l.Width
-	height := l.Height
-	padding := l.Padding
+func (c Columns) Render(samples []float32, fs float64) (*image.NRGBA, error) {
+	width := c.Width
+	height := c.Height
+	padding := c.Padding
 
 	w := width
 	h := height
@@ -31,8 +31,8 @@ func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	grid := wav2png.Grid(l.GridSpec, width, height, padding)
-	waveform := l.render(samples, fs, w, h)
+	grid := wav2png.Grid(c.GridSpec, width, height, padding)
+	waveform := c.render(samples, fs, w, h)
 
 	x0 := padding
 	y0 := padding
@@ -43,9 +43,9 @@ func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
 	rect := image.Rect(x0, y0, x1, y1)
 	rectg := img.Bounds()
 
-	wav2png.Fill(img, l.FillSpec)
+	wav2png.Fill(img, c.FillSpec)
 
-	if l.GridSpec.Overlay() {
+	if c.GridSpec.Overlay() {
 		draw.Draw(img, rect, waveform, origin, draw.Over)
 		draw.Draw(img, rectg, grid, origin, draw.Over)
 	} else {
@@ -56,8 +56,8 @@ func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
 	return img, nil
 }
 
-func (l Lines) render(samples []float32, fs float64, w, h int) *image.NRGBA {
-	waveform := wav2png.Render(samples, fs, w, h, l.Palette, l.VScale)
+func (c Columns) render(samples []float32, fs float64, w, h int) *image.NRGBA {
+	waveform := wav2png.Render(samples, fs, w, h, c.Palette, c.VScale)
 
-	return wav2png.Antialias(waveform, l.AntiAlias)
+	return wav2png.Antialias(waveform, c.AntiAlias)
 }

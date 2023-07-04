@@ -318,4 +318,3 @@ func parseWFX(b []byte) ([]float32, error) {
 
 	return data, nil
 }
-
