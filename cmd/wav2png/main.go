@@ -98,7 +98,7 @@ func render(audio encoding.Audio, from, to time.Duration, options options.Option
 	start := int(math.Floor(from.Seconds() * fs))
 	end := int(math.Floor(to.Seconds() * fs))
 
-	return renderer.Render(samples[start:end], fs)
+	return renderer.Render(samples[start:end])
 }
 
 func read(wavfile string) (encoding.Audio, error) {

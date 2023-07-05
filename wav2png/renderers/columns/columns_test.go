@@ -8,6 +8,7 @@ import (
 	"image/color"
 	"image/png"
 	"math"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -48,10 +49,12 @@ func TestRender(t *testing.T) {
 	start := int(math.Floor(from.Seconds() * fs))
 	end := int(math.Floor(to.Seconds() * fs))
 
-	if img, err := renderer.Render(samples[start:end], fs); err != nil {
+	if img, err := renderer.Render(samples[start:end]); err != nil {
 		t.Fatalf("error rendering test image (%v)", err)
 	} else if !reflect.DeepEqual(encode(img), reference) {
 		t.Errorf("incorrectly rendered test image")
+
+		os.WriteFile("../../../runtime/columns.png", encode(img), 0666)
 	}
 }
 

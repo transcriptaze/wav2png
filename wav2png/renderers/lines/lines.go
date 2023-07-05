@@ -3,7 +3,6 @@ package lines
 import (
 	"image"
 	"image/draw"
-	"math"
 	"time"
 
 	"github.com/transcriptaze/wav2png/wav2png"
@@ -26,7 +25,7 @@ type Lines struct {
 	VScale    float64
 }
 
-func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
+func (l Lines) Render(samples []float32) (*image.NRGBA, error) {
 	width := l.Width
 	height := l.Height
 	padding := l.Padding
@@ -40,7 +39,7 @@ func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	grid := wav2png.Grid(l.GridSpec, width, height, padding)
-	waveform := l.render(samples, fs, w, h)
+	waveform := l.render(samples, w, h)
 
 	x0 := padding
 	y0 := padding
@@ -64,26 +63,21 @@ func (l Lines) Render(samples []float32, fs float64) (*image.NRGBA, error) {
 	return img, nil
 }
 
-func (r Lines) render(samples []float32, fs float64, width, height int) *image.NRGBA {
+func (r Lines) render(samples []float32, width, height int) *image.NRGBA {
 	volume := r.VScale
-	pps := float64(width) / float64(len(samples))
-	duration := seconds(float64(len(samples)) / fs)
-	l := int(math.Round(math.Ceil(fs*duration.Seconds()) / float64(width)))
-	buffer := make([]float32, l)
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := r.Palette.Realize()
 
-	x := 0.0
-	offset := x / pps
-	start := int(math.Round(offset))
+	x := 0
+	dx := 1
+	start := 0
 
 	for start < len(samples) {
-		end := int(math.Round(offset + 1.0/pps))
-		N := copy(buffer, samples[start:end])
+		end := (x + dx) * len(samples) / width
 
 		sum := make([]int, height)
 		u := vscale(0, -int(height))
-		for _, sample := range buffer[0:N] {
+		for _, sample := range samples[start:end] {
 			v := int16(32768 * float64(sample) * volume)
 			h := vscale(v, -int(height))
 			dy := signum(int(h) - int(u))
@@ -92,17 +86,17 @@ func (r Lines) render(samples []float32, fs float64, width, height int) *image.N
 			}
 		}
 
+		N := end - start
 		for y := 0; y < height; y++ {
 			if sum[y] > 0 {
 				l := len(colours)
 				i := ceil((l-1)*sum[y], N)
-				waveform.Set(int(x+1.0), int(y), colours[i])
+				waveform.Set(x+dx, y, colours[i])
 			}
 		}
 
-		x += 1.0
-		offset = x / pps
-		start = int(math.Round(offset))
+		x += dx
+		start = end
 	}
 
 	return wav2png.Antialias(waveform, r.AntiAlias)
