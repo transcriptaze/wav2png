@@ -22,7 +22,7 @@ func Render(pcm []float32, fs float64, width, height int, palette Palette, volum
 	l := int(math.Round(math.Ceil(fs*duration.Seconds()) / float64(width)))
 	buffer := make([]float32, l)
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
-	colours := palette.realize()
+	colours := palette.Realize()
 
 	x := 0.0
 	offset := x / pps

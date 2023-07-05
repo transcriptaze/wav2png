@@ -30,7 +30,7 @@ func PaletteFromPng(png image.Image) (*Palette, error) {
 	}, nil
 }
 
-func (p *Palette) realize() []color.NRGBA {
+func (p *Palette) Realize() []color.NRGBA {
 	return p.colours
 }
 
