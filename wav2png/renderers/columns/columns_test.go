@@ -33,6 +33,8 @@ func TestRender(t *testing.T) {
 		Width:     640,
 		Height:    480,
 		Padding:   0,
+		BarWidth:  16,
+		BarGap:    1,
 		Palette:   palettes.Fire,
 		FillSpec:  wav2png.NewSolidFill(black),
 		GridSpec:  wav2png.NewSquareGrid(green, 64, wav2png.Approximate, false),

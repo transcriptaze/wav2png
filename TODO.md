@@ -1,7 +1,7 @@
 # TODO
 
 - [ ] Columns renderer
-      - [ ] Refactor default renderer out as 'lines'
+      - [x] Refactor default renderer out as 'lines'
       - [ ] --style <JSON> argument
 
 - [x] 24 bit WAV files

@@ -3,7 +3,6 @@ package lines
 import (
 	"image"
 	"image/draw"
-	"time"
 
 	"github.com/transcriptaze/wav2png/wav2png"
 )
@@ -100,10 +99,6 @@ func (r Lines) render(samples []float32, width, height int) *image.NRGBA {
 	}
 
 	return wav2png.Antialias(waveform, r.AntiAlias)
-}
-
-func seconds(g float64) time.Duration {
-	return time.Duration(g * float64(time.Second))
 }
 
 func signum(N int) int {

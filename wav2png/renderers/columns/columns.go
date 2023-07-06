@@ -2,8 +2,6 @@ package columns
 
 import (
 	"image"
-	// "image/draw"
-	"time"
 
 	"golang.org/x/image/draw"
 
@@ -20,6 +18,8 @@ type Columns struct {
 	Width     int
 	Height    int
 	Padding   int
+	BarWidth  int
+	BarGap    int
 	Palette   wav2png.Palette
 	FillSpec  wav2png.FillSpec
 	GridSpec  wav2png.GridSpec
@@ -66,12 +66,16 @@ func (c Columns) Render(samples []float32) (*image.NRGBA, error) {
 }
 
 func (c Columns) render(samples []float32, width, height int) *image.NRGBA {
+	bar := image.NewNRGBA(image.Rect(0, 0, 1, int(height)))
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := c.Palette.Realize()
 	volume := c.VScale
 
+	scaler := draw.CatmullRom
+	column := image.Rect(1, 0, c.BarWidth, height)
+
 	x := 0
-	dx := 16
+	dx := c.BarWidth + c.BarGap
 	start := 0
 
 	for start < len(samples) {
@@ -93,26 +97,26 @@ func (c Columns) render(samples []float32, width, height int) *image.NRGBA {
 		}
 
 		N := end - start
+
+		draw.Draw(bar, bar.Bounds(), image.Transparent, image.Pt(0, 0), draw.Src)
+
 		for y := 0; y < height; y++ {
 			if sum[y] > 0 {
 				l := len(colours)
 				i := ceil((l-1)*sum[y], N)
 
-				for k := 1; k <= dx; k++ {
-					waveform.Set(x+k, y, colours[i])
-				}
+				bar.Set(0, y, colours[i])
 			}
 		}
+
+		xy := image.Pt(x+1, 0)
+		scaler.Scale(waveform, column.Add(xy), bar, bar.Bounds(), draw.Over, nil)
 
 		x += dx
 		start = end
 	}
 
 	return wav2png.Antialias(waveform, c.AntiAlias)
-}
-
-func seconds(g float64) time.Duration {
-	return time.Duration(g * float64(time.Second))
 }
 
 func signum(N int) int {
