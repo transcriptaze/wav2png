@@ -3,6 +3,7 @@
 - [ ] Columns renderer
       - [x] Refactor default renderer out as 'lines'
       - [ ] --style <JSON> argument
+      - [ ] Delegate grid, background etc to compositor
 
 - [x] 24 bit WAV files
 - [ ] wav2mp4 does not seperate L/R audio with --mix option
