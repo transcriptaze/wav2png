@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/transcriptaze/wav2png/cmd/options"
+	"github.com/transcriptaze/wav2png/fills"
+	"github.com/transcriptaze/wav2png/grids"
+	"github.com/transcriptaze/wav2png/kernels"
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
@@ -52,9 +55,9 @@ type Options struct {
 	Mix     options.Mix
 
 	Palette   wav2png.Palette
-	FillSpec  wav2png.FillSpec
-	GridSpec  wav2png.GridSpec
-	Antialias wav2png.Kernel
+	FillSpec  fills.FillSpec
+	GridSpec  grids.GridSpec
+	Antialias kernels.Kernel
 	VScale    float64
 
 	Window *time.Duration

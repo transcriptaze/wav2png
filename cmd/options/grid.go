@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/transcriptaze/wav2png/wav2png"
+	"github.com/transcriptaze/wav2png/grids"
 )
 
 type Grid struct {
@@ -100,7 +100,7 @@ func (g *Grid) Set(s string) error {
 	return nil
 }
 
-func (g Grid) GridSpec() wav2png.GridSpec {
+func (g Grid) GridSpec() grids.GridSpec {
 	// ... overlay
 	overlay := g.Overlay
 
@@ -118,29 +118,29 @@ func (g Grid) GridSpec() wav2png.GridSpec {
 
 	// ... no grid
 	if g.Grid == "none" {
-		return wav2png.NewNoGrid()
+		return grids.NewNoGrid()
 	}
 
 	// ... rectangular
 	if g.Grid == "rectangular" {
-		fit := wav2png.Approximate
+		fit := grids.Approximate
 		width := uint(64)
 		height := uint(48)
 
 		if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)x([0-9]+)`).FindStringSubmatch(g.WH); len(matched) == 4 {
 			switch matched[1] {
 			case "~":
-				fit = wav2png.Approximate
+				fit = grids.Approximate
 			case "=":
-				fit = wav2png.Exact
+				fit = grids.Exact
 			case "≥":
-				fit = wav2png.AtLeast
+				fit = grids.AtLeast
 			case "≤":
-				fit = wav2png.AtMost
+				fit = grids.AtMost
 			case ">":
-				fit = wav2png.LargerThan
+				fit = grids.LargerThan
 			case "<":
-				fit = wav2png.SmallerThan
+				fit = grids.SmallerThan
 			}
 
 			if v, err := strconv.ParseUint(matched[2], 10, 32); err == nil && v >= 16 && v <= 1024 {
@@ -152,27 +152,27 @@ func (g Grid) GridSpec() wav2png.GridSpec {
 			}
 		}
 
-		return wav2png.NewRectangularGrid(colour, width, height, fit, overlay)
+		return grids.NewRectangularGrid(colour, width, height, fit, overlay)
 	}
 
 	// ... default to square
-	fit := wav2png.Approximate
+	fit := grids.Approximate
 	size := uint(64)
 
 	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)`).FindStringSubmatch(g.Size); len(matched) == 3 {
 		switch matched[1] {
 		case "~":
-			fit = wav2png.Approximate
+			fit = grids.Approximate
 		case "=":
-			fit = wav2png.Exact
+			fit = grids.Exact
 		case "≥":
-			fit = wav2png.AtLeast
+			fit = grids.AtLeast
 		case "≤":
-			fit = wav2png.AtMost
+			fit = grids.AtMost
 		case ">":
-			fit = wav2png.LargerThan
+			fit = grids.LargerThan
 		case "<":
-			fit = wav2png.SmallerThan
+			fit = grids.SmallerThan
 		}
 
 		if v, err := strconv.ParseUint(matched[2], 10, 32); err == nil && v >= 16 && v <= 1024 {
@@ -180,27 +180,27 @@ func (g Grid) GridSpec() wav2png.GridSpec {
 		}
 	}
 
-	return wav2png.NewSquareGrid(colour, size, fit, overlay)
+	return grids.NewSquareGrid(colour, size, fit, overlay)
 }
 
-func size(s string) (wav2png.Fit, uint) {
-	fit := wav2png.Approximate
+func size(s string) (grids.Fit, uint) {
+	fit := grids.Approximate
 	size := uint(64)
 
 	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)`).FindStringSubmatch(s); len(matched) == 3 {
 		switch matched[1] {
 		case "~":
-			fit = wav2png.Approximate
+			fit = grids.Approximate
 		case "=":
-			fit = wav2png.Exact
+			fit = grids.Exact
 		case "≥":
-			fit = wav2png.AtLeast
+			fit = grids.AtLeast
 		case "≤":
-			fit = wav2png.AtMost
+			fit = grids.AtMost
 		case ">":
-			fit = wav2png.LargerThan
+			fit = grids.LargerThan
 		case "<":
-			fit = wav2png.SmallerThan
+			fit = grids.SmallerThan
 		}
 
 		if v, err := strconv.ParseUint(matched[2], 10, 32); err == nil && v >= 16 && v <= 1024 {
@@ -211,25 +211,25 @@ func size(s string) (wav2png.Fit, uint) {
 	return fit, size
 }
 
-func wh(s string) (wav2png.Fit, uint, uint) {
-	fit := wav2png.Approximate
+func wh(s string) (grids.Fit, uint, uint) {
+	fit := grids.Approximate
 	width := uint(64)
 	height := uint(48)
 
 	if matched := regexp.MustCompile(`([~=><≥≤])?\s*([0-9]+)x([0-9]+)`).FindStringSubmatch(s); len(matched) == 4 {
 		switch matched[1] {
 		case "~":
-			fit = wav2png.Approximate
+			fit = grids.Approximate
 		case "=":
-			fit = wav2png.Exact
+			fit = grids.Exact
 		case "≥":
-			fit = wav2png.AtLeast
+			fit = grids.AtLeast
 		case "≤":
-			fit = wav2png.AtMost
+			fit = grids.AtMost
 		case ">":
-			fit = wav2png.LargerThan
+			fit = grids.LargerThan
 		case "<":
-			fit = wav2png.SmallerThan
+			fit = grids.SmallerThan
 		}
 
 		if v, err := strconv.ParseUint(matched[2], 10, 32); err == nil && v >= 16 && v <= 1024 {

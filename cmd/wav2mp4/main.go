@@ -12,6 +12,8 @@ import (
 
 	"github.com/transcriptaze/wav2png/cmd/wav2mp4/options"
 	"github.com/transcriptaze/wav2png/encoding/wav"
+	"github.com/transcriptaze/wav2png/fills"
+	"github.com/transcriptaze/wav2png/grids"
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
@@ -208,7 +210,7 @@ func render(wav audio, from, to time.Duration, options options.Options, shift fl
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	grid := wav2png.Grid(gridspec, width, height, padding)
+	grid := grids.Grid(gridspec, width, height, padding)
 	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
 	antialiased := wav2png.Antialias(waveform, kernel)
 
@@ -224,7 +226,7 @@ func render(wav audio, from, to time.Duration, options options.Options, shift fl
 	rect := image.Rect(x0, padding, x1, h)
 	rectg := img.Bounds()
 
-	wav2png.Fill(img, fillspec)
+	fills.Fill(img, fillspec)
 
 	if gridspec.Overlay() {
 		draw.Draw(img, rect, antialiased, origin, draw.Over)

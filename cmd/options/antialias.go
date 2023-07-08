@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/transcriptaze/wav2png/wav2png"
+	"github.com/transcriptaze/wav2png/kernels"
 )
 
 type Antialias struct {
@@ -52,20 +52,20 @@ func (a *Antialias) Set(s string) error {
 	return nil
 }
 
-func (a Antialias) Kernel() wav2png.Kernel {
+func (a Antialias) Kernel() kernels.Kernel {
 	switch a.Type {
 	case "none":
-		return wav2png.None
+		return kernels.None
 
 	case "horizontal":
-		return wav2png.Horizontal
+		return kernels.Horizontal
 
 	case "vertical":
-		return wav2png.Vertical
+		return kernels.Vertical
 
 	case "soft":
-		return wav2png.Soft
+		return kernels.Soft
 	}
 
-	return wav2png.Soft
+	return kernels.Soft
 }

@@ -1,4 +1,4 @@
-package wav2png
+package kernels
 
 type Kernel [3][3]uint32
 

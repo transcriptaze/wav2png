@@ -1,10 +1,10 @@
-package columns
+package lines
 
 import (
 	"image"
+	"image/draw"
 
-	"golang.org/x/image/draw"
-
+	"github.com/transcriptaze/wav2png/kernels"
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
@@ -14,24 +14,13 @@ const (
 	RANGE     int32 = RANGE_MAX - RANGE_MIN + 1
 )
 
-type Columns struct {
-	Width     int
-	Height    int
-	Padding   int
-	BarWidth  int
-	BarGap    int
+type Lines struct {
 	Palette   wav2png.Palette
-	FillSpec  wav2png.FillSpec
-	GridSpec  wav2png.GridSpec
-	AntiAlias wav2png.Kernel
+	AntiAlias kernels.Kernel
 	VScale    float64
 }
 
-func (c Columns) Render(samples []float32) (*image.NRGBA, error) {
-	width := c.Width
-	height := c.Height
-	padding := c.Padding
-
+func (l Lines) Render(samples []float32, width, height, padding int) (*image.NRGBA, error) {
 	w := width
 	h := height
 	if padding > 0 {
@@ -40,8 +29,7 @@ func (c Columns) Render(samples []float32) (*image.NRGBA, error) {
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	grid := wav2png.Grid(c.GridSpec, width, height, padding)
-	waveform := c.render(samples, w, h)
+	waveform := l.render(samples, w, h)
 
 	x0 := padding
 	y0 := padding
@@ -50,43 +38,27 @@ func (c Columns) Render(samples []float32) (*image.NRGBA, error) {
 
 	origin := image.Pt(0, 0)
 	rect := image.Rect(x0, y0, x1, y1)
-	rectg := img.Bounds()
 
-	wav2png.Fill(img, c.FillSpec)
-
-	if c.GridSpec.Overlay() {
-		draw.Draw(img, rect, waveform, origin, draw.Over)
-		draw.Draw(img, rectg, grid, origin, draw.Over)
-	} else {
-		draw.Draw(img, rectg, grid, origin, draw.Over)
-		draw.Draw(img, rect, waveform, origin, draw.Over)
-	}
+	draw.Draw(img, img.Bounds(), image.Transparent, image.Point{}, draw.Src)
+	draw.Draw(img, rect, waveform, origin, draw.Over)
 
 	return img, nil
 }
 
-func (c Columns) render(samples []float32, width, height int) *image.NRGBA {
-	bar := image.NewNRGBA(image.Rect(0, 0, 1, int(height)))
+func (r Lines) render(samples []float32, width, height int) *image.NRGBA {
+	volume := r.VScale
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
-	colours := c.Palette.Realize()
-	volume := c.VScale
-
-	scaler := draw.CatmullRom
-	column := image.Rect(1, 0, c.BarWidth, height)
+	colours := r.Palette.Realize()
 
 	x := 0
-	dx := c.BarWidth + c.BarGap
+	dx := 1
 	start := 0
 
 	for start < len(samples) {
 		end := (x + dx) * len(samples) / width
-		if end > len(samples) {
-			end = len(samples)
-		}
 
 		sum := make([]int, height)
 		u := vscale(0, -int(height))
-
 		for _, sample := range samples[start:end] {
 			v := int16(32768 * float64(sample) * volume)
 			h := vscale(v, -int(height))
@@ -97,26 +69,19 @@ func (c Columns) render(samples []float32, width, height int) *image.NRGBA {
 		}
 
 		N := end - start
-
-		draw.Draw(bar, bar.Bounds(), image.Transparent, image.Pt(0, 0), draw.Src)
-
 		for y := 0; y < height; y++ {
 			if sum[y] > 0 {
 				l := len(colours)
 				i := ceil((l-1)*sum[y], N)
-
-				bar.Set(0, y, colours[i])
+				waveform.Set(x+dx, y, colours[i])
 			}
 		}
-
-		xy := image.Pt(x+1, 0)
-		scaler.Scale(waveform, column.Add(xy), bar, bar.Bounds(), draw.Over, nil)
 
 		x += dx
 		start = end
 	}
 
-	return wav2png.Antialias(waveform, c.AntiAlias)
+	return wav2png.Antialias(waveform, r.AntiAlias)
 }
 
 func signum(N int) int {

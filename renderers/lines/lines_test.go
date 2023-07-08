@@ -1,22 +1,19 @@
-package columns
+package lines
 
 import (
 	"bytes"
 	_ "embed"
 	"fmt"
 	"image"
-	"image/color"
 	"image/png"
-	"math"
 	"os"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/transcriptaze/wav2png/encoding"
 	"github.com/transcriptaze/wav2png/encoding/wav"
-	"github.com/transcriptaze/wav2png/styles/palettes"
-	"github.com/transcriptaze/wav2png/wav2png"
+	"github.com/transcriptaze/wav2png/kernels"
+	"github.com/transcriptaze/wav2png/palettes"
 )
 
 //go:embed reference.wav
@@ -25,38 +22,22 @@ var audio []byte
 //go:embed reference.png
 var reference []byte
 
-var black = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xff}
-var green = color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff}
-
 func TestRender(t *testing.T) {
-	renderer := Columns{
-		Width:     640,
-		Height:    480,
-		Padding:   0,
-		BarWidth:  16,
-		BarGap:    1,
+	renderer := Lines{
 		Palette:   palettes.Fire,
-		FillSpec:  wav2png.NewSolidFill(black),
-		GridSpec:  wav2png.NewSquareGrid(green, 64, wav2png.Approximate, false),
-		AntiAlias: wav2png.Vertical,
+		AntiAlias: kernels.Vertical,
 		VScale:    1.0,
 	}
 
 	audio := read()
-	from := 0 * time.Second
-	to := 2 * time.Second
-	fs := audio.SampleRate
-	samples := mix(audio, []int{1}...)
+	samples := mix(audio, []int{1}...)[0:16000]
 
-	start := int(math.Floor(from.Seconds() * fs))
-	end := int(math.Floor(to.Seconds() * fs))
-
-	if img, err := renderer.Render(samples[start:end]); err != nil {
+	if img, err := renderer.Render(samples, 640, 480, 0); err != nil {
 		t.Fatalf("error rendering test image (%v)", err)
 	} else if !reflect.DeepEqual(encode(img), reference) {
 		t.Errorf("incorrectly rendered test image")
 
-		os.WriteFile("../../../runtime/columns.png", encode(img), 0666)
+		os.WriteFile("../../runtime/lines.png", encode(img), 0666)
 	}
 }
 

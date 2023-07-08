@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/transcriptaze/wav2png/cmd/options"
-	"github.com/transcriptaze/wav2png/styles/palettes"
+	"github.com/transcriptaze/wav2png/palettes"
 )
 
 type settings struct {

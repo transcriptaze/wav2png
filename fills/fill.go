@@ -1,4 +1,4 @@
-package wav2png
+package fills
 
 import (
 	"image"
@@ -6,7 +6,6 @@ import (
 )
 
 type FillSpec interface {
-	Colour() color.NRGBA
 	Fill(img *image.NRGBA)
 }
 
@@ -24,13 +23,9 @@ func NewSolidFill(colour color.NRGBA) SolidFill {
 	}
 }
 
-func (f SolidFill) Colour() color.NRGBA {
-	return f.colour
-}
-
 func (f SolidFill) Fill(img *image.NRGBA) {
 	bounds := img.Bounds()
-	background := f.Colour()
+	background := f.colour
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {

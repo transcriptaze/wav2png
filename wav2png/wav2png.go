@@ -7,6 +7,8 @@ import (
 	"image/color"
 	"math"
 	"time"
+
+	"github.com/transcriptaze/wav2png/kernels"
 )
 
 const (
@@ -59,7 +61,7 @@ func Render(pcm []float32, fs float64, width, height int, palette Palette, volum
 	return waveform
 }
 
-func Antialias(img *image.NRGBA, kernel Kernel) *image.NRGBA {
+func Antialias(img *image.NRGBA, kernel kernels.Kernel) *image.NRGBA {
 	w := img.Bounds().Dx()
 	h := img.Bounds().Dy()
 	out := image.NewNRGBA(image.Rectangle{

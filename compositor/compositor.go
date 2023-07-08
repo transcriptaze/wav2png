@@ -1,0 +1,59 @@
+package compositor
+
+import (
+	"image"
+
+	"golang.org/x/image/draw"
+
+	"github.com/transcriptaze/wav2png/fills"
+	"github.com/transcriptaze/wav2png/grids"
+	"github.com/transcriptaze/wav2png/renderers"
+)
+
+type Compositor struct {
+	width      int
+	height     int
+	padding    int
+	background fills.FillSpec
+	grid       grids.GridSpec
+	renderer   renderers.Renderer
+}
+
+func NewCompositor(width, height, padding int, background fills.FillSpec, grid grids.GridSpec, renderer renderers.Renderer) Compositor {
+	return Compositor{
+		width:      width,
+		height:     height,
+		padding:    padding,
+		background: background,
+		grid:       grid,
+		renderer:   renderer,
+	}
+}
+
+func (c Compositor) Render(samples []float32) (*image.NRGBA, error) {
+	width := c.width
+	height := c.height
+	padding := c.padding
+
+	img := image.NewNRGBA(image.Rect(0, 0, width, height))
+	grid := grids.Grid(c.grid, width, height, padding)
+
+	if waveform, err := c.renderer.Render(samples, width, height, padding); err != nil {
+		return nil, err
+	} else {
+		origin := image.Pt(0, 0)
+		bounds := img.Bounds()
+
+		fills.Fill(img, c.background)
+
+		if c.grid.Overlay() {
+			draw.Draw(img, bounds, waveform, origin, draw.Over)
+			draw.Draw(img, bounds, grid, origin, draw.Over)
+		} else {
+			draw.Draw(img, bounds, grid, origin, draw.Over)
+			draw.Draw(img, bounds, waveform, origin, draw.Over)
+		}
+
+		return img, nil
+	}
+}

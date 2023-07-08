@@ -1,4 +1,4 @@
-package wav2png
+package grids
 
 import (
 	"image"
@@ -6,39 +6,37 @@ import (
 	"math"
 )
 
-type RectangularGrid struct {
+type SquareGrid struct {
 	colour  color.NRGBA
-	width   uint
-	height  uint
+	size    uint
 	fit     Fit
 	overlay bool
 }
 
-func NewRectangularGrid(colour color.NRGBA, width, height uint, fit Fit, overlay bool) RectangularGrid {
-	return RectangularGrid{
+func NewSquareGrid(colour color.NRGBA, size uint, fit Fit, overlay bool) SquareGrid {
+	return SquareGrid{
 		colour:  colour,
-		width:   width,
-		height:  height,
+		size:    size,
 		fit:     fit,
 		overlay: overlay,
 	}
 }
 
-func (g RectangularGrid) Colour() color.NRGBA {
+func (g SquareGrid) Colour() color.NRGBA {
 	return g.colour
 }
 
-func (g RectangularGrid) Overlay() bool {
+func (g SquareGrid) Overlay() bool {
 	return g.overlay
 }
 
-func (g RectangularGrid) Border(bounds image.Rectangle, padding int) *image.Rectangle {
+func (g SquareGrid) Border(bounds image.Rectangle, padding int) *image.Rectangle {
 	border := image.Rect(bounds.Min.X+padding, bounds.Min.Y+padding, bounds.Max.X-1-padding, bounds.Max.Y-1-padding)
 
 	return &border
 }
 
-func (g RectangularGrid) VLines(bounds image.Rectangle, padding int) []int {
+func (g SquareGrid) VLines(bounds image.Rectangle, padding int) []int {
 	vlines := []int{}
 
 	x0 := bounds.Min.X
@@ -50,24 +48,24 @@ func (g RectangularGrid) VLines(bounds image.Rectangle, padding int) []int {
 		x1 = border.Max.X
 	}
 
-	N := float64(x1-x0) / float64(g.width)
+	N := float64(x1-x0) / float64(g.size)
 	dw := float64(x1-x0) / math.Round(N)
 
 	switch g.fit {
 	case Exact:
-		dw = float64(g.width)
+		dw = float64(g.size)
 
 	case AtLeast:
-		dw = math.Max(dw, float64(g.width))
+		dw = math.Max(dw, float64(g.size))
 
 	case AtMost:
-		dw = math.Min(dw, float64(g.width))
+		dw = math.Min(dw, float64(g.size))
 
 	case LargerThan:
-		dw = math.Max(dw, float64(g.width+1))
+		dw = math.Max(dw, float64(g.size+1))
 
 	case SmallerThan:
-		dw = math.Max(dw, float64(g.width-1))
+		dw = math.Min(dw, float64(g.size-1))
 	}
 
 	if dw > 0.0 {
@@ -84,7 +82,7 @@ func (g RectangularGrid) VLines(bounds image.Rectangle, padding int) []int {
 	return vlines
 }
 
-func (g RectangularGrid) HLines(bounds image.Rectangle, padding int) []int {
+func (g SquareGrid) HLines(bounds image.Rectangle, padding int) []int {
 	hlines := []int{}
 
 	y0 := bounds.Min.Y
@@ -96,18 +94,18 @@ func (g RectangularGrid) HLines(bounds image.Rectangle, padding int) []int {
 		y1 = border.Max.Y
 	}
 
-	N := float64(y1-y0) / float64(g.height)
+	N := float64(y1-y0) / float64(g.size)
 	dw := float64(y1-y0) / math.Round(N)
 
 	switch g.fit {
 	case Exact:
-		dw = float64(g.height)
+		dw = float64(g.size)
 
 	case AtLeast:
-		dw = math.Max(dw, float64(g.height))
+		dw = math.Max(dw, float64(g.size))
 
 	case AtMost:
-		dw = math.Min(dw, float64(g.height))
+		dw = math.Min(dw, float64(g.size))
 	}
 
 	ym := float64(y1-y0+2*padding) / 2.0

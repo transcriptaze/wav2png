@@ -1,4 +1,4 @@
-package wav2png
+package grids
 
 import (
 	"image"

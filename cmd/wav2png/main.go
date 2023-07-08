@@ -9,10 +9,11 @@ import (
 	"time"
 
 	"github.com/transcriptaze/wav2png/cmd/wav2png/options"
+	"github.com/transcriptaze/wav2png/compositor"
 	"github.com/transcriptaze/wav2png/encoding"
 	"github.com/transcriptaze/wav2png/encoding/wav"
+	"github.com/transcriptaze/wav2png/renderers/lines"
 	"github.com/transcriptaze/wav2png/styles"
-	"github.com/transcriptaze/wav2png/wav2png/renderers/lines"
 )
 
 const VERSION = "v1.1.0"
@@ -82,23 +83,24 @@ func main() {
 }
 
 func render(audio encoding.Audio, from, to time.Duration, options options.Options) (*image.NRGBA, error) {
-	renderer := lines.Lines{
-		Width:     int(options.Width),
-		Height:    int(options.Height),
-		Padding:   options.Padding,
-		Palette:   options.Palette,
-		FillSpec:  options.FillSpec,
-		GridSpec:  options.GridSpec,
-		AntiAlias: options.Antialias,
-		VScale:    options.VScale,
-	}
+	compositor := compositor.NewCompositor(
+		int(options.Width),
+		int(options.Height),
+		int(options.Padding),
+		options.FillSpec,
+		options.GridSpec,
+		lines.Lines{
+			Palette:   options.Palette,
+			AntiAlias: options.Antialias,
+			VScale:    options.VScale,
+		})
 
 	fs := audio.SampleRate
 	samples := mix(audio, options.Mix.Channels()...)
 	start := int(math.Floor(from.Seconds() * fs))
 	end := int(math.Floor(to.Seconds() * fs))
 
-	return renderer.Render(samples[start:end])
+	return compositor.Render(samples[start:end])
 }
 
 func read(wavfile string) (encoding.Audio, error) {
