@@ -4,6 +4,7 @@
       - [x] Refactor default renderer out as 'lines'
       - [x] Delegate grid, background etc to compositor
       - [ ] --style <JSON> argument
+      - [ ] Gallery
 
 - [ ] wav2mp4 does not seperate L/R audio with --mix option
 - [ ] wav2mp4 does not trim audio to size either

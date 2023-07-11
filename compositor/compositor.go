@@ -11,15 +11,15 @@ import (
 )
 
 type Compositor struct {
-	width      int
-	height     int
+	width      uint
+	height     uint
 	padding    int
 	background fills.FillSpec
 	grid       grids.GridSpec
 	renderer   renderers.Renderer
 }
 
-func NewCompositor(width, height, padding int, background fills.FillSpec, grid grids.GridSpec, renderer renderers.Renderer) Compositor {
+func NewCompositor(width uint, height uint, padding int, background fills.FillSpec, grid grids.GridSpec, renderer renderers.Renderer) Compositor {
 	return Compositor{
 		width:      width,
 		height:     height,
@@ -31,8 +31,8 @@ func NewCompositor(width, height, padding int, background fills.FillSpec, grid g
 }
 
 func (c Compositor) Render(samples []float32) (*image.NRGBA, error) {
-	width := c.width
-	height := c.height
+	width := int(c.width)
+	height := int(c.height)
 	padding := c.padding
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))

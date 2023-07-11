@@ -65,12 +65,30 @@ func main() {
 		fmt.Println()
 	}
 
-	if _, err := styles.Load(options.Style); err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
-		os.Exit(1)
+	// if _, err := styles.Load(options.Style); err != nil {
+	// 	fmt.Printf("\n   ERROR: %v\n", err)
+	// 	os.Exit(1)
+	// }
+
+	style := styles.LinesStyle{
+		Style: styles.Style{
+			Width:      options.Width,
+			Height:     options.Height,
+			Padding:    options.Padding,
+			Background: options.FillSpec,
+			Grid:       options.GridSpec,
+		},
+		Palette:   options.Palette,
+		Antialias: options.Antialias,
+		VScale:    options.VScale,
 	}
 
-	img, err := render(audio, from, to, options)
+	fs := audio.SampleRate
+	samples := mix(audio, options.Mix.Channels()...)
+	start := int(math.Floor(from.Seconds() * fs))
+	end := int(math.Floor(to.Seconds() * fs))
+
+	img, err := render(samples[start:end], style)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
@@ -82,25 +100,20 @@ func main() {
 	}
 }
 
-func render(audio encoding.Audio, from, to time.Duration, options options.Options) (*image.NRGBA, error) {
+func render(audio []float32, style styles.LinesStyle) (*image.NRGBA, error) {
 	compositor := compositor.NewCompositor(
-		int(options.Width),
-		int(options.Height),
-		int(options.Padding),
-		options.FillSpec,
-		options.GridSpec,
+		style.Width,
+		style.Height,
+		style.Padding,
+		style.Background,
+		style.Grid,
 		lines.Lines{
-			Palette:   options.Palette,
-			AntiAlias: options.Antialias,
-			VScale:    options.VScale,
+			Palette:   style.Palette,
+			AntiAlias: style.Antialias,
+			VScale:    style.VScale,
 		})
 
-	fs := audio.SampleRate
-	samples := mix(audio, options.Mix.Channels()...)
-	start := int(math.Floor(from.Seconds() * fs))
-	end := int(math.Floor(to.Seconds() * fs))
-
-	return compositor.Render(samples[start:end])
+	return compositor.Render(audio)
 }
 
 func read(wavfile string) (encoding.Audio, error) {
