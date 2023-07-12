@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"image"
 	"image/png"
-	"math"
+	// "math"
 	"os"
-	"time"
+	// "time"
+	"flag"
 
-	"github.com/transcriptaze/wav2png/cmd/wav2png/options"
+	// "github.com/transcriptaze/wav2png/cmd/wav2png/options"
 	"github.com/transcriptaze/wav2png/compositor"
 	"github.com/transcriptaze/wav2png/encoding"
 	"github.com/transcriptaze/wav2png/encoding/wav"
@@ -17,6 +18,14 @@ import (
 )
 
 const VERSION = "v1.1.0"
+
+var options = struct {
+	out   string
+	debug bool
+}{
+	out:   "",
+	debug: false,
+}
 
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "version" {
@@ -29,75 +38,99 @@ func main() {
 		os.Exit(0)
 	}
 
-	options := options.NewOptions()
-	if err := options.Parse(); err != nil {
+	flag.StringVar(&options.out, "out", options.out, "Output file (or directory)")
+	// flag.UintVar(&width, "width", o.Width, "Image width (pixels)")
+	// flag.UintVar(&height, "height", o.Height, "Image height (pixels)")
+	// flag.IntVar(&padding, "padding", o.Padding, "Image padding (pixels)")
+	// flag.Var(&palette, "palette", "name of built-in palette or PNG file")
+	// flag.Var(&grid, "grid", "'grid' specification")
+	// flag.Var(&fill, "fill", "'fill' specification")
+	// flag.Var(&antialias, "antialias", "'antialias' specification")
+	// flag.Var(&scale, "scale", "vertical scaling")
+	// flag.DurationVar(&start, "start", 0, "start time of audio selection")
+	// flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
+	// flag.Var(&mix, "mix", "channel mix")
+	// flag.StringVar(&style, "style", "", "render style")
+	flag.BoolVar(&options.debug, "debug", options.debug, "Displays diagnostic information")
+	flag.Parse()
+
+	if len(flag.Args()) < 1 {
+		fmt.Printf("   *** ERROR: missing WAV file")
 		usage()
 		os.Exit(1)
 	}
 
-	audio, err := read(options.WAV)
+	wavfile := flag.Args()[0]
+
+	audio, err := read(wavfile)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
 
-	from := 0 * time.Second
-	to := audio.Duration
+	// options := options.NewOptions()
+	// if err := options.Parse(); err != nil {
+	// 	usage()
+	// 	os.Exit(1)
+	// }
 
-	if options.From != nil {
-		from = *options.From
-	}
+	// from := 0 * time.Second
+	// to := audio.Duration
 
-	if options.To != nil {
-		to = *options.To
-	}
+	// if options.From != nil {
+	// 	from = *options.From
+	// }
 
-	if options.Debug {
+	// if options.To != nil {
+	// 	to = *options.To
+	// }
+
+	if options.debug {
 		fmt.Println()
-		fmt.Printf("   File:        %v\n", options.WAV)
+		fmt.Printf("   File:        %v\n", wavfile)
 		fmt.Printf("   Channels:    %v\n", audio.Channels)
 		fmt.Printf("   Format:      %v\n", audio.Format)
 		fmt.Printf("   Sample Rate: %v\n", audio.SampleRate)
 		fmt.Printf("   Duration:    %v\n", audio.Duration)
 		fmt.Printf("   Samples:     %v\n", audio.Length)
-		fmt.Printf("   PNG:         %v\n", options.PNG)
-		fmt.Printf("   Style:       %v\n", options.Style)
+		// fmt.Printf("   PNG:         %v\n", options.PNG)
+		// fmt.Printf("   Style:       %v\n", options.Style)
 		fmt.Println()
 	}
 
-	// if _, err := styles.Load(options.Style); err != nil {
+	// // if _, err := styles.Load(options.Style); err != nil {
+	// // 	fmt.Printf("\n   ERROR: %v\n", err)
+	// // 	os.Exit(1)
+	// // }
+
+	// style := styles.LinesStyle{
+	// 	Style: styles.Style{
+	// 		Width:      options.Width,
+	// 		Height:     options.Height,
+	// 		Padding:    options.Padding,
+	// 		Background: options.FillSpec,
+	// 		Grid:       options.GridSpec,
+	// 	},
+	// 	Palette:   options.Palette,
+	// 	Antialias: options.Antialias,
+	// 	VScale:    options.VScale,
+	// }
+
+	// fs := audio.SampleRate
+	// samples := mix(audio, options.Mix.Channels()...)
+	// start := int(math.Floor(from.Seconds() * fs))
+	// end := int(math.Floor(to.Seconds() * fs))
+
+	// img, err := render(samples[start:end], style)
+	// if err != nil {
 	// 	fmt.Printf("\n   ERROR: %v\n", err)
 	// 	os.Exit(1)
 	// }
 
-	style := styles.LinesStyle{
-		Style: styles.Style{
-			Width:      options.Width,
-			Height:     options.Height,
-			Padding:    options.Padding,
-			Background: options.FillSpec,
-			Grid:       options.GridSpec,
-		},
-		Palette:   options.Palette,
-		Antialias: options.Antialias,
-		VScale:    options.VScale,
-	}
-
-	fs := audio.SampleRate
-	samples := mix(audio, options.Mix.Channels()...)
-	start := int(math.Floor(from.Seconds() * fs))
-	end := int(math.Floor(to.Seconds() * fs))
-
-	img, err := render(samples[start:end], style)
-	if err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
-		os.Exit(1)
-	}
-
-	if err := write(img, options.PNG); err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
-		os.Exit(1)
-	}
+	// if err := write(img, options.PNG); err != nil {
+	// 	fmt.Printf("\n   ERROR: %v\n", err)
+	// 	os.Exit(1)
+	// }
 }
 
 func render(audio []float32, style styles.LinesStyle) (*image.NRGBA, error) {
