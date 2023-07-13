@@ -1,15 +1,15 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"image"
 	"image/png"
-	// "math"
 	"os"
-	// "time"
-	"flag"
+	"path/filepath"
+	"strings"
+	"time"
 
-	// "github.com/transcriptaze/wav2png/cmd/wav2png/options"
 	"github.com/transcriptaze/wav2png/compositor"
 	"github.com/transcriptaze/wav2png/encoding"
 	"github.com/transcriptaze/wav2png/encoding/wav"
@@ -21,10 +21,19 @@ const VERSION = "v1.1.0"
 
 var options = struct {
 	out   string
+	start time.Duration
+	end   time.Duration
 	debug bool
 }{
 	out:   "",
 	debug: false,
+}
+
+type wavfile struct {
+	file  string
+	audio encoding.Audio
+	from  time.Duration
+	to    time.Duration
 }
 
 func main() {
@@ -47,8 +56,8 @@ func main() {
 	// flag.Var(&fill, "fill", "'fill' specification")
 	// flag.Var(&antialias, "antialias", "'antialias' specification")
 	// flag.Var(&scale, "scale", "vertical scaling")
-	// flag.DurationVar(&start, "start", 0, "start time of audio selection")
-	// flag.DurationVar(&end, "end", 1*time.Hour, "end time of audio selection")
+	flag.DurationVar(&options.start, "start", 0, "start time of audio selection")
+	flag.DurationVar(&options.end, "end", 1*time.Hour, "end time of audio selection")
 	// flag.Var(&mix, "mix", "channel mix")
 	// flag.StringVar(&style, "style", "", "render style")
 	flag.BoolVar(&options.debug, "debug", options.debug, "Displays diagnostic information")
@@ -60,41 +69,50 @@ func main() {
 		os.Exit(1)
 	}
 
-	wavfile := flag.Args()[0]
+	wavfile := filepath.Clean(flag.Arg(0))
+	filename := filepath.Base(wavfile)
+	ext := filepath.Ext(filename)
+	png := strings.TrimSuffix(filename, ext) + ".png"
 
-	audio, err := read(wavfile)
+	wav, err := read(wavfile)
 	if err != nil {
 		fmt.Printf("\n   ERROR: %v\n", err)
 		os.Exit(1)
 	}
 
-	// options := options.NewOptions()
-	// if err := options.Parse(); err != nil {
-	// 	usage()
-	// 	os.Exit(1)
-	// }
+	style := styles.NewStyle()
 
-	// from := 0 * time.Second
-	// to := audio.Duration
+	flag.Visit(func(f *flag.Flag) {
+		switch f.Name {
+		case "out":
+			info, err := os.Stat(options.out)
+			if err != nil && !os.IsNotExist(err) {
+				fmt.Printf("\n   ERROR: %v\n\n", err)
+				os.Exit(1)
+			} else if err == nil && info.IsDir() {
+				png = filepath.Join(options.out, png)
+			} else {
+				png = options.out
+			}
 
-	// if options.From != nil {
-	// 	from = *options.From
-	// }
+		case "start":
+			wav.from = options.start
 
-	// if options.To != nil {
-	// 	to = *options.To
-	// }
+		case "end":
+			wav.to = options.end
+		}
+	})
 
 	if options.debug {
 		fmt.Println()
-		fmt.Printf("   File:        %v\n", wavfile)
-		fmt.Printf("   Channels:    %v\n", audio.Channels)
-		fmt.Printf("   Format:      %v\n", audio.Format)
-		fmt.Printf("   Sample Rate: %v\n", audio.SampleRate)
-		fmt.Printf("   Duration:    %v\n", audio.Duration)
-		fmt.Printf("   Samples:     %v\n", audio.Length)
-		// fmt.Printf("   PNG:         %v\n", options.PNG)
-		// fmt.Printf("   Style:       %v\n", options.Style)
+		fmt.Printf("   File:        %v\n", wav.file)
+		fmt.Printf("   Channels:    %v\n", wav.audio.Channels)
+		fmt.Printf("   Format:      %v\n", wav.audio.Format)
+		fmt.Printf("   Sample Rate: %v\n", wav.audio.SampleRate)
+		fmt.Printf("   Duration:    %v\n", wav.audio.Duration)
+		fmt.Printf("   Samples:     %v\n", wav.audio.Length)
+		fmt.Printf("   PNG:         %v\n", png)
+		fmt.Printf("   Style:       %v\n", style.Name)
 		fmt.Println()
 	}
 
@@ -149,26 +167,38 @@ func render(audio []float32, style styles.LinesStyle) (*image.NRGBA, error) {
 	return compositor.Render(audio)
 }
 
-func read(wavfile string) (encoding.Audio, error) {
-	file, err := os.Open(wavfile)
+func read(file string) (wavfile, error) {
+	f, err := os.Open(file)
 	if err != nil {
-		return encoding.Audio{}, err
+		return wavfile{
+			file: file,
+		}, err
 	}
 
-	defer file.Close()
+	defer f.Close()
 
-	w, err := wav.Decode(file)
+	audio, err := wav.Decode(f)
 	if err != nil {
-		return encoding.Audio{}, err
+		return wavfile{
+			file: file,
+		}, err
 	}
 
-	return encoding.Audio{
-		SampleRate: float64(w.Format.SampleRate),
-		Format:     fmt.Sprintf("%v", w.Format),
-		Channels:   int(w.Format.Channels),
-		Duration:   w.Duration(),
-		Length:     w.Frames(),
-		Samples:    w.Samples,
+	from := 0 * time.Second
+	to := audio.Duration()
+
+	return wavfile{
+		file: file,
+		from: from,
+		to:   to,
+		audio: encoding.Audio{
+			SampleRate: float64(audio.Format.SampleRate),
+			Format:     fmt.Sprintf("%v", audio.Format),
+			Channels:   int(audio.Format.Channels),
+			Duration:   audio.Duration(),
+			Length:     audio.Frames(),
+			Samples:    audio.Samples,
+		},
 	}, nil
 }
 
