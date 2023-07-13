@@ -5,35 +5,37 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"io/fs"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/transcriptaze/wav2png/cmd/options"
 	"github.com/transcriptaze/wav2png/compositor"
 	"github.com/transcriptaze/wav2png/encoding"
-	"github.com/transcriptaze/wav2png/encoding/wav"
-	"github.com/transcriptaze/wav2png/renderers/lines"
 	"github.com/transcriptaze/wav2png/styles"
 )
 
 const VERSION = "v1.1.0"
 
-var options = struct {
-	out   string
+var opts = struct {
 	start time.Duration
 	end   time.Duration
+	mix   options.Mix
+
+	out     string
+	width   uint
+	height  uint
+	padding int
+
 	debug bool
 }{
-	out:   "",
-	debug: false,
-}
-
-type wavfile struct {
-	file  string
-	audio encoding.Audio
-	from  time.Duration
-	to    time.Duration
+	out:    "",
+	width:  800,
+	height: 600,
+	debug:  false,
 }
 
 func main() {
@@ -47,159 +49,150 @@ func main() {
 		os.Exit(0)
 	}
 
-	flag.StringVar(&options.out, "out", options.out, "Output file (or directory)")
-	// flag.UintVar(&width, "width", o.Width, "Image width (pixels)")
-	// flag.UintVar(&height, "height", o.Height, "Image height (pixels)")
-	// flag.IntVar(&padding, "padding", o.Padding, "Image padding (pixels)")
+	var wavfile string
+	var outfile string
+	var audio []float32
+	var style styles.Style
+	var err error
+
+	exit := func(err error) {
+		fmt.Printf("   *** ERROR: %v", err)
+		usage()
+		os.Exit(1)
+	}
+
+	if wavfile, err = parse(); err != nil {
+		exit(err)
+	} else if outfile, err = makeOutFile(wavfile); err != nil {
+		exit(err)
+	} else if style, err = makeStyle(); err != nil {
+		exit(err)
+	} else if audio, err = getAudio(wavfile); err != nil {
+		exit(err)
+	}
+
+	if img, err := render(audio, style); err != nil {
+		exit(err)
+	} else if err := write(img, outfile); err != nil {
+		exit(err)
+	}
+}
+
+func parse() (string, error) {
+	flag.StringVar(&opts.out, "out", opts.out, "Output file (or directory)")
+	flag.UintVar(&opts.width, "width", opts.width, "Image width (pixels)")
+	flag.UintVar(&opts.height, "height", opts.height, "Image height (pixels)")
+	flag.IntVar(&opts.padding, "padding", opts.padding, "Image padding (pixels)")
 	// flag.Var(&palette, "palette", "name of built-in palette or PNG file")
 	// flag.Var(&grid, "grid", "'grid' specification")
 	// flag.Var(&fill, "fill", "'fill' specification")
 	// flag.Var(&antialias, "antialias", "'antialias' specification")
 	// flag.Var(&scale, "scale", "vertical scaling")
-	flag.DurationVar(&options.start, "start", 0, "start time of audio selection")
-	flag.DurationVar(&options.end, "end", 1*time.Hour, "end time of audio selection")
-	// flag.Var(&mix, "mix", "channel mix")
+	flag.DurationVar(&opts.start, "start", 0, "start time of audio selection")
+	flag.DurationVar(&opts.end, "end", 1*time.Hour, "end time of audio selection")
+	flag.Var(&opts.mix, "mix", "channel mix")
 	// flag.StringVar(&style, "style", "", "render style")
-	flag.BoolVar(&options.debug, "debug", options.debug, "Displays diagnostic information")
+	flag.BoolVar(&opts.debug, "debug", opts.debug, "Displays diagnostic information")
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
-		fmt.Printf("   *** ERROR: missing WAV file")
-		usage()
-		os.Exit(1)
+		return "", fmt.Errorf("missing WAV file")
+	} else {
+		return filepath.Clean(flag.Args()[0]), nil
 	}
+}
 
-	wavfile := filepath.Clean(flag.Arg(0))
+func makeOutFile(wavfile string) (png string, err error) {
 	filename := filepath.Base(wavfile)
 	ext := filepath.Ext(filename)
-	png := strings.TrimSuffix(filename, ext) + ".png"
+	png = strings.TrimSuffix(filename, ext) + ".png"
 
-	wav, err := read(wavfile)
-	if err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
-		os.Exit(1)
-	}
-
-	style := styles.NewStyle()
+	var info fs.FileInfo
 
 	flag.Visit(func(f *flag.Flag) {
-		switch f.Name {
-		case "out":
-			info, err := os.Stat(options.out)
+		if f.Name == "out" {
+			info, err = os.Stat(opts.out)
 			if err != nil && !os.IsNotExist(err) {
-				fmt.Printf("\n   ERROR: %v\n\n", err)
-				os.Exit(1)
+				return
 			} else if err == nil && info.IsDir() {
-				png = filepath.Join(options.out, png)
+				png = filepath.Join(opts.out, png)
 			} else {
-				png = options.out
+				png = opts.out
 			}
-
-		case "start":
-			wav.from = options.start
-
-		case "end":
-			wav.to = options.end
 		}
 	})
 
-	if options.debug {
-		fmt.Println()
-		fmt.Printf("   File:        %v\n", wav.file)
-		fmt.Printf("   Channels:    %v\n", wav.audio.Channels)
-		fmt.Printf("   Format:      %v\n", wav.audio.Format)
-		fmt.Printf("   Sample Rate: %v\n", wav.audio.SampleRate)
-		fmt.Printf("   Duration:    %v\n", wav.audio.Duration)
-		fmt.Printf("   Samples:     %v\n", wav.audio.Length)
-		fmt.Printf("   PNG:         %v\n", png)
-		fmt.Printf("   Style:       %v\n", style.Name)
-		fmt.Println()
-	}
-
-	// // if _, err := styles.Load(options.Style); err != nil {
-	// // 	fmt.Printf("\n   ERROR: %v\n", err)
-	// // 	os.Exit(1)
-	// // }
-
-	// style := styles.LinesStyle{
-	// 	Style: styles.Style{
-	// 		Width:      options.Width,
-	// 		Height:     options.Height,
-	// 		Padding:    options.Padding,
-	// 		Background: options.FillSpec,
-	// 		Grid:       options.GridSpec,
-	// 	},
-	// 	Palette:   options.Palette,
-	// 	Antialias: options.Antialias,
-	// 	VScale:    options.VScale,
-	// }
-
-	// fs := audio.SampleRate
-	// samples := mix(audio, options.Mix.Channels()...)
-	// start := int(math.Floor(from.Seconds() * fs))
-	// end := int(math.Floor(to.Seconds() * fs))
-
-	// img, err := render(samples[start:end], style)
-	// if err != nil {
-	// 	fmt.Printf("\n   ERROR: %v\n", err)
-	// 	os.Exit(1)
-	// }
-
-	// if err := write(img, options.PNG); err != nil {
-	// 	fmt.Printf("\n   ERROR: %v\n", err)
-	// 	os.Exit(1)
-	// }
+	return
 }
 
-func render(audio []float32, style styles.LinesStyle) (*image.NRGBA, error) {
-	compositor := compositor.NewCompositor(
-		style.Width,
-		style.Height,
-		style.Padding,
-		style.Background,
-		style.Grid,
-		lines.Lines{
-			Palette:   style.Palette,
-			AntiAlias: style.Antialias,
-			VScale:    style.VScale,
-		})
+func makeStyle() (style styles.Style, err error) {
+	style = styles.NewStyle()
+	err = nil
 
-	return compositor.Render(audio)
+	flag.Visit(func(f *flag.Flag) {
+		switch f.Name {
+		case "width":
+			style.Width = opts.width
+		case "height":
+			style.Height = opts.height
+		case "padding":
+			style.Padding = opts.padding
+		}
+	})
+
+	return
 }
 
-func read(file string) (wavfile, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return wavfile{
-			file: file,
-		}, err
+func getAudio(file string) (pcm []float32, err error) {
+	var f *os.File
+	var audio encoding.Audio
+
+	if f, err = os.Open(file); err != nil {
+		return
 	}
 
 	defer f.Close()
 
-	audio, err := wav.Decode(f)
-	if err != nil {
-		return wavfile{
-			file: file,
-		}, err
+	if audio, err = encoding.Decode(f); err != nil {
+		return
 	}
 
 	from := 0 * time.Second
-	to := audio.Duration()
+	to := audio.Duration
 
-	return wavfile{
-		file: file,
-		from: from,
-		to:   to,
-		audio: encoding.Audio{
-			SampleRate: float64(audio.Format.SampleRate),
-			Format:     fmt.Sprintf("%v", audio.Format),
-			Channels:   int(audio.Format.Channels),
-			Duration:   audio.Duration(),
-			Length:     audio.Frames(),
-			Samples:    audio.Samples,
-		},
-	}, nil
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "start" && opts.start < audio.Duration {
+			from = opts.start
+		} else if f.Name == "end" && opts.end < audio.Duration {
+			to = opts.end
+		}
+	})
+
+	if opts.debug {
+		fmt.Println()
+		fmt.Printf("   File:        %v\n", file)
+		fmt.Printf("   Channels:    %v\n", audio.Channels)
+		fmt.Printf("   Format:      %v\n", audio.Format)
+		fmt.Printf("   Sample Rate: %v\n", audio.SampleRate)
+		fmt.Printf("   Duration:    %v\n", audio.Duration)
+		fmt.Printf("   Samples:     %v\n", audio.Length)
+		fmt.Println()
+	}
+
+	fs := audio.SampleRate
+	samples := mix(audio, opts.mix.Channels()...)
+	start := int(math.Floor(from.Seconds() * fs))
+	end := int(math.Floor(to.Seconds() * fs))
+
+	pcm = samples[start:end]
+
+	return
+}
+
+func render(audio []float32, style styles.Style) (*image.NRGBA, error) {
+	compositor := compositor.FromStyle(style)
+
+	return compositor.Render(audio)
 }
 
 func write(img *image.NRGBA, file string) error {

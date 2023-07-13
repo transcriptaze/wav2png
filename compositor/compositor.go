@@ -8,6 +8,7 @@ import (
 	"github.com/transcriptaze/wav2png/fills"
 	"github.com/transcriptaze/wav2png/grids"
 	"github.com/transcriptaze/wav2png/renderers"
+	"github.com/transcriptaze/wav2png/styles"
 )
 
 type Compositor struct {
@@ -17,6 +18,17 @@ type Compositor struct {
 	background fills.FillSpec
 	grid       grids.GridSpec
 	renderer   renderers.Renderer
+}
+
+func FromStyle(style styles.Style) Compositor {
+	return Compositor{
+		width:      style.Width,
+		height:     style.Height,
+		padding:    style.Padding,
+		background: style.Fill(),
+		grid:       style.Grid(),
+		renderer:   style.Renderer(),
+	}
 }
 
 func NewCompositor(width uint, height uint, padding int, background fills.FillSpec, grid grids.GridSpec, renderer renderers.Renderer) Compositor {
