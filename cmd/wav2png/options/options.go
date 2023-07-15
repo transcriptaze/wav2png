@@ -12,6 +12,7 @@ import (
 	"github.com/transcriptaze/wav2png/fills"
 	"github.com/transcriptaze/wav2png/grids"
 	"github.com/transcriptaze/wav2png/kernels"
+	"github.com/transcriptaze/wav2png/styles"
 	"github.com/transcriptaze/wav2png/wav2png"
 )
 
@@ -22,12 +23,12 @@ var defaults = settings{
 	},
 	Padding: options.Padding(2),
 	Palette: "ice",
-	Fill: options.Fill{
+	Fill: styles.Fill{
 		Fill:   "solid",
 		Colour: "#000000",
 		Alpha:  255,
 	},
-	Grid: options.Grid{
+	Grid: styles.Grid{
 		Grid:   "square",
 		Colour: "#008000",
 		Alpha:  255,
@@ -37,7 +38,7 @@ var defaults = settings{
 	Antialias: options.Antialias{
 		Type: "vertical",
 	},
-	Scale: options.Scale{
+	Scale: styles.Scale{
 		Horizontal: 1.0,
 		Vertical:   1.0,
 	},
