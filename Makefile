@@ -51,7 +51,7 @@ release: build-all
 	cd dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
-	./bin/wav2png --debug --start 2.5s --end 7.5s --out runtime ./samples/noise.wav
+	./bin/wav2png --debug --style .styles/default.json --start 2.5s --end 7.5s --out runtime ./samples/noise.wav
 
 version: build
 	./bin/wav2png version

@@ -1,7 +1,10 @@
 package styles
 
 import (
+	"encoding/json"
+	"fmt"
 	"image/color"
+	"os"
 
 	"github.com/transcriptaze/wav2png/fills"
 	"github.com/transcriptaze/wav2png/grids"
@@ -15,33 +18,104 @@ var BLACK = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xff}
 var GREEN = color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff}
 
 type Style struct {
-	Name       string
-	Width      uint
-	Height     uint
-	Padding    int
-	background string
-	grid       string
-	renderer   string
+	Name     string
+	width    uint
+	height   uint
+	padding  int
+	scale    Scale
+	fill     Fill
+	grid     Grid
+	renderer string
 }
 
 func NewStyle() Style {
 	return Style{
-		Name:       "default",
-		Width:      800,
-		Height:     600,
-		Padding:    2,
-		background: "black",
-		grid:       "square",
-		renderer:   "lines, palette:ice, antialias:vertical, vscale:1.0",
+		Name:    "default",
+		width:   800,
+		height:  600,
+		padding: 2,
+
+		scale: Scale{
+			Horizontal: 1.0,
+			Vertical:   1.0,
+		},
+
+		fill: Fill{
+			Fill:   "solid",
+			Colour: "#000000",
+			Alpha:  255,
+		},
+
+		grid: Grid{
+			Grid:   "square",
+			Colour: "#008000",
+			Alpha:  255,
+			Size:   "~64",
+			WH:     "~64x48",
+		},
+
+		renderer: "lines, palette:ice, antialias:vertical, vscale:1.0",
 	}
 }
 
+func (s Style) WithWidth(width uint) Style {
+	s.width = width
+
+	return s
+}
+
+func (s Style) WithHeight(height uint) Style {
+	s.height = height
+
+	return s
+}
+
+func (s Style) WithPadding(padding int) Style {
+	s.padding = padding
+
+	return s
+}
+
+func (s Style) WithScale(scale Scale) Style {
+	s.scale = scale
+
+	return s
+}
+
+func (s Style) WithFill(fill Fill) Style {
+	s.fill = fill
+
+	return s
+}
+
+func (s Style) WithGrid(grid Grid) Style {
+	s.grid = grid
+
+	return s
+}
+
+func (s Style) Width() uint {
+	return s.width
+}
+
+func (s Style) Height() uint {
+	return s.height
+}
+
+func (s Style) Padding() int {
+	return s.padding
+}
+
+func (s Style) Scale() Scale {
+	return s.scale
+}
+
 func (s Style) Fill() fills.FillSpec {
-	return fills.NewSolidFill(BLACK)
+	return s.fill.FillSpec()
 }
 
 func (s Style) Grid() grids.GridSpec {
-	return grids.NewSquareGrid(GREEN, 64, grids.Approximate, false)
+	return s.grid.GridSpec()
 }
 
 func (s Style) Renderer() renderers.Renderer {
@@ -49,5 +123,35 @@ func (s Style) Renderer() renderers.Renderer {
 		Palette:   palettes.Fire,
 		AntiAlias: kernels.Vertical,
 		VScale:    1.0,
+	}
+}
+
+func (s Style) Load(style string) (Style, error) {
+	serializable := struct {
+		Name     string          `json:"name"`
+		Width    uint            `json:"width"`
+		Height   uint            `json:"height"`
+		Padding  int             `json:"padding"`
+		Scale    Scale           `json:"scale"`
+		Fill     Fill            `json:"fill"`
+		Grid     Grid            `json:"grid"`
+		Renderer json.RawMessage `json:"renderer"`
+	}{
+		Width:   s.width,
+		Height:  s.height,
+		Padding: s.padding,
+		Scale:   s.scale,
+		Fill:    s.fill,
+		Grid:    s.grid,
+	}
+
+	if bytes, err := os.ReadFile(style); err != nil {
+		return s, err
+	} else if err := json.Unmarshal(bytes, &serializable); err != nil {
+		return s, err
+	} else {
+		fmt.Printf(">>>>>>>>> %+v\n", serializable)
+
+		return s, fmt.Errorf("NOT IMPLEMENTED")
 	}
 }

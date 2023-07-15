@@ -22,9 +22,9 @@ type Compositor struct {
 
 func FromStyle(style styles.Style) Compositor {
 	return Compositor{
-		width:      style.Width,
-		height:     style.Height,
-		padding:    style.Padding,
+		width:      style.Width(),
+		height:     style.Height(),
+		padding:    style.Padding(),
 		background: style.Fill(),
 		grid:       style.Grid(),
 		renderer:   style.Renderer(),

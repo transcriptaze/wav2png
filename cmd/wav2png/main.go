@@ -21,21 +21,47 @@ import (
 const VERSION = "v1.1.0"
 
 var opts = struct {
+	out   string
 	start time.Duration
 	end   time.Duration
 	mix   options.Mix
 
-	out     string
+	style string
+
 	width   uint
 	height  uint
 	padding int
 
+	scale styles.Scale
+	fill  styles.Fill
+	grid  styles.Grid
+
 	debug bool
 }{
 	out:    "",
+	style:  "",
 	width:  800,
 	height: 600,
-	debug:  false,
+	scale: styles.Scale{
+		Horizontal: 1.0,
+		Vertical:   1.0,
+	},
+
+	fill: styles.Fill{
+		Fill:   "solid",
+		Colour: "#000000",
+		Alpha:  255,
+	},
+
+	grid: styles.Grid{
+		Grid:   "square",
+		Colour: "#008000",
+		Alpha:  255,
+		Size:   "~64",
+		WH:     "~64x48",
+	},
+
+	debug: false,
 }
 
 func main() {
@@ -56,7 +82,7 @@ func main() {
 	var err error
 
 	exit := func(err error) {
-		fmt.Printf("   *** ERROR: %v", err)
+		fmt.Printf("\n   *** ERROR: %v\n", err)
 		usage()
 		os.Exit(1)
 	}
@@ -83,15 +109,15 @@ func parse() (string, error) {
 	flag.UintVar(&opts.width, "width", opts.width, "Image width (pixels)")
 	flag.UintVar(&opts.height, "height", opts.height, "Image height (pixels)")
 	flag.IntVar(&opts.padding, "padding", opts.padding, "Image padding (pixels)")
-	// flag.Var(&palette, "palette", "name of built-in palette or PNG file")
-	// flag.Var(&grid, "grid", "'grid' specification")
-	// flag.Var(&fill, "fill", "'fill' specification")
-	// flag.Var(&antialias, "antialias", "'antialias' specification")
-	// flag.Var(&scale, "scale", "vertical scaling")
+	flag.Var(&opts.scale, "scale", "(legacy) vertical scaling")
+	flag.StringVar(&opts.style, "style", "", "render style")
+	flag.Var(&opts.fill, "fill", "(legacy) 'fill' specification")
+	flag.Var(&opts.grid, "grid", "(legacy) 'grid' specification")
+	// flag.Var(&palette, "palette", "(legacy) name of built-in palette or PNG file")
+	// flag.Var(&antialias, "antialias", "(legacy) 'antialias' specification")
 	flag.DurationVar(&opts.start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&opts.end, "end", 1*time.Hour, "end time of audio selection")
 	flag.Var(&opts.mix, "mix", "channel mix")
-	// flag.StringVar(&style, "style", "", "render style")
 	flag.BoolVar(&opts.debug, "debug", opts.debug, "Displays diagnostic information")
 	flag.Parse()
 
@@ -130,13 +156,29 @@ func makeStyle() (style styles.Style, err error) {
 	err = nil
 
 	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "style" {
+			style, err = style.Load(opts.style)
+		}
+	})
+
+	if err != nil {
+		return
+	}
+
+	flag.Visit(func(f *flag.Flag) {
 		switch f.Name {
 		case "width":
-			style.Width = opts.width
+			style = style.WithWidth(opts.width)
 		case "height":
-			style.Height = opts.height
+			style = style.WithHeight(opts.height)
 		case "padding":
-			style.Padding = opts.padding
+			style = style.WithPadding(opts.padding)
+		case "scale":
+			style = style.WithScale(opts.scale)
+		case "fill":
+			style = style.WithFill(opts.fill)
+		case "grid":
+			style = style.WithGrid(opts.grid)
 		}
 	})
 
@@ -229,7 +271,7 @@ func mix(wav encoding.Audio, channels ...int) []float32 {
 
 func usage() {
 	fmt.Println()
-	fmt.Println("   Usage: wav2png [--debug] [--height <height>] [--width <width>] [--padding <padding>] [--out <filepath>] <filename>")
+	fmt.Println("   Usage: wav2png [--debug] [--style <file>] [--height <height>] [--width <width>] [--padding <padding>] [--scale <scale>] [--out <filepath>] <filename>")
 	fmt.Println()
 }
 
@@ -249,24 +291,28 @@ func help() {
 	fmt.Println()
 	fmt.Println("   Options:")
 	fmt.Println()
-	fmt.Println("    --settings <file>      JSON file with the default settings for the height, width, etc.Defaults to .settings.json if")
-	fmt.Println("                           not specified, falling back to internal default values if .settings.json does not exist")
+	fmt.Println("    --style <file>         JSON file with the settings for the height, width, etc. Defaults to an internal style of")
+	fmt.Println("                           800x600 pixels, 2 pixels padding and lines rendered with the 'ice' palette.")
 	fmt.Println()
-	fmt.Println("    --width    <pixels>    Width (in pixels) of the PNG image. Valid values are in the range 32 to 8192, defaults to")
-	fmt.Println("                           645px")
+	fmt.Println("    --width    <pixels>    (optional) Width (in pixels) of the PNG image, overrides the style width. Valid values are")
+	fmt.Println("                            in the range 32 to 8192")
 	fmt.Println()
-	fmt.Println("    --height   <pixels>    Height (in pixels) of the PNG image. Valid values are in the range 32 to 8192, defaults to")
-	fmt.Println("                           395px")
+	fmt.Println("    --height   <pixels>    (optional) Height (in pixels) of the PNG image, overrides the style height. Valid values are")
+	fmt.Println("                            in the range 32 to 8192")
 	fmt.Println()
-	fmt.Println("    --padding  <pixels>    Padding (in pixels) between the border of the PNG and the extent of the rendered waveform. Valid")
-	fmt.Println("                           values are in the range -16 to 32, defaults to 2")
+	fmt.Println("    --padding  <pixels>    (optional) Padding (in pixels) between the border of the PNG and the extent of the rendered")
+	fmt.Println("                            waveform, overrides the style padding. Valid values are in the range -16 to 32, defaults to 2")
 	fmt.Println()
-	fmt.Println("    --palette  <palette>   Palette used to colour the waveform. May be the name of one of the internal colour palettes")
-	fmt.Println("                           or a user provided PNG file. Defaults to 'ice'")
+	fmt.Println("    --scale <scale>        (optional) A vertical scaling factor to size the height of the rendered waveform, overrides")
+	fmt.Println("                           the style scaling. The valid range is 0.2 to 5.0.")
 	fmt.Println()
-	fmt.Println("    --fill <fillspec>      Fill specification for the background colour, in the form type:colour e.g. solid:#0000ffff")
+	fmt.Println("    --palette  <palette>   (legacy) Palette used to colour the waveform. May be the name of one of the internal colour")
+	fmt.Println("                           palettes or a user provided PNG file. Defaults to 'ice'")
 	fmt.Println()
-	fmt.Println("    --grid <gridspec>      Grid specification for an optional rectilinear grid, in the form type:colour:size:overlay, e.g.")
+	fmt.Println("    --fill <fillspec>      (legacy) Fill specification for the background colour, in the form type:colour e.g. solid:#0000ffff")
+	fmt.Println()
+	fmt.Println("    --grid <gridspec>      (legacy) Grid specification for an optional rectilinear grid, in the form type:colour:size:overlay")
+	fmt.Println("                           e.g.")
 	fmt.Println("                           - none")
 	fmt.Println("                           - square:#008000ff:~64")
 	fmt.Println("                           - rectangle:#008000ff:~64x48:overlay")
@@ -283,16 +329,13 @@ func help() {
 	fmt.Println()
 	fmt.Println("                           The default gridspec is 'square:#008000ff:~64'")
 	fmt.Println()
-	fmt.Println("    --antialias <kernel>   The antialising kernel applied to soften the rendered PNG. Valid values are:")
+	fmt.Println("    --antialias <kernel>   (legacy) The antialising kernel applied to soften the rendered PNG. Valid values are:")
 	fmt.Println("                           - none        no antialiasing")
 	fmt.Println("                           - horizontal  blurs horizontal edges")
 	fmt.Println("                           - vertical    blurs vertical edges")
 	fmt.Println("                           - soft        blurs both horizontal and vertical edges")
 	fmt.Println()
 	fmt.Println("                           The default kernel is 'vertical'")
-	fmt.Println()
-	fmt.Println("    --scale <scale>        A vertical scaling factor to size the height of the rendered waveform. The valid range")
-	fmt.Println("                           is 0.2 to 5.0, defaults to 1.0.")
 	fmt.Println()
 	fmt.Println("    --mix  <mixspec>       Specifies how to combine channels from a stereo WAV file. Valid values are:")
 	fmt.Println("                           - 'L'    Renders the left channel only")
