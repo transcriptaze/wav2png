@@ -40,13 +40,13 @@ func TestLines(t *testing.T) {
 		width:      640,
 		height:     480,
 		padding:    0,
+		scale:      1.0,
 		background: fills.NewSolidFill(black),
 		grid:       grids.NewSquareGrid(green, 64, grids.Approximate, false),
 
 		renderer: lines.Lines{
-			Palette:   palettes.Fire,
+			Palette:   palettes.Fire.Palette(),
 			AntiAlias: kernels.Vertical,
-			VScale:    1.0,
 		},
 	}
 
@@ -79,7 +79,7 @@ func TestColumns(t *testing.T) {
 		renderer: columns.Columns{
 			BarWidth:  16,
 			BarGap:    1,
-			Palette:   palettes.Fire,
+			Palette:   palettes.Fire.Palette(),
 			AntiAlias: kernels.Vertical,
 			VScale:    1.0,
 		},

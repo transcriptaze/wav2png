@@ -3,7 +3,10 @@
 - [ ] Columns renderer
       - [x] Refactor default renderer out as 'lines'
       - [x] Delegate grid, background etc to compositor
-      - [ ] --style <JSON> argument
+      - [x] --style <JSON> argument
+      - [ ] columns.json
+      - [ ] Restructure palettes
+      - [ ] Stretch palette horizontally
       - [ ] Gallery
 
 - [ ] wav2mp4 does not seperate L/R audio with --mix option

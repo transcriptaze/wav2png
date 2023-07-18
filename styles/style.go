@@ -2,7 +2,6 @@ package styles
 
 import (
 	"encoding/json"
-	"fmt"
 	"image/color"
 	"os"
 
@@ -18,19 +17,19 @@ var BLACK = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xff}
 var GREEN = color.NRGBA{R: 0x00, G: 0x80, B: 0x00, A: 0xff}
 
 type Style struct {
-	Name     string
+	name     string
 	width    uint
 	height   uint
 	padding  int
 	scale    Scale
 	fill     Fill
 	grid     Grid
-	renderer string
+	renderer any
 }
 
 func NewStyle() Style {
 	return Style{
-		Name:    "default",
+		name:    "default",
 		width:   800,
 		height:  600,
 		padding: 2,
@@ -54,7 +53,14 @@ func NewStyle() Style {
 			WH:     "~64x48",
 		},
 
-		renderer: "lines, palette:ice, antialias:vertical, vscale:1.0",
+		renderer: linesRenderer{
+			palette: palette{
+				palette: palettes.Ice,
+			},
+			antialias: kernel{
+				kernel: kernels.Vertical,
+			},
+		},
 	}
 }
 
@@ -94,6 +100,10 @@ func (s Style) WithGrid(grid Grid) Style {
 	return s
 }
 
+func (s Style) Name() string {
+	return s.name
+}
+
 func (s Style) Width() uint {
 	return s.width
 }
@@ -119,23 +129,29 @@ func (s Style) Grid() grids.GridSpec {
 }
 
 func (s Style) Renderer() renderers.Renderer {
+	if l, ok := s.renderer.(*linesRenderer); ok {
+		return lines.Lines{
+			Palette:   l.palette.Palette(),
+			AntiAlias: kernels.Vertical,
+		}
+	}
+
 	return lines.Lines{
-		Palette:   palettes.Fire,
+		Palette:   palettes.Ice.Palette(),
 		AntiAlias: kernels.Vertical,
-		VScale:    1.0,
 	}
 }
 
 func (s Style) Load(style string) (Style, error) {
 	serializable := struct {
-		Name     string          `json:"name"`
-		Width    uint            `json:"width"`
-		Height   uint            `json:"height"`
-		Padding  int             `json:"padding"`
-		Scale    Scale           `json:"scale"`
-		Fill     Fill            `json:"fill"`
-		Grid     Grid            `json:"grid"`
-		Renderer json.RawMessage `json:"renderer"`
+		Name    string         `json:"name"`
+		Width   uint           `json:"width"`
+		Height  uint           `json:"height"`
+		Padding int            `json:"padding"`
+		Scale   Scale          `json:"scale"`
+		Fill    Fill           `json:"fill"`
+		Grid    Grid           `json:"grid"`
+		Lines   *linesRenderer `json:"lines"`
 	}{
 		Width:   s.width,
 		Height:  s.height,
@@ -150,8 +166,18 @@ func (s Style) Load(style string) (Style, error) {
 	} else if err := json.Unmarshal(bytes, &serializable); err != nil {
 		return s, err
 	} else {
-		fmt.Printf(">>>>>>>>> %+v\n", serializable)
+		s.name = serializable.Name
+		s.width = serializable.Width
+		s.height = serializable.Height
+		s.padding = serializable.Padding
+		s.scale = serializable.Scale
+		s.fill = serializable.Fill
+		s.grid = serializable.Grid
 
-		return s, fmt.Errorf("NOT IMPLEMENTED")
+		if serializable.Lines != nil {
+			s.renderer = serializable.Lines
+		}
+
+		return s, nil
 	}
 }

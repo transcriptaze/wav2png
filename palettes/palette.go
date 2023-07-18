@@ -14,6 +14,9 @@ import (
 
 type Palette string
 
+//go:embed palettes/ice.png
+var palette_ice []byte
+
 //go:embed palettes/fire.png
 var palette_fire []byte
 
@@ -36,6 +39,7 @@ var palette_green []byte
 var palette_gold []byte
 
 var palettes = map[string][]byte{
+	"ice":     palette_ice,
 	"fire":    palette_fire,
 	"aurora":  palette_aurora,
 	"horizon": palette_horizon,
@@ -45,7 +49,14 @@ var palettes = map[string][]byte{
 	"gold":    palette_gold,
 }
 
-var Fire = Palette("fire").Palette()
+var Ice = Palette("ice")
+var Fire = Palette("fire")
+var Aurora = Palette("aurora")
+var Horizon = Palette("horizon")
+var Amber = Palette("amber")
+var Blue = Palette("blue")
+var Green = Palette("green")
+var Gold = Palette("gold")
 
 func (p Palette) String() string {
 	return fmt.Sprintf("%v", string(p))

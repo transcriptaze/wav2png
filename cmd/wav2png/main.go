@@ -109,7 +109,7 @@ func parse() (string, error) {
 	flag.UintVar(&opts.width, "width", opts.width, "Image width (pixels)")
 	flag.UintVar(&opts.height, "height", opts.height, "Image height (pixels)")
 	flag.IntVar(&opts.padding, "padding", opts.padding, "Image padding (pixels)")
-	flag.Var(&opts.scale, "scale", "(legacy) vertical scaling")
+	flag.Var(&opts.scale, "scale", "Vertical scaling")
 	flag.StringVar(&opts.style, "style", "", "render style")
 	flag.Var(&opts.fill, "fill", "(legacy) 'fill' specification")
 	flag.Var(&opts.grid, "grid", "(legacy) 'grid' specification")

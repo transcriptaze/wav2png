@@ -15,6 +15,7 @@ type Compositor struct {
 	width      uint
 	height     uint
 	padding    int
+	scale      float64
 	background fills.FillSpec
 	grid       grids.GridSpec
 	renderer   renderers.Renderer
@@ -25,17 +26,19 @@ func FromStyle(style styles.Style) Compositor {
 		width:      style.Width(),
 		height:     style.Height(),
 		padding:    style.Padding(),
+		scale:      style.Scale().Vertical,
 		background: style.Fill(),
 		grid:       style.Grid(),
 		renderer:   style.Renderer(),
 	}
 }
 
-func NewCompositor(width uint, height uint, padding int, background fills.FillSpec, grid grids.GridSpec, renderer renderers.Renderer) Compositor {
+func NewCompositor(width uint, height uint, padding int, scale float64, background fills.FillSpec, grid grids.GridSpec, renderer renderers.Renderer) Compositor {
 	return Compositor{
 		width:      width,
 		height:     height,
 		padding:    padding,
+		scale:      scale,
 		background: background,
 		grid:       grid,
 		renderer:   renderer,
@@ -46,11 +49,12 @@ func (c Compositor) Render(samples []float32) (*image.NRGBA, error) {
 	width := int(c.width)
 	height := int(c.height)
 	padding := c.padding
+	scale := c.scale
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	grid := grids.Grid(c.grid, width, height, padding)
 
-	if waveform, err := c.renderer.Render(samples, width, height, padding); err != nil {
+	if waveform, err := c.renderer.Render(samples, width, height, padding, scale); err != nil {
 		return nil, err
 	} else {
 		origin := image.Pt(0, 0)

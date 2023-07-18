@@ -17,10 +17,9 @@ const (
 type Lines struct {
 	Palette   wav2png.Palette
 	AntiAlias kernels.Kernel
-	VScale    float64
 }
 
-func (l Lines) Render(samples []float32, width, height, padding int) (*image.NRGBA, error) {
+func (l Lines) Render(samples []float32, width, height, padding int, vscale float64) (*image.NRGBA, error) {
 	w := width
 	h := height
 	if padding > 0 {
@@ -29,7 +28,7 @@ func (l Lines) Render(samples []float32, width, height, padding int) (*image.NRG
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	waveform := l.render(samples, w, h)
+	waveform := l.render(samples, w, h, vscale)
 
 	x0 := padding
 	y0 := padding
@@ -45,8 +44,7 @@ func (l Lines) Render(samples []float32, width, height, padding int) (*image.NRG
 	return img, nil
 }
 
-func (r Lines) render(samples []float32, width, height int) *image.NRGBA {
-	volume := r.VScale
+func (r Lines) render(samples []float32, width, height int, vscale float64) *image.NRGBA {
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := r.Palette.Realize()
 
@@ -58,10 +56,10 @@ func (r Lines) render(samples []float32, width, height int) *image.NRGBA {
 		end := (x + dx) * len(samples) / width
 
 		sum := make([]int, height)
-		u := vscale(0, -int(height))
+		u := scale(0, -int(height))
 		for _, sample := range samples[start:end] {
-			v := int16(32768 * float64(sample) * volume)
-			h := vscale(v, -int(height))
+			v := int16(32768 * float64(sample) * vscale)
+			h := scale(v, -int(height))
 			dy := signum(int(h) - int(u))
 			for y := int(u); y != int(h); y += dy {
 				sum[y]++
@@ -107,7 +105,7 @@ func ceil(p int, q int) int {
 // height of 256 pixels, vscale maps -32768 to 0 and +32767 to 255. A negative height
 // 'flips' the conversion e.g. for height of -256, -32768 is mapped to 255 and +32767 is
 // mapped to 0.
-func vscale(v int16, height int) int16 {
+func scale(v int16, height int) int16 {
 	h := int32(height)
 	vv := int32(v) - RANGE_MIN
 	vvv := int16(h * vv / RANGE)

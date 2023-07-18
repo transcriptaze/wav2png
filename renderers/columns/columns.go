@@ -23,7 +23,7 @@ type Columns struct {
 	VScale    float64
 }
 
-func (c Columns) Render(samples []float32, width, height, padding int) (*image.NRGBA, error) {
+func (c Columns) Render(samples []float32, width, height, padding int, vscale float64) (*image.NRGBA, error) {
 	w := width
 	h := height
 	if padding > 0 {

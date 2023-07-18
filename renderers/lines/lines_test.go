@@ -24,15 +24,14 @@ var reference []byte
 
 func TestRender(t *testing.T) {
 	renderer := Lines{
-		Palette:   palettes.Fire,
+		Palette:   palettes.Fire.Palette(),
 		AntiAlias: kernels.Vertical,
-		VScale:    1.0,
 	}
 
 	audio := read()
 	samples := mix(audio, []int{1}...)[0:16000]
 
-	if img, err := renderer.Render(samples, 640, 480, 0); err != nil {
+	if img, err := renderer.Render(samples, 640, 480, 0, 1.0); err != nil {
 		t.Fatalf("error rendering test image (%v)", err)
 	} else if !reflect.DeepEqual(encode(img), reference) {
 		t.Errorf("incorrectly rendered test image")
