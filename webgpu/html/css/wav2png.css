@@ -1,0 +1,192 @@
+@font-face {
+  font-family: "Lato";
+  font-style: normal;
+  font-weight: bold;
+  src: url("/fonts/Lato/Lato-Bold.ttf");
+}
+@font-face {
+  font-family: "Lato";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/fonts/Lato/Lato-Semibold.ttf");
+}
+@font-face {
+  font-family: "Lato";
+  font-style: normal;
+  font-weight: normal;
+  src: url("/fonts/Lato/Lato-Regular.ttf");
+}
+:root {
+  --background: #fad5a5;
+}
+
+* {
+  background: transparent;
+  border: none;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-family: "Lato";
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  background-image: url("/images/textures/ep_naturalwhite.webp");
+  background-blend-mode: luminosity;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: center;
+  column-gap: 16px;
+}
+
+img#logo {
+  grid-column: 1;
+  grid-row: 1;
+  width: 80px;
+  margin-top: 16px;
+  margin-left: 16px;
+}
+
+div#workspace {
+  grid-column: 1/3;
+  grid-row: 1/3;
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  column-gap: 8px;
+}
+div#workspace div#canvas {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  border-radius: 4px;
+}
+div#workspace div#canvas canvas {
+  grid-column: 1;
+  grid-row: 1;
+  width: 960px;
+  height: 540px;
+}
+div#workspace div#canvas .overlay {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 2;
+}
+div#workspace div.toolbar {
+  width: fit-content;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+}
+div#workspace div.toolbar button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border: 1px solid black;
+  border-radius: 4px;
+  filter: invert(88%) sepia(0%) saturate(1%) hue-rotate(168deg) brightness(78%) contrast(87%);
+}
+div#workspace div.toolbar button img {
+  width: 20px;
+  height: 20px;
+}
+div#workspace div.toolbar button:enabled {
+  cursor: pointer;
+  filter: none;
+}
+div#workspace div.toolbar input {
+  width: 38px;
+  height: 38px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border: 1px solid black;
+  border-radius: 4px;
+  outline: none;
+  filter: invert(88%) sepia(0%) saturate(1%) hue-rotate(168deg) brightness(78%) contrast(87%);
+}
+div#workspace div.toolbar input:enabled {
+  filter: none;
+  cursor: pointer;
+}
+
+div#picker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#windmill {
+  display: none;
+  margin-top: -150px;
+  margin-left: -150px;
+}
+
+#windmill.visible {
+  display: block;
+}
+
+#windmill:before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  margin: auto;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border-top: 12px solid #daa520;
+  border-right: 2px solid transparent;
+  animation: windmill 1.25s linear infinite;
+}
+
+#windmill.visible {
+  display: block;
+  visibility: visible;
+}
+
+@keyframes windmill {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

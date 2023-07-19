@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>wav2png</title>
+    <meta charset="utf-8">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/wav2png.css"  type="text/css" id="css_wav2png">
+  </head>
+
+  <body>
+    <img id="logo" src="/images/logo.png" />
+    <div id="workspace">
+      <div id="canvas">
+        <canvas width="1920" height="1080"></canvas>
+        <div id="picker" class="overlay" 
+                         onclick="onPick(event)" 
+                         ondragover="onDragOver(event)" 
+                         ondragleave="onDragLeave(event"
+                         ondrop="onDrop(event)">
+          <input type="file" accept="audio/*" onchange="onPicked(event)" style="display:none;" />          
+          <span id="windmill"></span>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button id="save" disabled>
+          <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
+        </button>
+        <input id="fill" type="color" value="#000000" onchange="onFill(event)" disabled />
+        <button id="clear" disabled>
+          <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
+        </button>
+
+        <a id="download" href="" style="display:none" download></a>
+      </div>
+    </div>
+
+  </body>
+
+  <script type="module">
+    import { initialise, load, download, trash } from './javascript/wav2png.js'
+
+    initialise()
+
+    window.onDragOver = function (event) {
+      event.preventDefault()
+    }
+
+    window.onDragLeave = function(event) {
+      event.preventDefault()
+    }
+
+    window.onDrop = function (event) {
+      event.preventDefault()
+
+      const audio = /audio\/.*/g
+      let files = []
+
+      if (event.dataTransfer.files) {
+        files = Array.prototype.map.call(event.dataTransfer.files, f => f)
+      } else if (event.dataTransfer.items) {
+        files = Array.prototype.filter.call(event.dataTransfer.items, f => f.kind === 'file').map(g => g.getAsFile())
+      }
+
+      if (files.length > 0 && audio.test(files[0].type)) {
+         load(files[0].name, files[0])
+      }
+    }
+    
+    window.onPick = function(event) {
+      const picker = document.querySelector('#picker')
+      const input = picker.querySelector('input[type="file"]')
+
+      input.value = null
+      input.click()
+    }
+
+    window.onPicked = function(event) {
+      const picker = document.querySelector('#picker')
+      const input = picker.querySelector('input[type="file"]')
+      const files = input.files
+
+      if (files.length > 0) {
+         load(files[0].name, files[0])
+      }
+    }
+
+    window.onDownload = function(event) {
+      download()
+    }
+
+    window.onFill = function(event) {
+      console.log(event)
+    }
+
+    window.onTrash = function(event) {
+      trash()
+    }
+  </script>
+</html>
