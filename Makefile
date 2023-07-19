@@ -52,7 +52,7 @@ release: build-all
 
 debug: build
 	rm ./runtime/noise.png
-	./bin/wav2png --debug --style .styles/debug.json --start 2.5s --end 7.5s --out runtime ./samples/noise.wav
+	./bin/wav2png --debug --style .styles/columns.json --start 2.5s --end 7.5s --out runtime ./samples/noise.wav
 	open ./runtime/noise.png
 
 version: build

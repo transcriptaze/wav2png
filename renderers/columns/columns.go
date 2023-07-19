@@ -16,11 +16,10 @@ const (
 )
 
 type Columns struct {
-	BarWidth  int
-	BarGap    int
+	BarWidth  uint
+	BarGap    uint
 	Palette   wav2png.Palette
 	AntiAlias kernels.Kernel
-	VScale    float64
 }
 
 func (c Columns) Render(samples []float32, width, height, padding int, vscale float64) (*image.NRGBA, error) {
@@ -32,7 +31,7 @@ func (c Columns) Render(samples []float32, width, height, padding int, vscale fl
 	}
 
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	waveform := c.render(samples, w, h)
+	waveform := c.render(samples, w, h, vscale)
 
 	x0 := padding
 	y0 := padding
@@ -48,17 +47,16 @@ func (c Columns) Render(samples []float32, width, height, padding int, vscale fl
 	return img, nil
 }
 
-func (c Columns) render(samples []float32, width, height int) *image.NRGBA {
+func (c Columns) render(samples []float32, width, height int, vscale float64) *image.NRGBA {
 	bar := image.NewNRGBA(image.Rect(0, 0, 1, int(height)))
 	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
 	colours := c.Palette.Realize()
-	volume := c.VScale
 
 	scaler := draw.CatmullRom
-	column := image.Rect(1, 0, c.BarWidth, height)
+	column := image.Rect(1, 0, int(c.BarWidth), height)
 
 	x := 0
-	dx := c.BarWidth + c.BarGap
+	dx := int(c.BarWidth + c.BarGap)
 	start := 0
 
 	for start < len(samples) {
@@ -68,11 +66,11 @@ func (c Columns) render(samples []float32, width, height int) *image.NRGBA {
 		}
 
 		sum := make([]int, height)
-		u := vscale(0, -int(height))
+		u := scale(0, -int(height))
 
 		for _, sample := range samples[start:end] {
-			v := int16(32768 * float64(sample) * volume)
-			h := vscale(v, -int(height))
+			v := int16(32768 * float64(sample) * vscale)
+			h := scale(v, -int(height))
 			dy := signum(int(h) - int(u))
 			for y := int(u); y != int(h); y += dy {
 				sum[y]++
@@ -125,7 +123,7 @@ func ceil(p int, q int) int {
 // height of 256 pixels, vscale maps -32768 to 0 and +32767 to 255. A negative height
 // 'flips' the conversion e.g. for height of -256, -32768 is mapped to 255 and +32767 is
 // mapped to 0.
-func vscale(v int16, height int) int16 {
+func scale(v int16, height int) int16 {
 	h := int32(height)
 	vv := int32(v) - RANGE_MIN
 	vvv := int16(h * vv / RANGE)

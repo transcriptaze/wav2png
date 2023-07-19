@@ -28,7 +28,6 @@ func TestRender(t *testing.T) {
 		BarGap:    1,
 		Palette:   palettes.Fire.Palette(),
 		AntiAlias: kernels.Vertical,
-		VScale:    1.0,
 	}
 
 	audio := read()

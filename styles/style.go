@@ -10,6 +10,7 @@ import (
 	"github.com/transcriptaze/wav2png/kernels"
 	"github.com/transcriptaze/wav2png/palettes"
 	"github.com/transcriptaze/wav2png/renderers"
+	"github.com/transcriptaze/wav2png/renderers/columns"
 	"github.com/transcriptaze/wav2png/renderers/lines"
 )
 
@@ -129,9 +130,18 @@ func (s Style) Grid() grids.GridSpec {
 }
 
 func (s Style) Renderer() renderers.Renderer {
-	if l, ok := s.renderer.(*linesRenderer); ok {
+	if r, ok := s.renderer.(*linesRenderer); ok {
 		return lines.Lines{
-			Palette:   l.palette.Palette(),
+			Palette:   r.palette.Palette(),
+			AntiAlias: kernels.Vertical,
+		}
+	}
+
+	if r, ok := s.renderer.(*columnsRenderer); ok {
+		return columns.Columns{
+			BarWidth:  r.barWidth,
+			BarGap:    r.barGap,
+			Palette:   r.palette.Palette(),
 			AntiAlias: kernels.Vertical,
 		}
 	}
@@ -144,14 +154,15 @@ func (s Style) Renderer() renderers.Renderer {
 
 func (s Style) Load(style string) (Style, error) {
 	serializable := struct {
-		Name    string         `json:"name"`
-		Width   uint           `json:"width"`
-		Height  uint           `json:"height"`
-		Padding int            `json:"padding"`
-		Scale   Scale          `json:"scale"`
-		Fill    Fill           `json:"fill"`
-		Grid    Grid           `json:"grid"`
-		Lines   *linesRenderer `json:"lines"`
+		Name    string           `json:"name"`
+		Width   uint             `json:"width"`
+		Height  uint             `json:"height"`
+		Padding int              `json:"padding"`
+		Scale   Scale            `json:"scale"`
+		Fill    Fill             `json:"fill"`
+		Grid    Grid             `json:"grid"`
+		Lines   *linesRenderer   `json:"lines"`
+		Columns *columnsRenderer `json:"columns"`
 	}{
 		Width:   s.width,
 		Height:  s.height,
@@ -176,6 +187,8 @@ func (s Style) Load(style string) (Style, error) {
 
 		if serializable.Lines != nil {
 			s.renderer = serializable.Lines
+		} else if serializable.Columns != nil {
+			s.renderer = serializable.Columns
 		}
 
 		return s, nil

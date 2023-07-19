@@ -1,0 +1,32 @@
+{
+    "name": "columns",
+    "width": 1920,
+    "height": 1080,
+    "padding": 20,
+
+    "scale": {
+        "horizontal": 1,
+        "vertical": 1
+    },
+
+    "fill": {
+        "type": "solid",
+        "colour": "#000000ff"
+    },
+
+    "grid": {
+        "type": "rectangular",
+        "colour": "#800000ff",
+        "shape": "~64x64",
+        "overlay": true
+    },
+    
+    "columns": {
+        "bar": {
+            "width": 16,
+            "gap": 1
+        },
+        "palette": "ice", 
+        "antialias": "vertical"
+    }
+}

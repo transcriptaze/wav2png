@@ -4,8 +4,9 @@
       - [x] Refactor default renderer out as 'lines'
       - [x] Delegate grid, background etc to compositor
       - [x] --style <JSON> argument
-      - [ ] columns.json
+      - [x] columns.json
       - [ ] Restructure palettes
+      - [x] Clean up wav2png.options
       - [ ] Stretch palette horizontally
       - [ ] Gallery
 
