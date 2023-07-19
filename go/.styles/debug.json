@@ -1,0 +1,29 @@
+{
+    "name": "debug",
+    "width": 640,
+    "height": 480,
+    "padding": 5,
+
+    "scale": {
+        "horizontal": 1,
+        "vertical": 0.75
+    },
+
+    "fill": {
+        "type": "solid",
+        "colour": "#ff00ffff"
+    },
+
+    "grid": {
+        "type": "square",
+        "colour": "#ffff00ff",
+        "shape": "~64",
+        "overlay": true
+    },
+    
+    "lines": {
+        "palette": "fire", 
+        "antialias": "soft"
+    }
+}
+

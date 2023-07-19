@@ -6,6 +6,7 @@
       - [x] --style <JSON> argument
       - [x] columns.json
       - [ ] Restructure palettes
+      - [ ] wav2mp4
       - [x] Clean up wav2png.options
       - [ ] Stretch palette horizontally
       - [ ] Gallery
