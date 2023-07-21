@@ -18,7 +18,7 @@ import (
 	"github.com/transcriptaze/wav2png/go/styles"
 )
 
-const VERSION = "v1.1.0"
+const VERSION = "v1.2.0"
 
 var opts = struct {
 	out   string
@@ -113,8 +113,6 @@ func parse() (string, error) {
 	flag.StringVar(&opts.style, "style", "", "render style")
 	flag.Var(&opts.fill, "fill", "(legacy) 'fill' specification")
 	flag.Var(&opts.grid, "grid", "(legacy) 'grid' specification")
-	// flag.Var(&palette, "palette", "(legacy) name of built-in palette or PNG file")
-	// flag.Var(&antialias, "antialias", "(legacy) 'antialias' specification")
 	flag.DurationVar(&opts.start, "start", 0, "start time of audio selection")
 	flag.DurationVar(&opts.end, "end", 1*time.Hour, "end time of audio selection")
 	flag.Var(&opts.mix, "mix", "channel mix")
@@ -142,8 +140,10 @@ func makeOutFile(wavfile string) (png string, err error) {
 				return
 			} else if err == nil && info.IsDir() {
 				png = filepath.Join(opts.out, png)
+				err = nil
 			} else {
 				png = opts.out
+				err = nil
 			}
 		}
 	})

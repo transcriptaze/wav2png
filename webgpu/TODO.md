@@ -12,6 +12,7 @@
       - [x] Accept any transcodable audio format
 
 - [ ] Set background colour
+- [ ] github workflow
 - [ ] Distributable Go app
 - [ ] :hover for drag (with audio file only)
 - [ ] lines:minmax

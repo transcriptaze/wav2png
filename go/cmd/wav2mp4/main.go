@@ -1,23 +1,25 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"image"
-	"image/draw"
+	// "image/draw"
 	"image/png"
+	"io/fs"
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/transcriptaze/wav2png/go/cmd/wav2mp4/options"
-	"github.com/transcriptaze/wav2png/go/encoding/wav"
-	"github.com/transcriptaze/wav2png/go/fills"
-	"github.com/transcriptaze/wav2png/go/grids"
-	"github.com/transcriptaze/wav2png/go/wav2png"
+	"github.com/transcriptaze/wav2png/go/cmd/options"
+	"github.com/transcriptaze/wav2png/go/compositor"
+	"github.com/transcriptaze/wav2png/go/encoding"
+	"github.com/transcriptaze/wav2png/go/styles"
 )
 
-const VERSION = "v1.1.0"
+const VERSION = "v1.2.0"
 
 type audio struct {
 	sampleRate float64
@@ -26,6 +28,57 @@ type audio struct {
 	duration   time.Duration
 	length     int
 	samples    [][]float32
+}
+
+var opts = struct {
+	out   string
+	start time.Duration
+	end   time.Duration
+	mix   options.Mix
+
+	style string
+
+	width   uint
+	height  uint
+	padding int
+
+	scale styles.Scale
+	fill  styles.Fill
+	grid  styles.Grid
+
+	fps    float64
+	window time.Duration
+	cursor options.Cursor
+
+	debug bool
+}{
+	out:    "",
+	style:  "",
+	width:  800,
+	height: 600,
+	scale: styles.Scale{
+		Horizontal: 1.0,
+		Vertical:   1.0,
+	},
+
+	fill: styles.Fill{
+		Fill:   "solid",
+		Colour: "#000000",
+		Alpha:  255,
+	},
+
+	grid: styles.Grid{
+		Grid:   "square",
+		Colour: "#008000",
+		Alpha:  255,
+		Size:   "~64",
+		WH:     "~64x48",
+	},
+
+	fps:    30.0,
+	window: 30 * time.Second,
+
+	debug: false,
 }
 
 func main() {
@@ -39,83 +92,52 @@ func main() {
 		os.Exit(0)
 	}
 
-	options := options.NewOptions()
-	if err := options.Parse(); err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
+	var wavfile string
+	var outfile string
+	var audio []float32
+	var fs float64
+	var from time.Duration
+	var to time.Duration
+	var style styles.Style
+	var err error
+
+	exit := func(err error) {
+		fmt.Printf("\n   *** ERROR: %v\n", err)
 		usage()
 		os.Exit(1)
 	}
 
-	audio, err := read(options.WAV)
-	if err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
-		os.Exit(1)
-	} else if audio == nil {
-		fmt.Printf("\n   ERROR: unable to read WAV file\n")
-		os.Exit(1)
+	if wavfile, err = parse(); err != nil {
+		exit(err)
+	} else if outfile, err = makeOutFile(wavfile); err != nil {
+		exit(err)
+	} else if style, err = makeStyle(); err != nil {
+		exit(err)
+	} else if audio, fs, from, to, err = getAudio(wavfile); err != nil {
+		exit(err)
 	}
 
-	from := 0 * time.Second
-	to := audio.duration
-
-	if options.From != nil {
-		from = *options.From
+	dir := filepath.Join(filepath.Dir(outfile), "frames")
+	if err := os.MkdirAll(dir, 0777); err != nil {
+		exit(err)
 	}
 
-	if options.To != nil {
-		to = *options.To
-	}
-
-	if err := os.MkdirAll(options.Frames, 0777); err != nil {
-		fmt.Printf("\n   ERROR: %v\n", err)
-		os.Exit(1)
-	}
-
-	w := int(options.Width)
-	h := int(options.Height)
-	padding := options.Padding
+	// cursor := options.Cursor.Render(h)
+	fn := opts.cursor.Fn()
 	duration := to - from
+	window := opts.window
+	fps := opts.fps
+	frames := int(math.Floor(duration.Seconds() * fps))
 
-	x0 := 0
-	y0 := 0
-	if padding > 0 {
-		x0 = padding
-		y0 = padding
-		w -= 2 * padding
-		h -= 2 * padding
-	}
-
-	cursor := options.Cursor.Render(h)
-	window := 1 * time.Second
-	fps := 30.0
-
-	if options.Window != nil {
-		window = *options.Window
-	}
-
-	if options.FPS != nil {
-		fps = *options.FPS
-	}
-
-	if options.Debug {
-		fmt.Println()
-		fmt.Printf("   File:        %v\n", options.WAV)
-		fmt.Printf("   Channels:    %v\n", audio.channels)
-		fmt.Printf("   Format:      %v\n", audio.format)
-		fmt.Printf("   Sample Rate: %v\n", audio.sampleRate)
-		fmt.Printf("   Duration:    %v\n", audio.duration)
-		fmt.Printf("   Samples:     %v\n", audio.length)
-		fmt.Printf("   MP4:         %v\n", options.MP4)
-		fmt.Printf("   - window:    %v\n", window)
-		fmt.Printf("   - FPS:       %v\n", fps)
+	if opts.debug {
+		fmt.Printf("   MP4:         %v\n", outfile)
+		fmt.Printf("     window:    %v\n", window)
+		fmt.Printf("     FPS:       %v\n", fps)
 		fmt.Println()
 	}
-
-	fn := options.Cursor.Fn()
-	frames := int(math.Floor((to - from).Seconds() * fps))
 
 	for frame := 0; frame <= frames; frame++ {
-		png := filepath.Join(options.Frames, fmt.Sprintf("frame-%05v.png", frame))
+		png := filepath.Join(dir, fmt.Sprintf("frame-%05v.png", frame))
 
 		percentage := float64(frame) / float64(frames)
 		t := seconds(percentage * duration.Seconds())
@@ -134,42 +156,37 @@ func main() {
 		if q > duration {
 			shift = (duration - (p + window)).Seconds() / window.Seconds()
 			p = duration - window
-			// q = p + window
 		}
 
 		start := from + p
 		end := start + window
 
 		if start < from {
-			fmt.Printf("\n   ERROR: frame %d - invalid frame 'start' (%v)\n", frame, start)
-			os.Exit(1)
+			exit(fmt.Errorf("frame %d - invalid frame 'start' (%v)", frame, start))
 		}
 
 		if end > to {
-			fmt.Printf("\n   ERROR: frame %d - invalid frame 'end' (%v)\n", frame, end)
-			os.Exit(1)
+			exit(fmt.Errorf("frame %d - invalid frame 'end' (%v)", frame, end))
 		}
 
-		img, err := render(*audio, start, end, options, shift)
+		img, err := render(audio, fs, start, end, shift, style)
 		if err != nil {
-			fmt.Printf("\n   ERROR: %v\n", err)
-			os.Exit(1)
+			exit(err)
 		} else if img == nil {
-			fmt.Printf("\n   ERROR: error creating frame\n")
-			os.Exit(1)
+			exit(fmt.Errorf("error creating frame"))
 		}
 
-		if cursor != nil {
-			cw := cursor.Bounds().Dx()
-			ch := cursor.Bounds().Dy()
-			cx := x0 + int(math.Round(x*float64(w-1))) - cw/2
-			cy := y0
+		// 	if cursor != nil {
+		// 		cw := cursor.Bounds().Dx()
+		// 		ch := cursor.Bounds().Dy()
+		// 		cx := x0 + int(math.Round(x*float64(w-1))) - cw/2
+		// 		cy := y0
 
-			draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, image.Pt(0, 0), draw.Over)
-		}
+		// 		draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, image.Pt(0, 0), draw.Over)
+		// 	}
 
-		if options.Debug {
-			fmt.Printf("   ... frame %-5d  %-8v %-8v %v   %+.3f\n", frame, start.Round(time.Millisecond), end.Round(time.Millisecond), png, shift)
+		if opts.debug {
+			fmt.Printf("   ... frame %-5d  %-8v %-8v %v   %+.3f\n", frame, (from + p).Round(time.Millisecond), (from + p + window).Round(time.Millisecond), png, shift)
 		}
 
 		if err := write(img, png); err != nil {
@@ -179,87 +196,149 @@ func main() {
 	}
 }
 
-func render(wav audio, from, to time.Duration, options options.Options, shift float64) (*image.NRGBA, error) {
-	width := int(options.Width)
-	height := int(options.Height)
-	padding := options.Padding
-	fillspec := options.FillSpec
-	gridspec := options.GridSpec
-	kernel := options.Antialias
-	vscale := options.VScale
-	palette := options.Palette
+func parse() (string, error) {
+	flag.StringVar(&opts.out, "out", opts.out, "Output file (or directory)")
+	flag.UintVar(&opts.width, "width", opts.width, "Image width (pixels)")
+	flag.UintVar(&opts.height, "height", opts.height, "Image height (pixels)")
+	flag.IntVar(&opts.padding, "padding", opts.padding, "Image padding (pixels)")
+	flag.Var(&opts.scale, "scale", "Vertical scaling")
+	flag.StringVar(&opts.style, "style", "", "render style")
+	flag.Var(&opts.fill, "fill", "(legacy) 'fill' specification")
+	flag.Var(&opts.grid, "grid", "(legacy) 'grid' specification")
+	flag.DurationVar(&opts.start, "start", 0, "start time of audio selection")
+	flag.DurationVar(&opts.end, "end", 1*time.Hour, "end time of audio selection")
+	flag.Var(&opts.mix, "mix", "channel mix")
+	flag.Float64Var(&opts.fps, "fps", opts.fps, "frame rate")
+	flag.DurationVar(&opts.window, "window", opts.window, "frame sample 'window'")
+	flag.Var(&opts.cursor, "cursor", "name of built-in cursor or PNG file")
+	flag.BoolVar(&opts.debug, "debug", opts.debug, "Displays diagnostic information")
+	flag.Parse()
 
-	w := width
-	h := height
-	if padding > 0 {
-		w = width - 2*padding
-		h = height - 2*padding
+	if len(flag.Args()) < 1 {
+		return "", fmt.Errorf("missing WAV file")
+	} else {
+		return filepath.Clean(flag.Args()[0]), nil
+	}
+}
+
+func makeOutFile(wavfile string) (mp4 string, err error) {
+	filename := filepath.Base(wavfile)
+	ext := filepath.Ext(filename)
+	mp4 = strings.TrimSuffix(filename, ext) + ".mp4"
+
+	var info fs.FileInfo
+
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "out" {
+			info, err = os.Stat(opts.out)
+			if err != nil && !os.IsNotExist(err) {
+				return
+			} else if err == nil && info.IsDir() {
+				mp4 = filepath.Join(opts.out, mp4)
+				err = nil
+			} else {
+				mp4 = opts.out
+				err = nil
+			}
+		}
+	})
+
+	return
+}
+
+func makeStyle() (style styles.Style, err error) {
+	style = styles.NewStyle()
+	err = nil
+
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "style" {
+			style, err = style.Load(opts.style)
+		}
+	})
+
+	if err != nil {
+		return
 	}
 
-	fs := wav.sampleRate
-	samples := mix(wav, options.Mix.Channels()...)
+	flag.Visit(func(f *flag.Flag) {
+		switch f.Name {
+		case "width":
+			style = style.WithWidth(opts.width)
+		case "height":
+			style = style.WithHeight(opts.height)
+		case "padding":
+			style = style.WithPadding(opts.padding)
+		case "scale":
+			style = style.WithScale(opts.scale)
+		case "fill":
+			style = style.WithFill(opts.fill)
+		case "grid":
+			style = style.WithGrid(opts.grid)
+		}
+	})
+
+	return
+}
+
+func getAudio(file string) (pcm []float32, fs float64, from, to time.Duration, err error) {
+	var f *os.File
+	var audio encoding.Audio
+
+	if f, err = os.Open(file); err != nil {
+		return
+	}
+
+	defer f.Close()
+
+	if audio, err = encoding.Decode(f); err != nil {
+		return
+	}
+
+	if opts.debug {
+		fmt.Println()
+		fmt.Printf("   File:        %v\n", file)
+		fmt.Printf("   Channels:    %v\n", audio.Channels)
+		fmt.Printf("   Format:      %v\n", audio.Format)
+		fmt.Printf("   Sample Rate: %v\n", audio.SampleRate)
+		fmt.Printf("   Duration:    %v\n", audio.Duration)
+		fmt.Printf("   Samples:     %v\n", audio.Length)
+		fmt.Println()
+	}
+
+	pcm = mix(audio, opts.mix.Channels()...)
+	fs = audio.SampleRate
+	from = 0 * time.Second
+	to = audio.Duration
+
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "start" && opts.start < audio.Duration {
+			from = opts.start
+		} else if f.Name == "end" && opts.end < audio.Duration {
+			to = opts.end
+		}
+	})
+
+	return
+}
+
+func render(audio []float32, fs float64, from, to time.Duration, shift float64, style styles.Style) (*image.NRGBA, error) {
+	duration := func() time.Duration {
+		return time.Duration(math.Floor(float64(len(audio))/fs)) * time.Second
+	}
 
 	start := int(math.Floor(from.Seconds() * fs))
-	if start < 0 || start > len(samples) {
-		return nil, fmt.Errorf("start position not in range %v-%v", from, wav.duration)
+	if start < 0 || start > len(audio) {
+		return nil, fmt.Errorf("start position not in range %v-%v", from, duration())
 	}
 
 	end := int(math.Floor(to.Seconds() * fs))
-	if end < 0 || end < start || end > len(samples) {
-		return nil, fmt.Errorf("end position not in range %v-%v", from, wav.duration)
+	if end < 0 || end < start || end > len(audio) {
+		return nil, fmt.Errorf("end position not in range %v-%v", from, duration())
 	}
 
-	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	grid := grids.Grid(gridspec, width, height, padding)
-	waveform := wav2png.Render(samples[start:end], fs, w, h, palette, vscale)
-	antialiased := wav2png.Antialias(waveform, kernel)
+	compositor := compositor.FromStyle(style)
 
-	offset := int(math.Round(shift * float64(w)))
-	x0 := padding + offset
-	x1 := padding + w
-	if x0 < padding {
-		x0 = padding
-		x1 = padding + offset + w
-	}
-
-	origin := image.Pt(0, 0)
-	rect := image.Rect(x0, padding, x1, h)
-	rectg := img.Bounds()
-
-	fills.Fill(img, fillspec)
-
-	if gridspec.Overlay() {
-		draw.Draw(img, rect, antialiased, origin, draw.Over)
-		draw.Draw(img, rectg, grid, origin, draw.Over)
-	} else {
-		draw.Draw(img, rectg, grid, origin, draw.Over)
-		draw.Draw(img, rect, antialiased, origin, draw.Over)
-	}
-
-	return img, nil
-}
-
-func read(wavfile string) (*audio, error) {
-	file, err := os.Open(wavfile)
-	if err != nil {
-		return nil, err
-	}
-
-	defer file.Close()
-
-	w, err := wav.Decode(file)
-	if err != nil {
-		return nil, err
-	}
-
-	return &audio{
-		sampleRate: float64(w.Format.SampleRate),
-		format:     fmt.Sprintf("%v", w.Format),
-		channels:   int(w.Format.Channels),
-		duration:   w.Duration(),
-		length:     w.Frames(),
-		samples:    w.Samples,
-	}, nil
+	return compositor.Render(audio[start:end])
 }
 
 func write(img *image.NRGBA, file string) error {
@@ -273,19 +352,19 @@ func write(img *image.NRGBA, file string) error {
 	return png.Encode(f, img)
 }
 
-func mix(wav audio, channels ...int) []float32 {
-	L := wav.length
+func mix(wav encoding.Audio, channels ...int) []float32 {
+	L := wav.Length
 	N := float64(len(channels))
 	samples := make([]float32, L)
 
-	if len(wav.samples) < 2 {
-		return wav.samples[0]
+	if len(wav.Samples) < 2 {
+		return wav.Samples[0]
 	}
 
 	for i := 0; i < L; i++ {
 		sample := 0.0
 		for _, ch := range channels {
-			sample += float64(wav.samples[ch-1][i])
+			sample += float64(wav.Samples[ch-1][i])
 		}
 
 		samples[i] = float32(sample / N)
