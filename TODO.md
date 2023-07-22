@@ -7,8 +7,8 @@
       - [x] columns.json
       - [x] wav2mp4
       - [x] Clean up wav2png.options
+      - [x] Move cursors to own package
       - [ ] Restructure palettes
-      - [ ] Move cursors to own package
       - [ ] Stretch palette horizontally
       - [ ] Gallery
 

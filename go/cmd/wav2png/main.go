@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/transcriptaze/wav2png/go/cmd/options"
+	"github.com/transcriptaze/wav2png/go/audio"
 	"github.com/transcriptaze/wav2png/go/compositor"
 	"github.com/transcriptaze/wav2png/go/encoding"
 	"github.com/transcriptaze/wav2png/go/styles"
@@ -24,7 +24,7 @@ var opts = struct {
 	out   string
 	start time.Duration
 	end   time.Duration
-	mix   options.Mix
+	mix   audio.Mix
 
 	style string
 
