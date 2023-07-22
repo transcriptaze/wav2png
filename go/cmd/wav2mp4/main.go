@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"image"
-	// "image/draw"
+	"image/draw"
 	"image/png"
 	"io/fs"
 	"math"
@@ -20,15 +20,6 @@ import (
 )
 
 const VERSION = "v1.2.0"
-
-type audio struct {
-	sampleRate float64
-	format     string
-	channels   int
-	duration   time.Duration
-	length     int
-	samples    [][]float32
-}
 
 var opts = struct {
 	out   string
@@ -122,12 +113,21 @@ func main() {
 		exit(err)
 	}
 
-	// cursor := options.Cursor.Render(h)
+	x0 := style.Padding()
+	y0 := style.Padding()
+	w := int(style.Width()) - 2*style.Padding()
+	h := int(style.Height()) - 2*style.Padding()
+
+	cursor := opts.cursor.Render(h)
 	fn := opts.cursor.Fn()
 	duration := to - from
 	window := opts.window
 	fps := opts.fps
 	frames := int(math.Floor(duration.Seconds() * fps))
+
+	if window > duration {
+		window = duration
+	}
 
 	if opts.debug {
 		fmt.Printf("   MP4:         %v\n", outfile)
@@ -176,14 +176,14 @@ func main() {
 			exit(fmt.Errorf("error creating frame"))
 		}
 
-		// 	if cursor != nil {
-		// 		cw := cursor.Bounds().Dx()
-		// 		ch := cursor.Bounds().Dy()
-		// 		cx := x0 + int(math.Round(x*float64(w-1))) - cw/2
-		// 		cy := y0
+		if cursor != nil {
+			cw := cursor.Bounds().Dx()
+			ch := cursor.Bounds().Dy()
+			cx := x0 + int(math.Round(x*float64(w-1))) - cw/2
+			cy := y0
 
-		// 		draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, image.Pt(0, 0), draw.Over)
-		// 	}
+			draw.Draw(img, image.Rect(cx, cy, cx+cw, cy+ch), cursor, image.Pt(0, 0), draw.Over)
+		}
 
 		if opts.debug {
 			fmt.Printf("   ... frame %-5d  %-8v %-8v %v   %+.3f\n", frame, (from + p).Round(time.Millisecond), (from + p + window).Round(time.Millisecond), png, shift)

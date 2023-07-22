@@ -5,9 +5,10 @@
       - [x] Delegate grid, background etc to compositor
       - [x] --style <JSON> argument
       - [x] columns.json
-      - [ ] Restructure palettes
-      - [ ] wav2mp4
+      - [x] wav2mp4
       - [x] Clean up wav2png.options
+      - [ ] Restructure palettes
+      - [ ] Move cursors to own package
       - [ ] Stretch palette horizontally
       - [ ] Gallery
 
