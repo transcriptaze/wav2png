@@ -1,0 +1,8 @@
+/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Embedder-Policy: require-corp
+  Access-Control-Allow-Methods: GET, OPTIONS
+  Access-Control-Allow-Headers: Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization
+  Cross-Origin-Opener-Policy: same-origin
+  Access-Control-Max-Age: 86400
+  Cache-Control: max-age=3600, must-revalidate

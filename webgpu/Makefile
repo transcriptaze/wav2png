@@ -32,6 +32,16 @@ lint:
 build-all: test vet lint
 
 release: build-all
+	rm -rf dist/html
+	mkdir -p dist/html/css
+	mkdir -p dist/html/fonts
+	mkdir -p dist/html/images
+	mkdir -p dist/html/javascript
+	cp    html/index.html  dist/html
+	cp    html/favicon.ico dist/html
+	cp -r html/css         dist/html
+	cp -r html/fonts       dist/html
+	cp -r html/images      dist/html
 
 debug: build
 	python3 httpd.py --directory ./html

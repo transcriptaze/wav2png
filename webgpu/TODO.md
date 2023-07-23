@@ -1,15 +1,8 @@
 # TODO
 
-- [x] Download image
-- [x] Textured page background
-- [x] Logo
-- [x] Render audio
-      - [x] 'copy' audio to waveform
-      - [x] Accumulate and average audio
-      - [x] Edge case: stride x pixels > samples.length
-      - [x] Pack constants properly i.e. not using all float32.
-      - [x] Render real audio
-      - [x] Accept any transcodable audio format
+- [ ] Cloudflare Pages
+      - [ ] package as _dist_
+      - [ ] deploy to Cloudflare
 
 - [ ] Set background colour
 - [ ] github workflow
