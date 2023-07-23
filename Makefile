@@ -32,6 +32,5 @@ cloudflare:
 	mkdir -p dist/cloudflare
 	cp -r  ./webgpu/html   dist/cloudflare
 	cp -r  ./cloudflare/*  dist/cloudflare
-	cd dist/$(DIST)/cloudflare; zip --recurse-paths ../cloudflare.zip .
 
 
