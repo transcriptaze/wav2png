@@ -1,8 +1,6 @@
 # TODO
 
 - [x] Cloudflare Pages
-      - [x] package as _dist_
-      - [x] deploy to Cloudflare
 
 - [ ] Set background colour
       - https://rgbacolorpicker.com/

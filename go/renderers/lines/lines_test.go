@@ -40,6 +40,28 @@ func TestRender(t *testing.T) {
 	}
 }
 
+func BenchmarkLines(b *testing.B) {
+	renderer := Lines{
+		Palette:   palettes.Fire.Palette(),
+		AntiAlias: kernels.Vertical,
+	}
+
+	audio := read()
+	samples := mix(audio, []int{1}...)[0:16000]
+
+	benchmark(b, renderer, samples)
+}
+
+func benchmark(b *testing.B, renderer Lines, samples []float32) {
+	for i := 0; i < b.N; i++ {
+		if img, err := renderer.Render(samples, 640, 480, 0, 1.0); err != nil {
+			b.Fatalf("error rendering test image (%v)", err)
+		} else if img == nil {
+			b.Errorf("incorrectly rendered test image")
+		}
+	}
+}
+
 func read() encoding.Audio {
 	r := bytes.NewBuffer(audio)
 	w, _ := wav.Decode(r)

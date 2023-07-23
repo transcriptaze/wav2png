@@ -51,19 +51,21 @@ release: build-all
 	cd ../dist/windows; zip --recurse-paths ../wav2png_$(DIST)-windows.zip wav2png
 
 debug: build
+	go test -bench BenchmarkLines ./...
+
 # 	rm -f ../runtime/noise.png
 # 	./bin/wav2png --debug --style .styles/columns.json --start 2.5s --end 7.5s --out ../runtime ../samples/noise.wav
 # 	open ../runtime/noise.png
 
-	rm -f ../runtime/frames/*
-	rm -f ../runtime/chirp.mp4
-	./bin/wav2mp4 --debug --style .styles/lines.json --width 640 --height 390 --padding 8 --out ../runtime/chirp.mp4 \
-	              --window 1s --fps 30 --cursor ../samples/cursors/gradient.png:erf \
-	              ../samples/chirp.wav
-	cd ../runtime/frames; \
-	ffmpeg -framerate 30 -i frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 23 -y out.mp4; \
-	ffmpeg -i out.mp4 -i ../../samples/chirp.wav -c:v copy -c:a aac -y ../chirp.mp4
-	open ../runtime/chirp.mp4
+# 	rm -f ../runtime/frames/*
+# 	rm -f ../runtime/chirp.mp4
+# 	./bin/wav2mp4 --debug --style .styles/lines.json --width 640 --height 390 --padding 8 --out ../runtime/chirp.mp4 \
+# 	              --window 1s --fps 30 --cursor ../samples/cursors/gradient.png:erf \
+# 	              ../samples/chirp.wav
+# 	cd ../runtime/frames; \
+# 	ffmpeg -framerate 30 -i frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 23 -y out.mp4; \
+# 	ffmpeg -i out.mp4 -i ../../samples/chirp.wav -c:v copy -c:a aac -y ../chirp.mp4
+# 	open ../runtime/chirp.mp4
 
 
 version: build
