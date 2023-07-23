@@ -17,7 +17,7 @@
   src: url("/fonts/Lato/Lato-Regular.ttf");
 }
 :root {
-  --background: #fad5a5;
+  --background: red;
 }
 
 * {
