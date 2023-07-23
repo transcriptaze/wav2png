@@ -30,7 +30,7 @@ release:
 cloudflare: 
 	rm -rf dist/cloudflare
 	mkdir -p dist/cloudflare
-	cp -r  ./webgpu/html   dist/cloudflare
+	cp -r  ./webgpu/html/* dist/cloudflare
 	cp -r  ./cloudflare/*  dist/cloudflare
 
 
