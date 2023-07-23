@@ -1,10 +1,12 @@
 # TODO
 
-- [ ] Cloudflare Pages
-      - [ ] package as _dist_
-      - [ ] deploy to Cloudflare
+- [x] Cloudflare Pages
+      - [x] package as _dist_
+      - [x] deploy to Cloudflare
 
 - [ ] Set background colour
+      - https://rgbacolorpicker.com/
+
 - [ ] github workflow
 - [ ] Distributable Go app
 - [ ] :hover for drag (with audio file only)
