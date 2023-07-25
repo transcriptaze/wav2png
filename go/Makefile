@@ -54,7 +54,7 @@ debug: build
 	go test -bench BenchmarkLines ./...
 
 # 	rm -f ../runtime/noise.png
-# 	./bin/wav2png --debug --style .styles/columns.json --start 2.5s --end 7.5s --out ../runtime ../samples/noise.wav
+# 	./bin/wav2png --debug --style .styles/lines.json --start 2.5s --end 7.5s --out ../runtime ../samples/noise.wav
 # 	open ../runtime/noise.png
 
 # 	rm -f ../runtime/frames/*

@@ -1,8 +1,8 @@
 package lines
 
 import (
+	"golang.org/x/image/draw"
 	"image"
-	"image/draw"
 
 	"github.com/transcriptaze/wav2png/go/kernels"
 	"github.com/transcriptaze/wav2png/go/wav2png"
@@ -27,25 +27,25 @@ func (l Lines) Render(samples []float32, width, height, padding int, vscale floa
 		h = height - 2*padding
 	}
 
-	img := image.NewNRGBA(image.Rect(0, 0, width, height))
-	waveform := l.render(samples, w, h, vscale)
-
 	x0 := padding
 	y0 := padding
 	x1 := x0 + w
 	y1 := y0 + h
 
-	origin := image.Pt(0, 0)
 	rect := image.Rect(x0, y0, x1, y1)
 
+	img := image.NewNRGBA(image.Rect(0, 0, width, height))
+	waveform := l.render(img.SubImage(rect).(*image.NRGBA), samples, vscale)
+
 	draw.Draw(img, img.Bounds(), image.Transparent, image.Point{}, draw.Src)
-	draw.Draw(img, rect, waveform, origin, draw.Over)
+	draw.Draw(img, rect, waveform, image.Pt(0, 0), draw.Over)
 
 	return img, nil
 }
 
-func (r Lines) render(samples []float32, width, height int, vscale float64) *image.NRGBA {
-	waveform := image.NewNRGBA(image.Rect(0, 0, int(width), int(height)))
+func (r Lines) render(waveform *image.NRGBA, samples []float32, vscale float64) *image.NRGBA {
+	width := waveform.Bounds().Dx()
+	height := waveform.Bounds().Dy()
 	colours := r.Palette.Realize()
 
 	x := 0
