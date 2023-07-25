@@ -1,8 +1,7 @@
 # TODO
 
 - [x] Cloudflare Pages
-
-- [ ] Set background colour
+- [x] Set background colour
       - https://rgbacolorpicker.com/
 
 - [ ] github workflow

@@ -1,8 +1,6 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
-const BACKGROUND = [0, 0, 0, 1]
-
-export function background (context, device, format) {
+export function background (context, device, format, colour) {
   const vertices = new Float32Array([
     -1.0, -1.0,
     +1.0, -1.0,
@@ -101,7 +99,7 @@ export function background (context, device, format) {
     }
   })
 
-  const constants = new Float32Array(BACKGROUND)
+  const constants = new Float32Array(colour)
   const uniformBuffer = device.createBuffer({
     label: 'background constants',
     size: constants.byteLength,

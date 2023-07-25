@@ -2,13 +2,14 @@ import { background } from './background.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 
-const BACKGROUND = { r: 0, g: 0, b: 0, a: 1 }
+const transparent = rgba('#00000000')
 
 const context = {
   device: null,
   loading: false,
   loaded: false,
-  audio: null
+  audio: null,
+  fill: '#000000ff'
 }
 
 export async function initialise () {
@@ -103,6 +104,14 @@ export function trash () {
   render(device, canvas, context.audio)
 }
 
+export function fill (colour) {
+  context.fill = colour
+
+  const canvas = document.querySelector('#canvas canvas')
+
+  render(context.device, canvas, context.audio)
+}
+
 async function transcode (bytes) {
   const AudioContext = window.AudioContext || window.webkitAudioContext
   const ctx = new AudioContext()
@@ -118,21 +127,21 @@ async function transcode (bytes) {
 }
 
 function render (device, canvas, audio) {
-  const context = canvas.getContext('webgpu')
+  const ctx = canvas.getContext('webgpu')
   const format = navigator.gpu.getPreferredCanvasFormat()
 
-  context.configure({ device, format })
+  ctx.configure({ device, format })
 
   const layers = []
 
-  layers.push(background(context, device, format))
-  layers.push(grid(context, device, format))
+  layers.push(background(ctx, device, format, rgba(context.fill)))
+  layers.push(grid(ctx, device, format))
 
   if (audio.length > 0) {
-    layers.push(waveform(context, device, format, audio))
+    layers.push(waveform(ctx, device, format, audio))
   }
 
-  draw(context, device, layers)
+  draw(ctx, device, layers)
 }
 
 function draw (context, device, layers) {
@@ -151,8 +160,8 @@ function draw (context, device, layers) {
       colorAttachments: [{
         view: context.getCurrentTexture().createView(),
         loadOp: 'clear',
-        clearValue: BACKGROUND,
-        storeOp: 'store'
+        storeOp: 'store',
+        clearValue: transparent
       }]
     })
 
@@ -167,29 +176,29 @@ function draw (context, device, layers) {
 }
 
 function save (blob, timestamp) {
-  if (context.loaded) {
-    const now = new Date()
-    const year = `${now.getFullYear()}`.padStart(4, '0')
-    const month = `${now.getMonth() + 1}`.padStart(2, '0')
-    const day = `${now.getDate()}`.padStart(2, '0')
-    const hour = `${now.getHours()}`.padStart(2, '0')
-    const minute = `${now.getMinutes()}`.padStart(2, '0')
-    const second = `${now.getSeconds()}`.padStart(2, '0')
-    const filename = timestamp ? `wav2png ${year}-${month}-${day} ${hour}.${minute}.${second}.png` : 'wav2png.png'
+  // if (context.loaded) {
+  const now = new Date()
+  const year = `${now.getFullYear()}`.padStart(4, '0')
+  const month = `${now.getMonth() + 1}`.padStart(2, '0')
+  const day = `${now.getDate()}`.padStart(2, '0')
+  const hour = `${now.getHours()}`.padStart(2, '0')
+  const minute = `${now.getMinutes()}`.padStart(2, '0')
+  const second = `${now.getSeconds()}`.padStart(2, '0')
+  const filename = timestamp ? `wav2png ${year}-${month}-${day} ${hour}.${minute}.${second}.png` : 'wav2png.png'
 
-    if (window.showSaveFilePicker) {
-      saveWithPicker(blob, filename)
-    } else {
-      const url = URL.createObjectURL(blob)
-      const anchor = document.getElementById('download')
+  if (window.showSaveFilePicker) {
+    saveWithPicker(blob, filename)
+  } else {
+    const url = URL.createObjectURL(blob)
+    const anchor = document.getElementById('download')
 
-      anchor.href = url
-      anchor.download = 'wav2png.png'
-      anchor.click()
+    anchor.href = url
+    anchor.download = 'wav2png.png'
+    anchor.click()
 
-      URL.revokeObjectURL(url)
-    }
+    URL.revokeObjectURL(url)
   }
+  // }
 }
 
 async function saveWithPicker (blob, filename) {
@@ -234,4 +243,21 @@ function unbusy () {
   const windmill = document.getElementById('windmill')
 
   windmill.classList.remove('visible')
+}
+
+function rgba (colour) {
+  const match = `${colour}`.match(/^#([a-fA-F0-9]+)$/)
+
+  if (match && match.length > 1) {
+    const hex = match[1]
+    const v = Number.parseInt(hex, 16)
+    const r = (v >>> 24) & 0x00ff
+    const g = (v >>> 16) & 0x00ff
+    const b = (v >>> 8) & 0x00ff
+    const a = (v >>> 0) & 0x00ff
+
+    return [r / 255, g / 255, b / 255, a / 255]
+  }
+
+  return [0, 0, 0, 0]
 }

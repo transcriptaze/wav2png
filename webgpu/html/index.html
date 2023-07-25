@@ -27,7 +27,7 @@
         <button id="save" disabled>
           <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
         </button>
-        <input id="fill" type="color" value="#000000" onchange="onFill(event)" disabled />
+        <input id="fill" type="color" value="#000000" onchange="onFill(event)" />
         <button id="clear" disabled>
           <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
         </button>
@@ -39,7 +39,7 @@
   </body>
 
   <script type="module">
-    import { initialise, load, download, trash } from './javascript/wav2png.js'
+    import { initialise, load, download, trash, fill } from './javascript/wav2png.js'
 
     initialise()
 
@@ -91,7 +91,9 @@
     }
 
     window.onFill = function(event) {
-      console.log(event)
+      const colour = document.querySelector('#fill').value
+      
+      fill(`${colour}ff`)
     }
 
     window.onTrash = function(event) {
