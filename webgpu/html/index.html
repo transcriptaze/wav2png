@@ -11,6 +11,10 @@
 
   <body>
     <img id="logo" src="/images/logo.png" />
+    <main>
+      <div id="overview">
+        <canvas width="1920" height="256"></canvas>
+      </div>
     <div id="workspace">
       <div id="canvas">
         <canvas width="1920" height="1080"></canvas>
@@ -23,19 +27,28 @@
           <span id="windmill"></span>
         </div>
       </div>
-      <div class="toolbar">
-        <button id="save" disabled>
-          <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
-        </button>
-        <input id="fill" type="color" value="#000000" onchange="onFill(event)" />
-        <button id="clear" disabled>
-          <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
-        </button>
-
-        <a id="download" href="" style="display:none" download></a>
-      </div>
     </div>
 
+    <div id="toolbar" class="toolbar">
+      <button id="save" disabled>
+        <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
+      </button>
+      <input id="fill" type="color" value="#000000" onchange="onFill(event)" />
+      <button id="clear" disabled>
+        <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
+      </button>
+      <a id="download" href="" style="display:none" download></a>
+    </div>
+
+    <div id="toolbox">
+      <fieldset>
+        <legend>Background</legend>
+        <div>
+          <input id="fill" type="color" value="#000000" onchange="onFill(event)" />
+        </div>
+      </fieldset>
+    </div>
+    </main>
   </body>
 
   <script type="module">

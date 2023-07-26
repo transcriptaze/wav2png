@@ -3,6 +3,7 @@
 - [x] Cloudflare Pages
 - [x] Set background colour
       - https://rgbacolorpicker.com/
+      - https://crbug.com
 
 - [ ] github workflow
 - [ ] Distributable Go app
