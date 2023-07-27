@@ -1,20 +1,13 @@
-import { background } from './background.js'
-import { grid } from './grid.js'
-import { waveform } from './waveform.js'
-
-const transparent = rgba('#00000000')
+import { overview } from './overview.js'
+import { canvas } from './canvas.js'
+import { offscreen } from './offscreen.js'
 
 const context = {
-  device: null,
   loading: false,
-  loaded: false,
-  audio: null,
-  fill: '#000000ff'
+  loaded: false
 }
 
 export async function initialise () {
-  const canvas = document.querySelector('#canvas canvas')
-
   if (!navigator.gpu) {
     throw new Error('WebGPU not supported on this browser.')
   }
@@ -24,15 +17,17 @@ export async function initialise () {
     throw new Error('No appropriate GPUAdapter found.')
   }
 
-  context.device = await adapter.requestDevice()
-  context.audio = new Float32Array()
+  const device = await adapter.requestDevice()
 
-  render(context.device, canvas, context.audio)
+  overview.device = device
+  canvas.device = device
+  offscreen.device = device
+
+  overview.redraw()
+  canvas.redraw()
 }
 
 export function load (filename, blob) {
-  const device = context.device
-  const canvas = document.querySelector('#canvas canvas')
   const save = document.getElementById('save')
   const fill = document.getElementById('fill')
   const clear = document.getElementById('clear')
@@ -43,20 +38,18 @@ export function load (filename, blob) {
 
   context.loading = true
   context.loaded = false
-  context.audio = new Float32Array()
 
   busy()
     .then(b => blob.arrayBuffer())
     .then(b => transcode(b))
     .then(b => b.getChannelData(0))
     .then(audio => {
-      render(device, canvas, audio)
-      return audio
-    })
-    .then(audio => {
-      context.audio = audio
       context.loading = false
       context.loaded = true
+
+      overview.audio = audio
+      canvas.audio = audio
+      offscreen.audio = audio
 
       save.disabled = false
       fill.disabled = false
@@ -72,44 +65,30 @@ export function load (filename, blob) {
 //      before unconfigure() or getCurrentTexture() are invoked ?). Workaround is to render it
 //      to an offscreen buffer for download.
 export function download () {
-  const canvas = document.querySelector('#canvas canvas')
-  const width = canvas.width
-  const height = canvas.height
-  const offscreen = new OffscreenCanvas(width, height)
-  const device = context.device
-  const audio = context.audio
-
-  render(device, offscreen, audio)
-
-  offscreen.convertToBlob().then((blob) => {
+  offscreen.render().then((blob) => {
     save(blob, false)
   })
 }
 
 export function trash () {
-  const device = context.device
-  const canvas = document.querySelector('#canvas canvas')
   const save = document.getElementById('save')
   const fill = document.getElementById('fill')
   const clear = document.getElementById('clear')
 
   context.loading = false
   context.loaded = false
-  context.audio = new Float32Array()
+
+  overview.audio = new Float32Array()
+  canvas.audio = new Float32Array()
 
   save.disabled = true
   fill.disabled = true
   clear.disabled = true
-
-  render(device, canvas, context.audio)
 }
 
 export function fill (colour) {
-  context.fill = colour
-
-  const canvas = document.querySelector('#canvas canvas')
-
-  render(context.device, canvas, context.audio)
+  canvas.fill = rgba(colour)
+  offscreen.fill = rgba(colour)
 }
 
 async function transcode (bytes) {
@@ -126,79 +105,30 @@ async function transcode (bytes) {
   return offline.startRendering()
 }
 
-function render (device, canvas, audio) {
-  const ctx = canvas.getContext('webgpu')
-  const format = navigator.gpu.getPreferredCanvasFormat()
-
-  ctx.configure({ device, format })
-
-  const layers = []
-
-  layers.push(background(ctx, device, format, rgba(context.fill)))
-  layers.push(grid(ctx, device, format))
-
-  if (audio.length > 0) {
-    layers.push(waveform(ctx, device, format, audio))
-  }
-
-  draw(ctx, device, layers)
-}
-
-function draw (context, device, layers) {
-  const encoder = device.createCommandEncoder()
-
-  {
-    const pass = encoder.beginComputePass()
-    for (const layer of layers) {
-      layer.compute(pass)
-    }
-    pass.end()
-  }
-
-  {
-    const pass = encoder.beginRenderPass({
-      colorAttachments: [{
-        view: context.getCurrentTexture().createView(),
-        loadOp: 'clear',
-        storeOp: 'store',
-        clearValue: transparent
-      }]
-    })
-
-    for (const layer of layers) {
-      layer.render(pass)
-    }
-
-    pass.end()
-  }
-
-  device.queue.submit([encoder.finish()])
-}
-
 function save (blob, timestamp) {
-  // if (context.loaded) {
-  const now = new Date()
-  const year = `${now.getFullYear()}`.padStart(4, '0')
-  const month = `${now.getMonth() + 1}`.padStart(2, '0')
-  const day = `${now.getDate()}`.padStart(2, '0')
-  const hour = `${now.getHours()}`.padStart(2, '0')
-  const minute = `${now.getMinutes()}`.padStart(2, '0')
-  const second = `${now.getSeconds()}`.padStart(2, '0')
-  const filename = timestamp ? `wav2png ${year}-${month}-${day} ${hour}.${minute}.${second}.png` : 'wav2png.png'
+  if (context.loaded) {
+    const now = new Date()
+    const year = `${now.getFullYear()}`.padStart(4, '0')
+    const month = `${now.getMonth() + 1}`.padStart(2, '0')
+    const day = `${now.getDate()}`.padStart(2, '0')
+    const hour = `${now.getHours()}`.padStart(2, '0')
+    const minute = `${now.getMinutes()}`.padStart(2, '0')
+    const second = `${now.getSeconds()}`.padStart(2, '0')
+    const filename = timestamp ? `wav2png ${year}-${month}-${day} ${hour}.${minute}.${second}.png` : 'wav2png.png'
 
-  if (window.showSaveFilePicker) {
-    saveWithPicker(blob, filename)
-  } else {
-    const url = URL.createObjectURL(blob)
-    const anchor = document.getElementById('download')
+    if (window.showSaveFilePicker) {
+      saveWithPicker(blob, filename)
+    } else {
+      const url = URL.createObjectURL(blob)
+      const anchor = document.getElementById('download')
 
-    anchor.href = url
-    anchor.download = 'wav2png.png'
-    anchor.click()
+      anchor.href = url
+      anchor.download = 'wav2png.png'
+      anchor.click()
 
-    URL.revokeObjectURL(url)
+      URL.revokeObjectURL(url)
+    }
   }
-  // }
 }
 
 async function saveWithPicker (blob, filename) {

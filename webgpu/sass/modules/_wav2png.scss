@@ -79,10 +79,10 @@ div#overview {
   align-items: flex-start;
 
   canvas {
-      width: 960px;
-      height: 80px;  
-      background: #222222ff;
-      border-radius: 4px;
+    width: 960px;
+    height: 80px;  
+    background: #222222ff;
+    border-radius: 4px;
   }
 }
 
@@ -101,6 +101,7 @@ div#workspace {
     grid-template-columns: auto;
     grid-template-rows: auto;
 
+    background: #222222ff;
     border-radius: 4px;
 
     canvas {

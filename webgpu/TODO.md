@@ -1,9 +1,11 @@
 # TODO
 
+Ref. https://bugs.chromium.org/p/chromium/issues/detail?id=1468157
+
+
 - [x] Cloudflare Pages
 - [x] Set background colour
       - https://rgbacolorpicker.com/
-      - https://crbug.com
 
 - [ ] github workflow
 - [ ] Distributable Go app

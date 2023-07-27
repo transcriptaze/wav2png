@@ -4,3 +4,4 @@ bin
 runtime
 dist
 .styles/debug.json
+html/bug.html
