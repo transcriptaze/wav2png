@@ -7,6 +7,8 @@ const context = {
   loaded: false
 }
 
+let stale = false
+
 export async function initialise () {
   if (!navigator.gpu) {
     throw new Error('WebGPU not supported on this browser.')
@@ -25,6 +27,27 @@ export async function initialise () {
 
   overview.redraw()
   canvas.redraw()
+
+  const fill = document.getElementById('fill')
+
+  fill.onchange = (c) => {
+    stale = true
+  }
+
+  fill.onchanged = (c) => {
+    canvas.fill = rgba(c)
+    offscreen.fill = rgba(c)
+  }
+
+  const refresh = () => {
+    if (stale) {
+      redraw()
+    }
+
+    window.requestAnimationFrame(refresh)
+  }
+
+  window.requestAnimationFrame(refresh)
 }
 
 export function load (filename, blob) {
@@ -86,11 +109,6 @@ export function trash () {
   clear.disabled = true
 }
 
-export function fill (colour) {
-  canvas.fill = rgba(colour)
-  offscreen.fill = rgba(colour)
-}
-
 async function transcode (bytes) {
   const AudioContext = window.AudioContext || window.webkitAudioContext
   const ctx = new AudioContext()
@@ -106,28 +124,26 @@ async function transcode (bytes) {
 }
 
 function save (blob, timestamp) {
-  if (context.loaded) {
-    const now = new Date()
-    const year = `${now.getFullYear()}`.padStart(4, '0')
-    const month = `${now.getMonth() + 1}`.padStart(2, '0')
-    const day = `${now.getDate()}`.padStart(2, '0')
-    const hour = `${now.getHours()}`.padStart(2, '0')
-    const minute = `${now.getMinutes()}`.padStart(2, '0')
-    const second = `${now.getSeconds()}`.padStart(2, '0')
-    const filename = timestamp ? `wav2png ${year}-${month}-${day} ${hour}.${minute}.${second}.png` : 'wav2png.png'
+  const now = new Date()
+  const year = `${now.getFullYear()}`.padStart(4, '0')
+  const month = `${now.getMonth() + 1}`.padStart(2, '0')
+  const day = `${now.getDate()}`.padStart(2, '0')
+  const hour = `${now.getHours()}`.padStart(2, '0')
+  const minute = `${now.getMinutes()}`.padStart(2, '0')
+  const second = `${now.getSeconds()}`.padStart(2, '0')
+  const filename = timestamp ? `wav2png ${year}-${month}-${day} ${hour}.${minute}.${second}.png` : 'wav2png.png'
 
-    if (window.showSaveFilePicker) {
-      saveWithPicker(blob, filename)
-    } else {
-      const url = URL.createObjectURL(blob)
-      const anchor = document.getElementById('download')
+  if (window.showSaveFilePicker) {
+    saveWithPicker(blob, filename)
+  } else {
+    const url = URL.createObjectURL(blob)
+    const anchor = document.getElementById('download')
 
-      anchor.href = url
-      anchor.download = 'wav2png.png'
-      anchor.click()
+    anchor.href = url
+    anchor.download = 'wav2png.png'
+    anchor.click()
 
-      URL.revokeObjectURL(url)
-    }
+    URL.revokeObjectURL(url)
   }
 }
 
@@ -153,6 +169,17 @@ async function saveWithPicker (blob, filename) {
       console.error(err)
     }
   }
+}
+
+function redraw () {
+  stale = false
+
+  return new Promise(() => {
+    const background = document.getElementById('fill').colour
+
+    canvas.fill = rgba(background)
+    offscreen.fill = rgba(background)
+  })
 }
 
 function busy () {
@@ -181,12 +208,12 @@ function rgba (colour) {
   if (match && match.length > 1) {
     const hex = match[1]
     const v = Number.parseInt(hex, 16)
-    const r = (v >>> 24) & 0x00ff
-    const g = (v >>> 16) & 0x00ff
-    const b = (v >>> 8) & 0x00ff
-    const a = (v >>> 0) & 0x00ff
+    const r = ((v >>> 24) & 0x00ff) / 255
+    const g = ((v >>> 16) & 0x00ff) / 255
+    const b = ((v >>> 8) & 0x00ff) / 255
+    const a = ((v >>> 0) & 0x00ff) / 255
 
-    return [r / 255, g / 255, b / 255, a / 255]
+    return [r * a, g * a, b * a, a]
   }
 
   return [0, 0, 0, 0]

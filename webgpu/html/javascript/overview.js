@@ -40,7 +40,7 @@ class Overview {
     const format = navigator.gpu.getPreferredCanvasFormat()
     const layers = []
 
-    ctx.configure({ device: this.device, format })
+    ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, black))
     layers.push(grid(ctx, device, format))

@@ -52,7 +52,7 @@ class Offscreen {
     const format = navigator.gpu.getPreferredCanvasFormat()
     const layers = []
 
-    ctx.configure({ device: this.device, format })
+    ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, this.fill))
     layers.push(grid(ctx, device, format))

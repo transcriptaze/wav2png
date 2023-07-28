@@ -15,44 +15,53 @@
       <div id="overview">
         <canvas width="1920" height="256"></canvas>
       </div>
-    <div id="workspace">
-      <div id="canvas">
-        <canvas width="1920" height="1080"></canvas>
-        <div id="picker" class="overlay" 
-                         onclick="onPick(event)" 
-                         ondragover="onDragOver(event)" 
-                         ondragleave="onDragLeave(event"
-                         ondrop="onDrop(event)">
-          <input type="file" accept="audio/*" onchange="onPicked(event)" style="display:none;" />          
-          <span id="windmill"></span>
+  
+      <div id="workspace">
+        <div id="canvas">
+          <canvas width="1920" height="1080"></canvas>
+          <div id="picker" class="overlay" 
+                           onclick="onPick(event)" 
+                           ondragover="onDragOver(event)" 
+                           ondragleave="onDragLeave(event"
+                           ondrop="onDrop(event)">
+            <input type="file" accept="audio/*" onchange="onPicked(event)" style="display:none;" />          
+            <span id="windmill"></span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="toolbar" class="toolbar">
-      <button id="save" disabled>
-        <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
-      </button>
-      <input id="fill" type="color" value="#000000" onchange="onFill(event)" />
-      <button id="clear" disabled>
-        <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
-      </button>
-      <a id="download" href="" style="display:none" download></a>
-    </div>
+      <div id="toolbar" class="toolbar">
+        <button id="save" disabled>
+          <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
+        </button>
+        <button id="clear" disabled>
+          <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
+        </button>
+        <a id="download" href="" style="display:none" download></a>
+      </div>
 
-    <div id="toolbox">
-      <fieldset>
-        <legend>Background</legend>
+      <div id="toolbox">
+        <wav2png-fill id="fill"></wav2png-fill>
+      </div>
+
+    </main>
+
+    <!-- TEMPLATES -->
+
+    <template id="template-fill">
+      <fieldset class="fill">
+        <legend>Fill</legend>
         <div>
-          <input id="fill" type="color" value="#000000" onchange="onFill(event)" />
+          <input id="rgb" type="color" value="#000000" />
         </div>
       </fieldset>
-    </div>
-    </main>
+    </template>
+
   </body>
 
   <script type="module">
-    import { initialise, load, download, trash, fill } from './javascript/wav2png.js'
+    import "./javascript/components/components.js"
+    import { initialise, load, download, trash } from './javascript/wav2png.js'
 
     initialise()
 
@@ -101,12 +110,6 @@
 
     window.onDownload = function(event) {
       download()
-    }
-
-    window.onFill = function(event) {
-      const colour = document.querySelector('#fill').value
-      
-      fill(`${colour}ff`)
     }
 
     window.onTrash = function(event) {

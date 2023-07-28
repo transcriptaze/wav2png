@@ -101,7 +101,7 @@ div#workspace {
     grid-template-columns: auto;
     grid-template-rows: auto;
 
-    background: #222222ff;
+    background: $shadow;
     border-radius: 4px;
 
     canvas {
@@ -109,6 +109,7 @@ div#workspace {
       grid-row: 1;
       width: 960px;
       height: 540px;
+      border-radius: 4px;
     }
 
     .overlay {
@@ -118,6 +119,7 @@ div#workspace {
       height: 100%;
 
       background: transparent;
+      border-radius: 4px;
       z-index: 2;
     }
   }

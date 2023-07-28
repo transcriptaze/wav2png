@@ -1,0 +1,20 @@
+@import '../base/_default';
+
+* { 
+  background: transparent;
+  margin: 0px; 
+  padding: 0px; 
+  box-sizing: border-box;
+  font-family: "Lato";
+}
+
+legend {
+  padding-left: 2px;
+  padding-right: 2px;
+
+  color: $legend-text;
+  font-family: sans-serif;
+  font-style: italic;
+  font-size: 0.8em;
+  white-space: nowrap;  
+}
