@@ -14,6 +14,15 @@
   font-family: "Lato";
 }
 
+a {
+  color: $link-text;
+  text-decoration: none;
+}
+
+a:visited {
+  color: $link-text;
+}
+
 html { 
   height: 100%;
 }
@@ -28,7 +37,7 @@ body {
 
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto 1fr;
   justify-items: center;
   align-items: center;
   column-gap: 16px;

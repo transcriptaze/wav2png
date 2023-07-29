@@ -11,12 +11,16 @@ let stale = false
 
 export async function initialise () {
   if (!navigator.gpu) {
-    throw new Error('WebGPU not supported on this browser.')
+    console.error(new Error('WebGPU not supported on this browser'))
+    window.location = '/unsupported.html'
+    return
   }
 
   const adapter = await navigator.gpu.requestAdapter()
   if (!adapter) {
-    throw new Error('No appropriate GPUAdapter found.')
+    console.error(new Error('No appropriate GPUAdapter found'))
+    window.location = '/unsupported.html'
+    return
   }
 
   const device = await adapter.requestDevice()
