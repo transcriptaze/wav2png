@@ -4,7 +4,7 @@ fieldset.fill {
     border: 1px solid #c0c0c0;
     border-radius: 8px;
 
-    padding-top: 12px;
+    padding-top: 4px;
     padding-bottom: 12px;
     padding-left: 12px;
     padding-right: 12px;
@@ -19,4 +19,20 @@ fieldset.fill {
         font-size: 0.8em;
         white-space: nowrap;  
     }
+
+    div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    input[type="color"] {
+        width: 48px;
+        height: 48px;
+        border: none;
+    }
+
+    input[type="range"] {
+        width: 128px;
+    }
+
 }

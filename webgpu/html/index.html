@@ -11,6 +11,14 @@
 
   <body>
     <img id="logo" src="/images/logo.png" />
+    <div id="samples">
+      <ul>
+        <li><a href="/audio/noise.wav">noise</a></li>
+        <li><a href="/audio/chirp.wav">chirp</a></li>
+        <li><a href="/audio/click.wav">clicks</a></li>
+        <li><a href="/audio/music.wav">music</a></li>
+      </ul>
+    </div>
     <main>
       <div id="overview">
         <canvas width="1920" height="256"></canvas>
@@ -24,7 +32,10 @@
                            ondragover="onDragOver(event)" 
                            ondragleave="onDragLeave(event"
                            ondrop="onDrop(event)">
-            <input type="file" accept="audio/*" onchange="onPicked(event)" style="display:none;" />          
+            <input type="file" 
+                   accept="audio/wav,audio/x-wav,audio/ogg,audio/aac,audio/opus,audio/3gpp,audio/3gpp2" 
+                   onchange="onPicked(event)" 
+                   style="display:none;" />          
             <span id="windmill"></span>
           </div>
         </div>
@@ -42,6 +53,7 @@
 
       <div id="toolbox">
         <wav2png-fill id="fill"></wav2png-fill>
+        <wav2png-grid id="grid"></wav2png-grid>
       </div>
 
     </main>
@@ -53,6 +65,17 @@
         <legend>Fill</legend>
         <div>
           <input id="rgb" type="color" value="#000000" />
+          <input id="alpha" type="range" step="any" min="0.0" max="1.0" value="1.0" />
+        </div>
+      </fieldset>
+    </template>
+
+    <template id="template-grid">
+      <fieldset class="grid">
+        <legend>Grid</legend>
+        <div>
+          <input id="rgb" type="color" value="#000000" />
+          <input id="alpha" type="range" step="any" min="0.0" max="1.0" value="1.0" />
         </div>
       </fieldset>
     </template>
