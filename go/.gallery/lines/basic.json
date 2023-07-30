@@ -1,0 +1,24 @@
+{
+    "name": "basic",
+    "width": 1024,
+    "height": 576,
+    "padding": 16,
+    "scale": {
+        "horizontal": 1,
+        "vertical": 1
+    },
+    "fill": {
+        "type": "solid",
+        "colour": "#000000ff"
+    },
+    "grid": {
+        "type": "rectangular",
+        "colour": "#800000ff",
+        "shape": "~64x64",
+        "overlay": true
+    },
+    "lines": {
+        "palette": "ice",
+        "antialias": "vertical"
+    }
+}

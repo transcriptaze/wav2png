@@ -1,0 +1,10 @@
+CMD = ./bin/wav2png
+GALLERY = ../documentation/gallery
+LINES = $(GALLERY)/lines
+
+.PHONY: lines
+
+lines: 
+	$(CMD) --style .gallery/lines/basic.json -out $(LINES)/basic.png ../samples/acoustic.wav
+	open $(LINES)/basic.png
+

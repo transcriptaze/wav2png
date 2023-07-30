@@ -14,6 +14,7 @@
 
 - [ ] Optimise antialiasing
 - [ ] Gallery
+      - [ ] black and white
 
 - [ ] wav2mp4 does not seperate L/R audio with --mix option
 - [ ] wav2mp4 does not trim audio to size either
