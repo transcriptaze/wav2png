@@ -12,6 +12,7 @@
       - [ ] Load palette from PNG file
       - [ ] Stretch palette horizontally
 
+- [ ] Optimise antialiasing
 - [ ] Gallery
 
 - [ ] wav2mp4 does not seperate L/R audio with --mix option

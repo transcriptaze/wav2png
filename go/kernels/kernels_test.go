@@ -1,12 +1,10 @@
-package wav2png
+package kernels
 
 import (
 	"image"
 	"image/color"
 	"reflect"
 	"testing"
-
-	"github.com/transcriptaze/wav2png/go/kernels"
 )
 
 func TestSinglePixelNoAntiAlias(t *testing.T) {
@@ -15,7 +13,7 @@ func TestSinglePixelNoAntiAlias(t *testing.T) {
 
 	expected.Set(1, 1, color.NRGBA{R: 0xff, G: 0xff, B: 0xff, A: 0xff})
 
-	result := Antialias(img, kernels.None)
+	result := Antialias(img, None)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -30,7 +28,7 @@ func TestSinglePixelVerticalAntiAlias(t *testing.T) {
 	expected.Set(1, 1, color.NRGBA{R: 0x7f, G: 0x7f, B: 0x7f, A: 0x7f})
 	expected.Set(1, 2, color.NRGBA{R: 0x3f, G: 0x3f, B: 0x3f, A: 0x3f})
 
-	result := Antialias(img, kernels.Vertical)
+	result := Antialias(img, Vertical)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -45,7 +43,7 @@ func TestSinglePixelHorizontalAntiAlias(t *testing.T) {
 	expected.Set(1, 1, color.NRGBA{R: 0x7f, G: 0x7f, B: 0x7f, A: 0x7f})
 	expected.Set(2, 1, color.NRGBA{R: 0x3f, G: 0x3f, B: 0x3f, A: 0x3f})
 
-	result := Antialias(img, kernels.Horizontal)
+	result := Antialias(img, Horizontal)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -68,7 +66,7 @@ func TestSinglePixelSoftAntiAlias(t *testing.T) {
 	expected.Set(2, 1, color.NRGBA{R: 0x15, G: 0x15, B: 0x15, A: 0x15})
 	expected.Set(2, 2, color.NRGBA{R: 0x0a, G: 0x0a, B: 0x0a, A: 0x0a})
 
-	result := Antialias(img, kernels.Soft)
+	result := Antialias(img, Soft)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -109,7 +107,7 @@ func TestFivePixelNoAntiAlias(t *testing.T) {
 	expected.Set(4, 3, color.NRGBA{R: 0x60, G: 0x60, B: 0x60, A: 0x60})
 	expected.Set(4, 4, color.NRGBA{R: 0x20, G: 0x20, B: 0x20, A: 0x20})
 
-	result := Antialias(img, kernels.None)
+	result := Antialias(img, None)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -150,7 +148,7 @@ func TestFivePixelVerticalAntiAlias(t *testing.T) {
 	expected.Set(4, 3, color.NRGBA{R: 0x50, G: 0x50, B: 0x50, A: 0x50})
 	expected.Set(4, 4, color.NRGBA{R: 0x28, G: 0x28, B: 0x28, A: 0x28})
 
-	result := Antialias(img, kernels.Vertical)
+	result := Antialias(img, Vertical)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -191,7 +189,7 @@ func TestFivePixelHorizontalAntiAlias(t *testing.T) {
 	expected.Set(4, 3, color.NRGBA{R: 0x6f, G: 0x6f, B: 0x6f, A: 0x6f})
 	expected.Set(4, 4, color.NRGBA{R: 0x30, G: 0x30, B: 0x30, A: 0x30})
 
-	result := Antialias(img, kernels.Horizontal)
+	result := Antialias(img, Horizontal)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)
@@ -232,7 +230,7 @@ func TestFivePixelSoftAntiAlias(t *testing.T) {
 	expected.Set(4, 3, color.NRGBA{R: 0x5f, G: 0x5f, B: 0x5f, A: 0x5f})
 	expected.Set(4, 4, color.NRGBA{R: 0x2d, G: 0x2d, B: 0x2d, A: 0x2d})
 
-	result := Antialias(img, kernels.Soft)
+	result := Antialias(img, Soft)
 
 	if !reflect.DeepEqual(result, expected) {
 		diff(result, expected, t)

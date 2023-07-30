@@ -7,7 +7,6 @@ import (
 
 	"github.com/transcriptaze/wav2png/go/kernels"
 	"github.com/transcriptaze/wav2png/go/palettes"
-	"github.com/transcriptaze/wav2png/go/wav2png"
 )
 
 const (
@@ -98,7 +97,7 @@ func (c Columns) render(samples []float32, width, height int, vscale float64) *i
 		start = end
 	}
 
-	return wav2png.Antialias(waveform, c.AntiAlias)
+	return kernels.Antialias(waveform, c.AntiAlias)
 }
 
 func signum(N int) int {
