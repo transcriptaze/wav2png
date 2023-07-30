@@ -7,7 +7,7 @@ const context = {
   loaded: false
 }
 
-let stale = false
+let stale = true
 
 export async function initialise () {
   if (!navigator.gpu) {
@@ -207,7 +207,7 @@ function unbusy () {
 }
 
 function rgba (colour) {
-  const match = `${colour}`.match(/^#([a-fA-F0-9]+)$/)
+  const match = `${colour}`.match(/^#([a-fA-F0-9]{8})$/)
 
   if (match && match.length > 1) {
     const hex = match[1]
