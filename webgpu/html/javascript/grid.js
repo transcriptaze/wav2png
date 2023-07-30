@@ -4,7 +4,7 @@ const GRIDX = 8
 const GRIDY = 4
 const PADDING = 20
 
-export function grid (context, device, format) {
+export function grid (context, device, format, { colour }) {
   const width = context.canvas.width
   const height = context.canvas.height
   const xscale = (width - 2 * PADDING) / width
@@ -58,7 +58,8 @@ export function grid (context, device, format) {
     code: `
     struct constants {
       grid: vec2f,
-      scale: vec2f
+      scale: vec2f,
+      colour: vec4f
     };
 
     struct VertexInput {
@@ -68,11 +69,7 @@ export function grid (context, device, format) {
 
     struct VertexOutput {
         @builtin(position) pos: vec4f,
-        @location(0) cell: vec2f, 
-    };
-
-    struct FragInput {
-        @location(0) cell: vec2f,
+        @location(0) colour: vec4f, 
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;
@@ -86,18 +83,18 @@ export function grid (context, device, format) {
        let scale = uconstants.scale;
 
        let cell = vec2f(i % grid.x, floor(i / grid.x));
-       let cellOffset = 2*cell / grid; 
-       let gridPos = (input.pos + 1) / grid - 1 + cellOffset;
+       let offset = 2*cell / grid; 
+       let pos = (input.pos + 1) / grid - 1 + offset;
 
-       output.pos = vec4f(gridPos, 0, 1) * vec4f(scale,1,1);
-       output.cell = cell/grid;
+       output.pos = vec4f(pos, 0, 1) * vec4f(scale,1,1);
+       output.colour = uconstants.colour;
 
        return output;
     }
 
     @fragment
-    fn fragmentMain(input: FragInput) -> @location(0) vec4f {
-       return vec4f(0, 1, 0, 1);
+    fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
+       return input.colour;
     }
 `
   })
@@ -114,7 +111,20 @@ export function grid (context, device, format) {
       module: shader,
       entryPoint: 'fragmentMain',
       targets: [
-        { format }
+        {
+          format,
+          blend: {
+            operation: 'add',
+            alpha: {
+              srcFactor: 'one',
+              dstFactor: 'one-minus-src-alpha'
+            },
+            color: {
+              srcFactor: 'src-alpha',
+              dstFactor: 'one-minus-src-alpha'
+            }
+          }
+        }
       ]
     },
     primitive: {
@@ -122,10 +132,10 @@ export function grid (context, device, format) {
     }
   })
 
-  const constants = new Float32Array([GRIDX, GRIDY, xscale, yscale])
+  const constants = new Float32Array([GRIDX, GRIDY, xscale, yscale, ...colour])
   const uniformBuffer = device.createBuffer({
     label: 'grid constants',
-    size: constants.byteLength,
+    size: 16 * Math.ceil(constants.byteLength / 16),
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
   })
 

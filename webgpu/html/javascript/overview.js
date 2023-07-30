@@ -1,14 +1,18 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
-import { black } from './colours.js'
+import { black, green } from './colours.js'
 
 class Overview {
   constructor () {
     this.internal = {
       device: null,
       audio: new Float32Array(),
-      canvas: document.querySelector('#overview canvas')
+      canvas: document.querySelector('#overview canvas'),
+      fill: black,
+      grid: {
+        colour: green
+      }
     }
   }
 
@@ -18,6 +22,24 @@ class Overview {
 
   set device (v) {
     this.internal.device = v
+  }
+
+  get fill () {
+    return this.internal.fill
+  }
+
+  set fill (v) {
+    this.internal.fill = v
+    this.redraw()
+  }
+
+  get grid () {
+    return this.internal.grid
+  }
+
+  set grid ({ colour }) {
+    this.internal.grid.colour = colour
+    this.redraw()
   }
 
   get audio () {
@@ -42,8 +64,8 @@ class Overview {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, black))
-    layers.push(grid(ctx, device, format))
+    layers.push(background(ctx, device, format, this.fill))
+    layers.push(grid(ctx, device, format, this.grid))
 
     if (audio.length > 0) {
       layers.push(waveform(ctx, device, format, audio))

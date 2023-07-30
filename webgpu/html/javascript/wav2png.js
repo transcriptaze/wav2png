@@ -33,6 +33,7 @@ export async function initialise () {
   canvas.redraw()
 
   const fill = document.getElementById('fill')
+  const grid = document.getElementById('grid')
 
   fill.onchange = (c) => {
     stale = true
@@ -41,6 +42,17 @@ export async function initialise () {
   fill.onchanged = (c) => {
     canvas.fill = rgba(c)
     offscreen.fill = rgba(c)
+    canvas.redraw()
+  }
+
+  grid.onchange = (c) => {
+    stale = true
+  }
+
+  grid.onchanged = (c) => {
+    canvas.grid = { colour: rgba(c) }
+    offscreen.grid = { colour: rgba(c) }
+    canvas.redraw()
   }
 
   const refresh = () => {
@@ -179,10 +191,16 @@ function redraw () {
   stale = false
 
   return new Promise(() => {
-    const background = document.getElementById('fill').colour
+    const fill = document.getElementById('fill').colour
+    const grid = document.getElementById('grid').colour
 
-    canvas.fill = rgba(background)
-    offscreen.fill = rgba(background)
+    canvas.fill = rgba(fill)
+    offscreen.fill = rgba(fill)
+
+    canvas.grid = { colour: rgba(grid) }
+    offscreen.grid = { colour: rgba(grid) }
+
+    canvas.redraw()
   })
 }
 

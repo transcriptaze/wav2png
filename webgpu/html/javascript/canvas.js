@@ -1,7 +1,7 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
-import { black, transparent } from './colours.js'
+import { black, green, transparent } from './colours.js'
 
 class Canvas {
   constructor () {
@@ -9,7 +9,10 @@ class Canvas {
       device: null,
       audio: new Float32Array(),
       canvas: document.querySelector('#canvas canvas'),
-      fill: black
+      fill: black,
+      grid: {
+        colour: green
+      }
     }
   }
 
@@ -36,7 +39,14 @@ class Canvas {
 
   set fill (v) {
     this.internal.fill = v
-    this.redraw()
+  }
+
+  get grid () {
+    return this.internal.grid
+  }
+
+  set grid ({ colour }) {
+    this.internal.grid.colour = colour
   }
 
   get canvas () {
@@ -53,7 +63,7 @@ class Canvas {
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, this.fill))
-    layers.push(grid(ctx, device, format))
+    layers.push(grid(ctx, device, format, this.grid))
 
     if (audio.length > 0) {
       layers.push(waveform(ctx, device, format, audio))
