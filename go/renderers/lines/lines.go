@@ -5,6 +5,7 @@ import (
 	"image"
 
 	"github.com/transcriptaze/wav2png/go/kernels"
+	"github.com/transcriptaze/wav2png/go/palettes"
 	"github.com/transcriptaze/wav2png/go/wav2png"
 )
 
@@ -15,7 +16,7 @@ const (
 )
 
 type Lines struct {
-	Palette   wav2png.Palette
+	Palette   palettes.Palette
 	AntiAlias kernels.Kernel
 }
 

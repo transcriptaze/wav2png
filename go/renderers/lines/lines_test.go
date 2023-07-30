@@ -24,7 +24,7 @@ var reference []byte
 
 func TestRender(t *testing.T) {
 	renderer := Lines{
-		Palette:   palettes.Fire.Palette(),
+		Palette:   palettes.Fire,
 		AntiAlias: kernels.Vertical,
 	}
 
@@ -43,7 +43,7 @@ func TestRender(t *testing.T) {
 func BenchmarkLines(b *testing.B) {
 	b.StopTimer()
 	renderer := Lines{
-		Palette:   palettes.Fire.Palette(),
+		Palette:   palettes.Fire,
 		AntiAlias: kernels.Vertical,
 	}
 

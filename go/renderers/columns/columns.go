@@ -6,6 +6,7 @@ import (
 	"golang.org/x/image/draw"
 
 	"github.com/transcriptaze/wav2png/go/kernels"
+	"github.com/transcriptaze/wav2png/go/palettes"
 	"github.com/transcriptaze/wav2png/go/wav2png"
 )
 
@@ -18,7 +19,7 @@ const (
 type Columns struct {
 	BarWidth  uint
 	BarGap    uint
-	Palette   wav2png.Palette
+	Palette   palettes.Palette
 	AntiAlias kernels.Kernel
 }
 

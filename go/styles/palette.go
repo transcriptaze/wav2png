@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/transcriptaze/wav2png/go/palettes"
-	"github.com/transcriptaze/wav2png/go/wav2png"
 )
 
 type palette struct {
@@ -34,14 +33,15 @@ func (p *palette) UnmarshalJSON(bytes []byte) error {
 		case "gold":
 			p.palette = palettes.Gold
 		default:
-			p.palette = palettes.Ice
+			p.palette = palettes.Default
 		}
+
 		return nil
 	}
 
 	return fmt.Errorf("invalid palette spec")
 }
 
-func (p palette) Palette() wav2png.Palette {
-	return p.palette.Palette()
+func (p palette) Palette() palettes.Palette {
+	return p.palette
 }

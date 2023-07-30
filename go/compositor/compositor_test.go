@@ -45,7 +45,7 @@ func TestLines(t *testing.T) {
 		grid:       grids.NewSquareGrid(green, 64, grids.Approximate, false),
 
 		renderer: lines.Lines{
-			Palette:   palettes.Fire.Palette(),
+			Palette:   palettes.Fire,
 			AntiAlias: kernels.Vertical,
 		},
 	}
@@ -80,7 +80,7 @@ func TestColumns(t *testing.T) {
 		renderer: columns.Columns{
 			BarWidth:  16,
 			BarGap:    1,
-			Palette:   palettes.Fire.Palette(),
+			Palette:   palettes.Fire,
 			AntiAlias: kernels.Vertical,
 		},
 	}

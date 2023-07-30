@@ -1,4 +1,4 @@
-package wav2png
+package palettes
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-//go:embed ice.png
+//go:embed palettes/ice.png
 var ice []byte
 
 func TestPaletteFromPng(t *testing.T) {
@@ -18,7 +18,7 @@ func TestPaletteFromPng(t *testing.T) {
 		t.Fatalf("Error loading PNG file (%v)", err)
 	}
 
-	palette, err := PaletteFromPng(img)
+	palette, err := PaletteFromPng("test", img)
 	if err != nil {
 		t.Fatalf("Error creating palette from PNG (%v)", err)
 	} else if palette == nil {

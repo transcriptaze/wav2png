@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/transcriptaze/wav2png/go/kernels"
+	"github.com/transcriptaze/wav2png/go/palettes"
 )
 
 const (
@@ -18,7 +19,7 @@ const (
 	RANGE     int32 = RANGE_MAX - RANGE_MIN + 1
 )
 
-func Render(pcm []float32, fs float64, width, height int, palette Palette, volume float64) *image.NRGBA {
+func Render(pcm []float32, fs float64, width, height int, palette palettes.Palette, volume float64) *image.NRGBA {
 	pps := float64(width) / float64(len(pcm))
 	duration := seconds(float64(len(pcm)) / fs)
 	l := int(math.Round(math.Ceil(fs*duration.Seconds()) / float64(width)))

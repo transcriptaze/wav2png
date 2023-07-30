@@ -56,7 +56,7 @@ func NewStyle() Style {
 
 		renderer: linesRenderer{
 			palette: palette{
-				palette: palettes.Ice,
+				palette: palettes.Default,
 			},
 			antialias: kernel{
 				kernel: kernels.Vertical,
@@ -147,7 +147,7 @@ func (s Style) Renderer() renderers.Renderer {
 	}
 
 	return lines.Lines{
-		Palette:   palettes.Ice.Palette(),
+		Palette:   palettes.Default,
 		AntiAlias: kernels.Vertical,
 	}
 }

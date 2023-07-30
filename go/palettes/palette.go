@@ -4,15 +4,13 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"image"
+	"image/color"
 	"image/png"
-	"os"
-	"regexp"
-	"strings"
-
-	"github.com/transcriptaze/wav2png/go/wav2png"
+	// "os"
+	// "regexp"
+	// "strings"
 )
-
-type Palette string
 
 //go:embed palettes/ice.png
 var palette_ice []byte
@@ -38,76 +36,100 @@ var palette_green []byte
 //go:embed palettes/gold.png
 var palette_gold []byte
 
-var palettes = map[string][]byte{
-	"ice":     palette_ice,
-	"fire":    palette_fire,
-	"aurora":  palette_aurora,
-	"horizon": palette_horizon,
-	"amber":   palette_amber,
-	"blue":    palette_blue,
-	"green":   palette_green,
-	"gold":    palette_gold,
+type Palette struct {
+	name    string
+	colours []color.NRGBA
 }
 
-var Ice = Palette("ice")
-var Fire = Palette("fire")
-var Aurora = Palette("aurora")
-var Horizon = Palette("horizon")
-var Amber = Palette("amber")
-var Blue = Palette("blue")
-var Green = Palette("green")
-var Gold = Palette("gold")
+func PaletteFromPng(name string, png image.Image) (*Palette, error) {
+	bounds := png.Bounds()
+	if bounds.Empty() {
+		return nil, fmt.Errorf("cannot create palette from empty PNG")
+	}
+
+	h := bounds.Size().Y
+	colours := make([]color.NRGBA, h)
+	nrgba := color.NRGBAModel
+
+	for i := 0; i < h; i++ {
+		colours[i] = nrgba.Convert(png.At(0, i)).(color.NRGBA)
+	}
+
+	return &Palette{
+		name:    name,
+		colours: colours,
+	}, nil
+}
 
 func (p Palette) String() string {
-	return fmt.Sprintf("%v", string(p))
+	return p.name
 }
 
-func (p *Palette) Set(s string) error {
-	ss := strings.ToLower(s)
-	match := regexp.MustCompile("^(ice|fire|aurora|horizon|amber|blue|green|gold)$").FindStringSubmatch(ss)
+// func (p *Palette) Set(s string) error {
+// ss := strings.ToLower(s)
+// match := regexp.MustCompile("^(ice|fire|aurora|horizon|amber|blue|green|gold)$").FindStringSubmatch(ss)
 
-	if len(match) > 1 {
-		*p = Palette(match[1])
+// if len(match) > 1 {
+// 	*p = Palette(match[1])
+// 	return nil
+// }
+
+// if info, err := os.Stat(s); os.IsNotExist(err) {
+// 	return fmt.Errorf("Palette %v does not exist", s)
+// } else if info.Mode().IsDir() || !info.Mode().IsRegular() {
+// 	return fmt.Errorf("Palette file %v is not a file", s)
+// } else {
+// 	*p = Palette(s)
+// }
+
+// return nil
+// }
+
+func (p *Palette) Realize() []color.NRGBA {
+	return p.colours
+}
+
+// func (p Palette) Palette() Palette {
+// if b, ok := palettes[string(p)]; ok {
+// 	if v := p.decode(b); v != nil {
+// 		return *v
+// 	}
+// }
+//
+// if b, err := os.ReadFile(string(p)); err == nil {
+// 	if v := p.decode(b); v != nil {
+// 		return *v
+// 	}
+// }
+//
+// return Ice
+// }
+
+func decode(name string, b []byte) *Palette {
+	if img, err := png.Decode(bytes.NewBuffer(b)); err != nil {
 		return nil
-	}
-
-	if info, err := os.Stat(s); os.IsNotExist(err) {
-		return fmt.Errorf("Palette %v does not exist", s)
-	} else if info.Mode().IsDir() || !info.Mode().IsRegular() {
-		return fmt.Errorf("Palette file %v is not a file", s)
+	} else if palette, err := PaletteFromPng(name, img); err != nil {
+		return nil
 	} else {
-		*p = Palette(s)
+		return palette
 	}
-
-	return nil
 }
 
-func (p Palette) Palette() wav2png.Palette {
-	if b, ok := palettes[string(p)]; ok {
-		if v := p.decode(b); v != nil {
-			return *v
-		}
+func mustDecode(name string, b []byte) Palette {
+	if img, err := png.Decode(bytes.NewBuffer(b)); err != nil {
+		panic(fmt.Errorf("invalid palette (%v)", err))
+	} else if palette, err := PaletteFromPng(name, img); err != nil {
+		panic(fmt.Errorf("invalid palette (%v)", err))
+	} else {
+		return *palette
 	}
-
-	if b, err := os.ReadFile(string(p)); err == nil {
-		if v := p.decode(b); v != nil {
-			return *v
-		}
-	}
-
-	return wav2png.Ice
 }
 
-func (p Palette) decode(b []byte) *wav2png.Palette {
-	img, err := png.Decode(bytes.NewBuffer(b))
-	if err != nil {
-		return nil
-	}
-
-	palette, err := wav2png.PaletteFromPng(img)
-	if err != nil {
-		return nil
-	}
-
-	return palette
-}
+var Ice = mustDecode("ice", palette_ice)
+var Fire = mustDecode("fire", palette_fire)
+var Aurora = mustDecode("aurora", palette_aurora)
+var Horizon = mustDecode("horizon", palette_horizon)
+var Amber = mustDecode("amber", palette_amber)
+var Blue = mustDecode("blue", palette_blue)
+var Green = mustDecode("green", palette_green)
+var Gold = mustDecode("gold", palette_gold)

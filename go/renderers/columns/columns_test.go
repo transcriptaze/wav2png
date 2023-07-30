@@ -26,7 +26,7 @@ func TestRender(t *testing.T) {
 	renderer := Columns{
 		BarWidth:  16,
 		BarGap:    1,
-		Palette:   palettes.Fire.Palette(),
+		Palette:   palettes.Fire,
 		AntiAlias: kernels.Vertical,
 	}
 

@@ -8,9 +8,11 @@
       - [x] wav2mp4
       - [x] Clean up wav2png.options
       - [x] Move cursors to own package
-      - [ ] Restructure palettes
+      - [x] Restructure palettes
+      - [ ] Load palette from PNG file
       - [ ] Stretch palette horizontally
-      - [ ] Gallery
+
+- [ ] Gallery
 
 - [ ] wav2mp4 does not seperate L/R audio with --mix option
 - [ ] wav2mp4 does not trim audio to size either

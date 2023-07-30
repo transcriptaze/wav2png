@@ -1,47 +1,11 @@
-package wav2png
+package palettes
 
 import (
-	"fmt"
-	"image"
 	"image/color"
 )
 
-type Palette struct {
-	colours []color.NRGBA
-}
-
-func PaletteFromPng(png image.Image) (*Palette, error) {
-
-	bounds := png.Bounds()
-	if bounds.Empty() {
-		return nil, fmt.Errorf("cannot create palette from empty PNG")
-	}
-
-	h := bounds.Size().Y
-	colours := make([]color.NRGBA, h)
-	nrgba := color.NRGBAModel
-
-	for i := 0; i < h; i++ {
-		colours[i] = nrgba.Convert(png.At(0, i)).(color.NRGBA)
-	}
-
-	return &Palette{
-		colours: colours,
-	}, nil
-}
-
-func (p *Palette) Realize() []color.NRGBA {
-	return p.colours
-}
-
-var Mono Palette = Palette{
-	colours: []color.NRGBA{
-		color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00},
-		color.NRGBA{R: 0x80, G: 0x80, B: 0xff, A: 0xff},
-	},
-}
-
-var Ice Palette = Palette{
+var Default Palette = Palette{
+	name: "default",
 	colours: []color.NRGBA{
 		color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00},
 		color.NRGBA{R: 0xc8, G: 0xe8, B: 0xff, A: 0x02},
