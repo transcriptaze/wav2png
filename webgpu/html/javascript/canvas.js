@@ -9,11 +9,17 @@ class Canvas {
       device: null,
       audio: new Float32Array(),
       canvas: document.querySelector('#canvas canvas'),
+
       fill: black,
+
       grid: {
         colour: green,
         gridx: 8,
         gridy: 4
+      },
+
+      waveform: {
+        vscale: 1.0
       }
     }
   }
@@ -51,6 +57,14 @@ class Canvas {
     this.internal.grid.colour = colour
   }
 
+  get waveform () {
+    return this.internal.waveform
+  }
+
+  set waveform ({ vscale }) {
+    this.internal.waveform.vscale = vscale
+  }
+
   get canvas () {
     return this.internal.canvas
   }
@@ -68,7 +82,7 @@ class Canvas {
     layers.push(grid(ctx, device, format, this.grid))
 
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio))
+      layers.push(waveform(ctx, device, format, audio, this.waveform))
     }
 
     draw(ctx, this.device, layers)

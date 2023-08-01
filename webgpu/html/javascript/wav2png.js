@@ -35,6 +35,7 @@ export async function initialise () {
 
   const fill = document.getElementById('fill')
   const grid = document.getElementById('grid')
+  const waveform = document.getElementById('waveform')
 
   fill.onchange = (c) => {
     stale = true
@@ -53,6 +54,16 @@ export async function initialise () {
   grid.onchanged = (c) => {
     canvas.grid = { colour: rgba(c) }
     offscreen.grid = { colour: rgba(c) }
+    canvas.redraw()
+  }
+
+  waveform.onchange = (c) => {
+    stale = true
+  }
+
+  waveform.onchanged = ({ vscale }) => {
+    canvas.waveform = { vscale }
+    offscreen.waveform = { vscale }
     canvas.redraw()
   }
 
@@ -194,12 +205,19 @@ function redraw () {
   return new Promise(() => {
     const fill = document.getElementById('fill').colour
     const grid = document.getElementById('grid').colour
+    const vscale = document.getElementById('waveform').vscale
 
     canvas.fill = rgba(fill)
-    offscreen.fill = rgba(fill)
-
     canvas.grid = { colour: rgba(grid) }
+    canvas.waveform = {
+      vscale
+    }
+
+    offscreen.fill = rgba(fill)
     offscreen.grid = { colour: rgba(grid) }
+    offscreen.waveform = {
+      vscale
+    }
 
     canvas.redraw()
   })

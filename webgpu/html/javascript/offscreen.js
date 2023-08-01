@@ -13,11 +13,17 @@ class Offscreen {
       device: null,
       audio: new Float32Array(),
       canvas: new OffscreenCanvas(width, height),
+
       fill: black,
+
       grid: {
         colour: green,
         gridx: 8,
         gridy: 4
+      },
+
+      waveform: {
+        vscale: 1.0
       }
     }
   }
@@ -54,6 +60,14 @@ class Offscreen {
     this.internal.grid.colour = colour
   }
 
+  get waveform () {
+    return this.internal.waveform
+  }
+
+  set waveform ({ vscale }) {
+    this.internal.waveform.vscale = vscale
+  }
+
   get canvas () {
     return this.internal.canvas
   }
@@ -71,7 +85,7 @@ class Offscreen {
     layers.push(grid(ctx, device, format, this.grid))
 
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio))
+      layers.push(waveform(ctx, device, format, audio, this.waveform))
     }
 
     draw(ctx, this.device, layers)

@@ -3,7 +3,7 @@
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function waveform (context, device, format, samples) {
+export function waveform (context, device, format, samples, { vscale }) {
   const width = context.canvas.width
   const height = context.canvas.height
   const xscale = (width - 2 * PADDING) / width
@@ -101,7 +101,7 @@ export function waveform (context, device, format, samples) {
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale })
+  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale })
   const waveform = new Float32Array(pixels * 2)
   const audio = new Float32Array(samples)
 
@@ -172,9 +172,9 @@ export function waveform (context, device, format, samples) {
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale }) {
+function pack ({ pixels, stride, samples, xscale, yscale, vscale }) {
   const pad = 0
-  const buffer = new ArrayBuffer(24)
+  const buffer = new ArrayBuffer(32)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -183,6 +183,7 @@ function pack ({ pixels, stride, samples, xscale, yscale }) {
   view.setUint32(12, pad, true)
   view.setFloat32(16, xscale, true) // vec2f: must be on a 16-byte boundary
   view.setFloat32(20, yscale, true) //
+  view.setFloat32(24, vscale, true)
 
   return new Uint8Array(buffer)
 }
@@ -193,7 +194,8 @@ const SHADER = `
       stride: u32,
       samples: u32,
       pad: f32,
-      scale: vec2f
+      scale: vec2f,
+      vscale: f32,
     };
 
     struct VertexInput {
@@ -216,9 +218,10 @@ const SHADER = `
 
        let i = f32(input.instance);
        let scale = uconstants.scale;
+       let vscale = uconstants.vscale;
        let w = f32(uconstants.pixels - 1);
 
-       let height = abs(waveform[input.instance]);
+       let height = vscale * abs(waveform[input.instance]);
        let origin = vec2f(-1,0); 
        let offset = origin + 2*i/w; 
        let x = input.pos.x + offset.x;

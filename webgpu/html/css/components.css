@@ -97,3 +97,30 @@ fieldset.grid input[type=color] {
 fieldset.grid input[type=range] {
   width: 128px;
 }
+
+fieldset.waveform {
+  width: 100%;
+  height: fit-content;
+  border: 1px solid #c0c0c0;
+  border-radius: 8px;
+  padding-top: 4px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+fieldset.waveform legend {
+  padding-left: 2px;
+  padding-right: 2px;
+  color: grey;
+  font-family: sans-serif;
+  font-style: italic;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+fieldset.waveform div {
+  display: flex;
+  flex-direction: column;
+}
+fieldset.waveform input[type=range] {
+  width: 128px;
+}

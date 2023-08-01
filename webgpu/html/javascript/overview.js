@@ -9,11 +9,17 @@ class Overview {
       device: null,
       audio: new Float32Array(),
       canvas: document.querySelector('#overview canvas'),
+
       fill: black,
+
       grid: {
         colour: rgba('#ffff00a0'),
         gridx: 64,
         gridy: 4
+      },
+
+      waveform: {
+        vscale: 1.0
       }
     }
   }
@@ -24,6 +30,15 @@ class Overview {
 
   set device (v) {
     this.internal.device = v
+  }
+
+  get audio () {
+    return this.internal.audio
+  }
+
+  set audio (v) {
+    this.internal.audio = v
+    this.redraw()
   }
 
   get fill () {
@@ -44,12 +59,12 @@ class Overview {
     this.redraw()
   }
 
-  get audio () {
-    return this.internal.audio
+  get waveform () {
+    return this.internal.waveform
   }
 
-  set audio (v) {
-    this.internal.audio = v
+  set waveform ({ vscale }) {
+    this.internal.waveform.vscale = vscale
     this.redraw()
   }
 
@@ -70,7 +85,7 @@ class Overview {
     layers.push(grid(ctx, device, format, this.grid))
 
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio))
+      layers.push(waveform(ctx, device, format, audio, this.waveform))
     }
 
     draw(ctx, this.device, layers)
