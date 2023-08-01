@@ -11,7 +11,9 @@ class Canvas {
       canvas: document.querySelector('#canvas canvas'),
       fill: black,
       grid: {
-        colour: green
+        colour: green,
+        gridx: 8,
+        gridy: 4
       }
     }
   }

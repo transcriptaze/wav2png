@@ -1,7 +1,7 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
-import { black, green } from './colours.js'
+import { black, rgba } from './colours.js'
 
 class Overview {
   constructor () {
@@ -11,7 +11,9 @@ class Overview {
       canvas: document.querySelector('#overview canvas'),
       fill: black,
       grid: {
-        colour: green
+        colour: rgba('#ffff00a0'),
+        gridx: 64,
+        gridy: 4
       }
     }
   }

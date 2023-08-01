@@ -15,7 +15,9 @@ class Offscreen {
       canvas: new OffscreenCanvas(width, height),
       fill: black,
       grid: {
-        colour: green
+        colour: green,
+        gridx: 8,
+        gridy: 4
       }
     }
   }

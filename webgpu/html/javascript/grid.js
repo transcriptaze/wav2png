@@ -1,10 +1,8 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
-const GRIDX = 8
-const GRIDY = 4
 const PADDING = 20
 
-export function grid (context, device, format, { colour }) {
+export function grid (context, device, format, { colour, gridx, gridy }) {
   const width = context.canvas.width
   const height = context.canvas.height
   const xscale = (width - 2 * PADDING) / width
@@ -132,7 +130,7 @@ export function grid (context, device, format, { colour }) {
     }
   })
 
-  const constants = new Float32Array([GRIDX, GRIDY, xscale, yscale, ...colour])
+  const constants = new Float32Array([gridx, gridy, xscale, yscale, ...colour])
   const uniformBuffer = device.createBuffer({
     label: 'grid constants',
     size: 16 * Math.ceil(constants.byteLength / 16),
@@ -156,7 +154,7 @@ export function grid (context, device, format, { colour }) {
     pass.setPipeline(pipeline)
     pass.setVertexBuffer(0, vertexBuffer)
     pass.setBindGroup(0, bindGroup)
-    pass.draw(vertices.length / 2, GRIDX * GRIDY)
+    pass.draw(vertices.length / 2, gridx * gridy)
   }
 
   return { compute, render }

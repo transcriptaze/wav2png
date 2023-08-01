@@ -1,6 +1,7 @@
 import { overview } from './overview.js'
 import { canvas } from './canvas.js'
 import { offscreen } from './offscreen.js'
+import { rgba } from './colours.js'
 
 const context = {
   loading: false,
@@ -222,21 +223,4 @@ function unbusy () {
   const windmill = document.getElementById('windmill')
 
   windmill.classList.remove('visible')
-}
-
-function rgba (colour) {
-  const match = `${colour}`.match(/^#([a-fA-F0-9]{8})$/)
-
-  if (match && match.length > 1) {
-    const hex = match[1]
-    const v = Number.parseInt(hex, 16)
-    const r = ((v >>> 24) & 0x00ff) / 255
-    const g = ((v >>> 16) & 0x00ff) / 255
-    const b = ((v >>> 8) & 0x00ff) / 255
-    const a = ((v >>> 0) & 0x00ff) / 255
-
-    return [r * a, g * a, b * a, a]
-  }
-
-  return [0, 0, 0, 0]
 }
