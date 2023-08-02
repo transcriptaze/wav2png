@@ -2,6 +2,9 @@
 
 - [x] Fix Firefox compilation errors
 - [ ] Fix Firefox flickering
+- [ ] Grid alpha blend
+- [ ] Waveform alpha blend
+- [ ] start:end
 
 - [ ]  Better colour picker
        - https://rgbacolorpicker.com/

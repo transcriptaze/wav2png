@@ -3,7 +3,7 @@
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function waveform (context, device, format, samples, { vscale }) {
+export function waveform (context, device, format, samples, { vscale, colour }) {
   const width = context.canvas.width
   const height = context.canvas.height
   const xscale = (width - 2 * PADDING) / width
@@ -101,7 +101,7 @@ export function waveform (context, device, format, samples, { vscale }) {
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale })
+  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colour })
   const waveform = new Float32Array(pixels * 2)
   const audio = new Float32Array(samples)
 
@@ -172,9 +172,9 @@ export function waveform (context, device, format, samples, { vscale }) {
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale, vscale }) {
+function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
   const pad = 0
-  const buffer = new ArrayBuffer(32)
+  const buffer = new ArrayBuffer(48)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -184,6 +184,10 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale }) {
   view.setFloat32(16, xscale, true) // vec2f: must be on a 16-byte boundary
   view.setFloat32(20, yscale, true) //
   view.setFloat32(24, vscale, true)
+  view.setFloat32(32, colour[0], true) // vec4f: must be on a 16-byte boundary
+  view.setFloat32(36, colour[1], true) // 
+  view.setFloat32(40, colour[2], true) // 
+  view.setFloat32(44, colour[3], true) // 
 
   return new Uint8Array(buffer)
 }
@@ -196,6 +200,7 @@ const SHADER = `
       pad: f32,
       scale: vec2f,
       vscale: f32,
+      colour: vec4f
     };
 
     struct VertexInput {
@@ -206,7 +211,7 @@ const SHADER = `
 
     struct VertexOutput {
         @builtin(position) pos: vec4f,
-        @location(0) cell: vec2f, 
+        @location(0) colour: vec4f, 
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;
@@ -228,13 +233,14 @@ const SHADER = `
        let y = input.pos.y*height[input.vertex];
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
+       output.colour = uconstants.colour;
 
        return output;
     }
 
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       return vec4f(0.5, 0.8, 1.0, 1.0);
+       return input.colour; 
     }
 `
 

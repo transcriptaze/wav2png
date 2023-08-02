@@ -19,7 +19,8 @@ class Overview {
       },
 
       waveform: {
-        vscale: 1.0
+        vscale: 1.0,
+        colour: rgba('#80ccffff')
       }
     }
   }

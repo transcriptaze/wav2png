@@ -25,6 +25,12 @@ fieldset.waveform {
         flex-direction: column;
     }
 
+    input[type="color"] {
+        width: 48px;
+        height: 48px;
+        border: none;
+    }
+
     input[type="range"] {
         width: 128px;
     }

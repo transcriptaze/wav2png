@@ -1,7 +1,7 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
-import { black, green, transparent } from './colours.js'
+import { black, green, transparent, rgba } from './colours.js'
 
 class Canvas {
   constructor () {
@@ -19,7 +19,8 @@ class Canvas {
       },
 
       waveform: {
-        vscale: 1.0
+        vscale: 1.0,
+        colour: rgba('#80ccffff')
       }
     }
   }
@@ -61,8 +62,9 @@ class Canvas {
     return this.internal.waveform
   }
 
-  set waveform ({ vscale }) {
+  set waveform ({ vscale, colour }) {
     this.internal.waveform.vscale = vscale
+    this.internal.waveform.colour = colour
   }
 
   get canvas () {

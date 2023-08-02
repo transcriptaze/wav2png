@@ -61,9 +61,9 @@ export async function initialise () {
     stale = true
   }
 
-  waveform.onchanged = ({ vscale }) => {
-    canvas.waveform = { vscale }
-    offscreen.waveform = { vscale }
+  waveform.onchanged = (w) => {
+    canvas.waveform = w
+    offscreen.waveform = w
     canvas.redraw()
   }
 
@@ -205,19 +205,15 @@ function redraw () {
   return new Promise(() => {
     const fill = document.getElementById('fill').colour
     const grid = document.getElementById('grid').colour
-    const vscale = document.getElementById('waveform').vscale
+    const waveform = document.getElementById('waveform').waveform
 
     canvas.fill = rgba(fill)
     canvas.grid = { colour: rgba(grid) }
-    canvas.waveform = {
-      vscale
-    }
+    canvas.waveform = waveform
 
     offscreen.fill = rgba(fill)
     offscreen.grid = { colour: rgba(grid) }
-    offscreen.waveform = {
-      vscale
-    }
+    offscreen.waveform = waveform
 
     canvas.redraw()
   })

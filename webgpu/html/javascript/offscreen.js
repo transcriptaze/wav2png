@@ -1,7 +1,7 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
-import { black, green, transparent } from './colours.js'
+import { black, green, transparent, rgba } from './colours.js'
 
 class Offscreen {
   constructor () {
@@ -23,7 +23,8 @@ class Offscreen {
       },
 
       waveform: {
-        vscale: 1.0
+        vscale: 1.0,
+        colour: rgba('#80ccffff')
       }
     }
   }

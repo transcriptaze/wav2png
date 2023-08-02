@@ -121,6 +121,11 @@ fieldset.waveform div {
   display: flex;
   flex-direction: column;
 }
+fieldset.waveform input[type=color] {
+  width: 48px;
+  height: 48px;
+  border: none;
+}
 fieldset.waveform input[type=range] {
   width: 128px;
 }

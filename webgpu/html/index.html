@@ -54,7 +54,7 @@
       <div id="toolbox">
         <wav2png-fill     id="fill" colour="#000000ff"></wav2png-fill>
         <wav2png-grid     id="grid" color='#00ff00ff'></wav2png-grid>
-        <wav2png-waveform id="waveform" vscale='1.0'></wav2png-waveform>
+        <wav2png-waveform id="waveform" vscale='1.0' colour="#80ccffff"></wav2png-waveform>
       </div>
 
     </main>
@@ -86,10 +86,11 @@
         <legend>Waveform</legend>
         <div>
           <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
+          <input id="rgb"   type="color" value="#80ccff" />
+          <input id="alpha" type="range" step="any" min="0.0" max="1.0" value="1.0" />
         </div>
       </fieldset>
     </template>
-
   </body>
 
   <script type="module">

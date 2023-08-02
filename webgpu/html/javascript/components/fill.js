@@ -26,32 +26,14 @@ export class Fill extends HTMLElement {
 
   connectedCallback () {
     const shadow = this.shadowRoot
-    const input = shadow.querySelector('input#rgb')
-    const range = shadow.querySelector('input#alpha')
+    const rgb = shadow.querySelector('input#rgb')
+    const alpha = shadow.querySelector('input#alpha')
 
-    input.oninput = (event) => {
-      if (this.onchange) {
-        this.onchange(this.colour)
-      }
-    }
+    rgb.oninput = (event) => onChange(this)
+    alpha.oninput = (event) => onChange(this)
 
-    input.onchange = (event) => {
-      if (this.onchanged) {
-        this.onchanged(this.colour)
-      }
-    }
-
-    range.oninput = (event) => {
-      if (this.onchange) {
-        this.onchange(this.colour)
-      }
-    }
-
-    range.onchange = (event) => {
-      if (this.onchanged) {
-        this.onchanged(this.colour)
-      }
-    }
+    rgb.onchange = (event) => onChanged(this)
+    alpha.onchange = (event) => onChanged(this)
   }
 
   disconnectedCallback () {
@@ -110,6 +92,20 @@ export class Fill extends HTMLElement {
         range.value = 1.0
       }
     }
+  }
+}
+
+function onChange (component) {
+  const colour = component.colour
+  if (component.onchange) {
+    component.onchange(colour)
+  }
+}
+
+function onChanged (component) {
+  const colour = component.colour
+  if (component.onchanged) {
+    component.onchanged(colour)
   }
 }
 
