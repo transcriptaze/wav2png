@@ -48,35 +48,7 @@ export function background (context, device, format, colour) {
 
   const shader = device.createShaderModule({
     label: 'background shader',
-    code: `
-    struct constants {
-      colour: vec4f
-    };
-
-    struct VertexInput {
-        @location(0) xy: vec2f
-    };
-
-    struct VertexOutput {
-        @builtin(position) pos: vec4f
-    };
-
-    @group(0) @binding(0) var<uniform> uconstants: constants;
-
-    @vertex
-    fn vertexMain(input: VertexInput) -> VertexOutput {
-       var output: VertexOutput;
-
-       output.pos = vec4f(input.xy, 0, 1);
-
-       return output;
-    }
-
-    @fragment
-    fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       return uconstants.colour;
-    }
-`
+    code: SHADER
   })
 
   const pipeline = device.createRenderPipeline({
@@ -128,3 +100,33 @@ export function background (context, device, format, colour) {
 
   return { compute, render }
 }
+
+const SHADER = `
+    struct constants {
+      colour: vec4f
+    };
+
+    struct VertexInput {
+        @location(0) xy: vec2f
+    };
+
+    struct VertexOutput {
+        @builtin(position) pos: vec4f
+    };
+
+    @group(0) @binding(0) var<uniform> uconstants: constants;
+
+    @vertex
+    fn vertexMain(input: VertexInput) -> VertexOutput {
+       var output: VertexOutput;
+
+       output.pos = vec4f(input.xy, 0.0, 1.0);
+
+       return output;
+    }
+
+    @fragment
+    fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
+       return uconstants.colour;
+    }
+`

@@ -53,48 +53,7 @@ export function grid (context, device, format, { colour, gridx, gridy }) {
 
   const shader = device.createShaderModule({
     label: 'grid shader',
-    code: `
-    struct constants {
-      grid: vec2f,
-      scale: vec2f,
-      colour: vec4f
-    };
-
-    struct VertexInput {
-        @location(0) pos: vec2f,
-        @builtin(instance_index) instance: u32,
-    };
-
-    struct VertexOutput {
-        @builtin(position) pos: vec4f,
-        @location(0) colour: vec4f, 
-    };
-
-    @group(0) @binding(0) var<uniform> uconstants: constants;
-
-    @vertex
-    fn vertexMain(input: VertexInput) -> VertexOutput {
-       var output: VertexOutput;
-
-       let i = f32(input.instance);
-       let grid = uconstants.grid;
-       let scale = uconstants.scale;
-
-       let cell = vec2f(i % grid.x, floor(i / grid.x));
-       let offset = 2*cell / grid; 
-       let pos = (input.pos + 1) / grid - 1 + offset;
-
-       output.pos = vec4f(pos, 0, 1) * vec4f(scale,1,1);
-       output.colour = uconstants.colour;
-
-       return output;
-    }
-
-    @fragment
-    fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       return input.colour;
-    }
-`
+    code: SHADER
   })
 
   const pipeline = device.createRenderPipeline({
@@ -159,3 +118,46 @@ export function grid (context, device, format, { colour, gridx, gridy }) {
 
   return { compute, render }
 }
+
+const SHADER = `
+    struct constants {
+      grid: vec2f,
+      scale: vec2f,
+      colour: vec4f
+    };
+
+    struct VertexInput {
+        @location(0) pos: vec2f,
+        @builtin(instance_index) instance: u32,
+    };
+
+    struct VertexOutput {
+        @builtin(position) pos: vec4f,
+        @location(0) colour: vec4f, 
+    };
+
+    @group(0) @binding(0) var<uniform> uconstants: constants;
+
+    @vertex
+    fn vertexMain(input: VertexInput) -> VertexOutput {
+       var output: VertexOutput;
+
+       let i = f32(input.instance);
+       let grid = uconstants.grid;
+       let scale = uconstants.scale;
+
+       let cell = vec2f(i % grid.x, floor(i / grid.x));
+       let offset = 2.0*cell / grid; 
+       let pos = (input.pos + 1.0) / grid - 1.0 + offset;
+
+       output.pos = vec4f(pos, 0.0, 1.0) * vec4f(scale,1.0,1.0);
+       output.colour = uconstants.colour;
+
+       return output;
+    }
+
+    @fragment
+    fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
+       return input.colour;
+    }
+`

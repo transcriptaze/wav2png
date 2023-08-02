@@ -1,11 +1,12 @@
 # TODO
 
-Ref. https://bugs.chromium.org/p/chromium/issues/detail?id=1468157
+- [x] Fix Firefox compilation errors
+- [ ] Fix Firefox flickering
 
+- [ ]  Better colour picker
+       - https://rgbacolorpicker.com/
 
-- [x] Cloudflare Pages
-- [x] Set background colour
-      - https://rgbacolorpicker.com/
+- [ ] Restyle range controls       
 
 - [ ] github workflow
 - [ ] Distributable Go app
@@ -17,6 +18,10 @@ Ref. https://bugs.chromium.org/p/chromium/issues/detail?id=1468157
 - (?) Create different bind group layouts for compute/render shaders to avoid confusion
 - (?) Experiment with border image for windmill
       - https://developer.mozilla.org/en-US/docs/Web/CSS/border-image
+      - https://web.dev/css-trig-functions/
+
+- https://web.dev/streams/
+- https://rome.tools/
 
 ## NOTES
 

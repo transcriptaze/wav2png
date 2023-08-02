@@ -219,22 +219,22 @@ const SHADER = `
        let i = f32(input.instance);
        let scale = uconstants.scale;
        let vscale = uconstants.vscale;
-       let w = f32(uconstants.pixels - 1);
+       let w = f32(uconstants.pixels - u32(1));
 
        let height = vscale * abs(waveform[input.instance]);
-       let origin = vec2f(-1,0); 
-       let offset = origin + 2*i/w; 
+       let origin = vec2f(-1.0, 0.0); 
+       let offset = origin + 2.0*i/w; 
        let x = input.pos.x + offset.x;
        let y = input.pos.y*height[input.vertex];
 
-       output.pos = vec4f(scale.x*x, scale.y*y, 0, 1);
+       output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
 
        return output;
     }
 
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       return vec4f(0.5,0.8,1,1);
+       return vec4f(0.5, 0.8, 1.0, 1.0);
     }
 `
 
@@ -263,12 +263,12 @@ const COMPUTE = `
        var m = u32(0);
        var n = u32(0);
 
-       for (var i: u32 = 0; i < stride; i++) {
+       for (var i: u32 = u32(0); i < stride; i++) {
           let v = audio[offset];
 
-          if (v > 0) {
+          if (v > 0.0) {
              p += v; m++;
-          } else if (v < 0) {
+          } else if (v < 0.0) {
              q += v; n++;
           } else {
              p += v; m++;
@@ -282,11 +282,11 @@ const COMPUTE = `
           }
        }
 
-       if (m > 0) {
+       if (m > u32(0)) {
           p = p/f32(m);
        }
 
-       if (n > 0) {
+       if (n > u32(0)) {
           q = q/f32(n);
        }
 
