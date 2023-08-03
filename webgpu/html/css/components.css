@@ -129,3 +129,9 @@ fieldset.waveform input[type=color] {
 fieldset.waveform input[type=range] {
   width: 128px;
 }
+
+canvas.overlay {
+  background: transparent;
+  border: none;
+  outline: none;
+}

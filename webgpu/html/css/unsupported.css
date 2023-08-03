@@ -90,6 +90,33 @@ main {
 
 div#overview {
   grid-area: overview;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+div#overview canvas {
+  width: 960px;
+  height: 80px;
+  border-radius: 4px;
+  outline: none;
+}
+div#overview wav2png-overlay {
+  border-radius: 4px;
+}
+div#overview wav2png-overlay::part(canvas) {
+  width: 960px;
+  height: 80px;
+}
+div#overview .canvas {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  background: #222222;
+}
+div#overview .overlay {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 2;
 }
 
 div#workspace {
@@ -102,19 +129,6 @@ div#toolbar {
 
 div#toolbox {
   grid-area: toolbox;
-}
-
-div#overview {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-start;
-}
-div#overview canvas {
-  width: 960px;
-  height: 80px;
-  background: #222222;
-  border-radius: 4px;
 }
 
 div#workspace {

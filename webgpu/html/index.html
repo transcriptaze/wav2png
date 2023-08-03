@@ -21,7 +21,8 @@
     </div>
     <main>
       <div id="overview">
-        <canvas width="1920" height="160"></canvas>
+        <canvas class="canvas"  width="1920" height="160"></canvas>
+        <wav2png-overlay class="overlay" width="1920" height="160"></wav2png-overlay>
       </div>
   
       <div id="workspace">
@@ -60,6 +61,10 @@
     </main>
 
     <!-- TEMPLATES -->
+
+    <template id="template-overlay">
+        <canvas part="canvas" class="overlay" width="1920" height="160"></canvas>
+    </template>
 
     <template id="template-fill">
       <fieldset class="fill">

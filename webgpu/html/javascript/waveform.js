@@ -185,9 +185,9 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
   view.setFloat32(20, yscale, true) //
   view.setFloat32(24, vscale, true)
   view.setFloat32(32, colour[0], true) // vec4f: must be on a 16-byte boundary
-  view.setFloat32(36, colour[1], true) // 
-  view.setFloat32(40, colour[2], true) // 
-  view.setFloat32(44, colour[3], true) // 
+  view.setFloat32(36, colour[1], true) //
+  view.setFloat32(40, colour[2], true) //
+  view.setFloat32(44, colour[3], true) //
 
   return new Uint8Array(buffer)
 }
