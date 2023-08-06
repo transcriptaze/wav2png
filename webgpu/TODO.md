@@ -2,9 +2,10 @@
 
 - [x] Fix Firefox compilation errors
 - [ ] Fix Firefox flickering
-- [ ] Grid alpha blend
-- [ ] Waveform alpha blend
+- [x] Grid alpha blend
+- [x] Waveform alpha blend
 - [ ] start:end
+- [ ] Render in ServiceWorker
 
 - [ ]  Better colour picker
        - https://rgbacolorpicker.com/

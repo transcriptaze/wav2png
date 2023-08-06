@@ -84,7 +84,20 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
       module: shader,
       entryPoint: 'fragmentMain',
       targets: [
-        { format }
+        {
+          format,
+          blend: {
+            operation: 'add',
+            alpha: {
+              srcFactor: 'one',
+              dstFactor: 'one-minus-src-alpha'
+            },
+            color: {
+              srcFactor: 'src-alpha',
+              dstFactor: 'one-minus-src-alpha'
+            }
+          }
+        }
       ]
     },
     primitive: {
