@@ -5,6 +5,8 @@
 - [x] Grid alpha blend
 - [x] Waveform alpha blend
 - [ ] start:end
+
+- [ ] Two point gradient
 - [ ] Render in ServiceWorker
 
 - [ ]  Better colour picker
@@ -34,3 +36,4 @@
 3. https://eliemichel.github.io/LearnWebGPU/
 4. https://en.wikipedia.org/wiki/Trochoidal_wave
 5. https://gist.github.com/munrocket/30e645d584b5300ee69295e54674b3e4
+6. https://wrfranklin.org/Research/Short_Notes/pnpoly.html
