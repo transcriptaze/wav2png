@@ -6,6 +6,7 @@
 - [x] Waveform alpha blend
 - [ ] start:end
       - [x] drag handles independently
+      - [x] fix hit test area so that only head is draggable
       - [ ] alt-drag drag together
       - [ ] label start, end, interval
       - [ ] onChange

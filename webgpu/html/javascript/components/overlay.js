@@ -7,6 +7,7 @@ export class Overlay extends HTMLElement {
     super()
 
     this.internal = {
+      duration: 60,
       padding: 20,
       start: 0,
       end: 1920 - 2 * 20,
@@ -125,6 +126,18 @@ export class Overlay extends HTMLElement {
     }
   }
 
+  get duration () {
+    return this.internal.duration
+  }
+
+  set duration (v) {
+    const duration = Number.parseFloat(`${v}`)
+
+    if (!Number.isNaN(duration)) {
+      this.internal.duration = duration
+    }
+  }
+
   get start () {
     return this.internal.start
   }
@@ -147,6 +160,17 @@ export class Overlay extends HTMLElement {
     if (!Number.isNaN(end)) {
       this.internal.end = Math.max(Math.min(end, 1920 - 2 * 20), this.start)
     }
+  }
+
+  reset () {
+    const shadow = this.shadowRoot
+    const canvas = shadow.querySelector('canvas')
+
+    this.duration = 0
+    this.start = 0
+    this.end = this.width - 2 * this.padding
+
+    redraw(this, canvas)
   }
 }
 
@@ -199,6 +223,7 @@ class Drag {
 
   onPointerUp (event, canvas, drag) {
     canvas.onpointermove = null
+    canvas.onpointerup = null
     canvas.releasePointerCapture(event.pointerId)
 
     if (this.dragging) {
@@ -226,24 +251,34 @@ function redraw (component, canvas) {
   ctx.clearRect(0, 0, width, height)
 
   // ... draw sizing handles
-  ctx.fillStyle = '#80ccffa0'
-  ctx.strokeStyle = '#80ccffa0'
+  ctx.fillStyle = '#80ccff80'
+  ctx.strokeStyle = '#80ccff80'
   ctx.lineWidth = 0
 
   ctx.beginPath()
   ctx.moveTo(0, 0)
   ctx.lineTo(padding + start, 0)
-  ctx.lineTo(padding + start + 32, height / 2)
   ctx.lineTo(padding + start, height)
   ctx.lineTo(0, height)
   ctx.fill()
 
   ctx.beginPath()
+  ctx.moveTo(padding + start - 32, height / 2)
+  ctx.lineTo(padding + start, height / 2 - 32)
+  ctx.lineTo(padding + start, height / 2 + 32)
+  ctx.fill()
+
+  ctx.beginPath()
   ctx.moveTo(width, 0)
   ctx.lineTo(padding + end, 0)
-  ctx.lineTo(padding + end - 32, height / 2)
   ctx.lineTo(padding + end, height)
   ctx.lineTo(width, height)
+  ctx.fill()
+
+  ctx.beginPath()
+  ctx.moveTo(padding + end + 32, height / 2)
+  ctx.lineTo(padding + end, height / 2 - 32)
+  ctx.lineTo(padding + end, height / 2 + 32)
   ctx.fill()
 }
 
@@ -262,19 +297,17 @@ function onPointerDown (component, canvas, handles, event) {
     const end = Math.min(component.end, width - 2 * padding)
 
     const left = [
-      { x: start, y: 0 },
       { x: padding + start, y: 0 },
-      { x: padding + start + 32, y: height / 2 },
       { x: padding + start, y: height },
-      { x: start, y: height }
+      { x: padding + start - 48, y: height },
+      { x: padding + start - 48, y: 0 }
     ]
 
     const right = [
-      { x: width, y: 0 },
-      { x: end, y: 0 },
-      { x: end - 32, y: height / 2 },
-      { x: end, y: height },
-      { x: width, y: height }
+      { x: padding + end, y: 0 },
+      { x: padding + end, y: height },
+      { x: padding + end + 48, y: height },
+      { x: padding + end + 48, y: 0 }
     ]
 
     if (hittest(xy, left)) {
