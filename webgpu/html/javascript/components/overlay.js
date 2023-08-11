@@ -8,6 +8,14 @@ export class Overlay extends HTMLElement {
 
     this.internal = {
       padding: 20,
+      start: 0,
+      end: 1920 - 2 * 20,
+
+      handles: {
+        left: new Drag(this, () => this.start, (v) => { this.start = v }),
+        right: new Drag(this, () => this.end, (v) => { this.end = v })
+      },
+
       onChange: null,
       onChanged: null
     }
@@ -28,9 +36,9 @@ export class Overlay extends HTMLElement {
   connectedCallback () {
     const shadow = this.shadowRoot
     const canvas = shadow.querySelector('canvas')
+    const handles = this.internal.handles
 
-    canvas.onpointerdown = (event) => onPointerDown(this, canvas, event)
-    canvas.onpointerup = (event) => onPointerUp(this, canvas, event)
+    canvas.onpointerdown = (event) => onPointerDown(this, canvas, handles, event)
 
     redraw(this, canvas)
   }
@@ -116,13 +124,106 @@ export class Overlay extends HTMLElement {
       this.internal.padding = p
     }
   }
+
+  get start () {
+    return this.internal.start
+  }
+
+  set start (v) {
+    const start = Number.parseInt(`${v}`)
+
+    if (!Number.isNaN(start)) {
+      this.internal.start = Math.min(Math.max(start, 0), this.end)
+    }
+  }
+
+  get end () {
+    return this.internal.end
+  }
+
+  set end (v) {
+    const end = Number.parseInt(`${v}`)
+
+    if (!Number.isNaN(end)) {
+      this.internal.end = Math.max(Math.min(end, 1920 - 2 * 20), this.start)
+    }
+  }
+}
+
+class Drag {
+  constructor (overlay, getX, setX) {
+    this.overlay = overlay
+    this.getX = getX
+    this.setX = setX
+    this.dragging = false
+
+    this.internal = {
+      hscale: 2, // FIXME calculate from client width
+      vscale: 2, // FIXME calculate from client height
+      origin: { x: 0 },
+      start: { x: 0 }
+    }
+  }
+
+  get origin () {
+    return this.internal.origin
+  }
+
+  get startXY () {
+    return this.internal.start
+  }
+
+  start (event, canvas) {
+    this.dragging = true
+    this.internal.origin = { x: this.getX() }
+    this.internal.start = { x: this.internal.hscale * event.offsetX, y: this.internal.vscale * event.offsetY }
+
+    canvas.onpointermove = (event) => this.onPointerMove(event, canvas)
+    canvas.onpointerup = (event) => this.onPointerUp(event, canvas)
+
+    canvas.setPointerCapture(event.pointerId)
+  }
+
+  onPointerMove (event, canvas) {
+    if (this.dragging) {
+      const hscale = 2 // FIXME calculate from client width
+      const vscale = 2 // FIXME calculate from client height
+      const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
+      const dx = xy.x - this.startXY.x
+
+      this.setX(this.origin.x + dx)
+
+      redraw(this.overlay, canvas)
+    }
+  }
+
+  onPointerUp (event, canvas, drag) {
+    canvas.onpointermove = null
+    canvas.releasePointerCapture(event.pointerId)
+
+    if (this.dragging) {
+      const hscale = 2 // FIXME calculate from client width
+      const vscale = 2 // FIXME calculate from client height
+      const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
+      const dx = xy.x - this.startXY.x
+
+      this.dragging = false
+      this.setX(this.origin.x + dx)
+
+      redraw(this.overlay, canvas)
+    }
+  }
 }
 
 function redraw (component, canvas) {
   const width = canvas.width
   const height = canvas.height
   const padding = component.padding
+  const start = component.start
+  const end = Math.min(width - 2 * padding, component.end)
   const ctx = canvas.getContext('2d')
+
+  ctx.clearRect(0, 0, width, height)
 
   // ... draw sizing handles
   ctx.fillStyle = '#80ccffa0'
@@ -131,20 +232,64 @@ function redraw (component, canvas) {
 
   ctx.beginPath()
   ctx.moveTo(0, 0)
-  ctx.lineTo(padding, 0)
-  ctx.lineTo(padding + 32, height / 2)
-  ctx.lineTo(padding, height)
+  ctx.lineTo(padding + start, 0)
+  ctx.lineTo(padding + start + 32, height / 2)
+  ctx.lineTo(padding + start, height)
   ctx.lineTo(0, height)
   ctx.fill()
 
   ctx.beginPath()
   ctx.moveTo(width, 0)
-  ctx.lineTo(width - padding, 0)
-  ctx.lineTo(width - padding - 32, height / 2)
-  ctx.lineTo(width - padding, height)
+  ctx.lineTo(padding + end, 0)
+  ctx.lineTo(padding + end - 32, height / 2)
+  ctx.lineTo(padding + end, height)
   ctx.lineTo(width, height)
   ctx.fill()
 }
+
+function onPointerDown (component, canvas, handles, event) {
+  const width = canvas.width
+  const height = canvas.height
+  const padding = component.padding
+
+  if (event.button === 0) {
+    event.preventDefault()
+
+    const hscale = 2 // FIXME calculate from client width
+    const vscale = 2 // FIXME calculate from client height
+    const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
+    const start = Math.max(component.start, 0)
+    const end = Math.min(component.end, width - 2 * padding)
+
+    const left = [
+      { x: start, y: 0 },
+      { x: padding + start, y: 0 },
+      { x: padding + start + 32, y: height / 2 },
+      { x: padding + start, y: height },
+      { x: start, y: height }
+    ]
+
+    const right = [
+      { x: width, y: 0 },
+      { x: end, y: 0 },
+      { x: end - 32, y: height / 2 },
+      { x: end, y: height },
+      { x: width, y: height }
+    ]
+
+    if (hittest(xy, left)) {
+      handles.left.start(event, canvas)
+    } else if (hittest(xy, right)) {
+      handles.right.start(event, canvas)
+    }
+  }
+}
+
+// function onChange (component) {
+// }
+
+// function onChanged (component) {
+// }
 
 // Ref. https://wrfranklin.org/Research/Short_Notes/pnpoly.html
 function hittest (xy, polygon) {
@@ -160,137 +305,5 @@ function hittest (xy, polygon) {
 
   return hit
 }
-
-function onPointerDown (component, canvas, event) {
-  const width = canvas.width
-  const height = canvas.height
-  const padding = component.padding
-
-  if (event.button === 0) {
-    event.preventDefault()
-
-    const hscale = 2 // FIXME calculate from client width
-    const vscale = 2 // FIXME calculate from client height
-    const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
-    const start = 0
-    const end = width
-
-    const left = [
-      { x: start, y: 0 },
-      { x: start + padding, y: 0 },
-      { x: start + padding + 32, y: height / 2 },
-      { x: start + padding, y: height },
-      { x: start, y: height }
-    ]
-
-    const right = [
-      { x: end, y: 0 },
-      { x: end - padding, y: 0 },
-      { x: end - padding - 32, y: height / 2 },
-      { x: end - padding, y: height },
-      { x: end, y: height }
-    ]
-
-    if (hittest(xy, left) || hittest(xy, right)) {
-      canvas.onpointermove = (event) => onPointerMove(component, canvas, event)
-      canvas.setPointerCapture(event.pointerId)
-
-      //   const gotcha = function (origin, p, icon) {
-      //     drag.dragging = true
-      //     drag.origin = origin
-      //     drag.start = { x: event.offsetX, y: event.offsetY }
-      //     drag.inflection = p
-      //     drag.icon = icon
-      //     drag.context.xscale = xscale
-      //     drag.context.yscale = yscale
-      //     drag.context.X = X
-      //     drag.context.Xʼ = Xʼ
-      //     drag.context.Y = Y
-      //     drag.context.Yʼ = Yʼ
-      //   }
-    }
-  }
-}
-
-function onPointerUp (component, canvas, event) {
-  canvas.onpointermove = null
-  canvas.releasePointerCapture(event.pointerId)
-
-  // if (this.drag.dragging) {
-  //   onMouseUp(this, event, this.drag)
-  //   this.redraw()
-  // }
-}
-
-function onPointerMove (component, canvas, event) {
-}
-
-// function onMouseUp (editor, event, drag) {
-//   drag.dragging = false
-//
-//   const p = drag.inflection
-//   const canvas = event.currentTarget
-//
-//   const xscale = drag.context.xscale
-//   const yscale = drag.context.yscale
-//   const X = drag.origin.x
-//   const Y = drag.context.Y
-
-//   const x = X + xscale * p.at
-//   const dx = (canvas.width / 600) * (event.offsetX - drag.start.x)
-//   const xʼ = x + dx
-//   const at = (xʼ - X) / xscale
-//
-//   const y = Y + yscale * p.level
-//   const dy = (canvas.height / 308) * (event.offsetY - drag.start.y)
-//   const yʼ = y + dy
-//   const level = (yʼ - Y) / yscale
-//
-//   const evt = new CustomEvent('changed', {
-//     detail: {
-//       tag: drag.inflection.tag,
-//       at,
-//       level
-//     }
-//   })
-//
-//   editor.dispatchEvent(evt)
-// }
-
-// function onMouseMove (editor, event, envelope, drag) {
-//   const p = drag.inflection
-//   const canvas = event.currentTarget
-//
-//   const xscale = drag.context.xscale
-//   const yscale = drag.context.yscale
-//   const X = drag.origin.x
-//   const Y = drag.context.Y
-//
-//   const x = X + xscale * p.at
-//   const dx = (canvas.width / 600) * (event.offsetX - drag.start.x)
-//   const xʼ = x + dx
-//   const at = (xʼ - X) / xscale
-//
-//   const y = Y + yscale * p.level
-//   const dy = (canvas.height / 308) * (event.offsetY - drag.start.y)
-//   const yʼ = y + dy
-//   const level = (yʼ - Y) / yscale
-//
-//   const evt = new CustomEvent('change', {
-//     detail: {
-//       tag: drag.inflection.tag,
-//       at,
-//       level
-//     }
-//   })
-
-//   editor.dispatchEvent(evt)
-// }
-
-// function onChange (component) {
-// }
-
-// function onChanged (component) {
-// }
 
 customElements.define('wav2png-overlay', Overlay)

@@ -5,6 +5,11 @@
 - [x] Grid alpha blend
 - [x] Waveform alpha blend
 - [ ] start:end
+      - [x] drag handles independently
+      - [ ] alt-drag drag together
+      - [ ] label start, end, interval
+      - [ ] onChange
+      - [ ] onChanged
 
 - [ ] Two point gradient
 - [ ] Render in ServiceWorker
