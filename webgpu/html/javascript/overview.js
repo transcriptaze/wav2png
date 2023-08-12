@@ -3,12 +3,15 @@ import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { black, rgba } from './colours.js'
 
+const FS = 44100
+
 class Overview {
   constructor () {
     this.internal = {
       device: null,
       audio: new Float32Array(),
       canvas: document.querySelector('#overview canvas'),
+      overlay: document.querySelector('#overview wav2png-overlay'),
 
       fill: black,
 
@@ -21,6 +24,12 @@ class Overview {
       waveform: {
         vscale: 1.0,
         colour: rgba('#80ccffff')
+      }
+    }
+
+    this.internal.overlay.onchanged = (start, end) => {
+      if (this.internal.onChange != null) {
+        this.internal.onChange(start, end)
       }
     }
   }
@@ -39,6 +48,9 @@ class Overview {
 
   set audio (v) {
     this.internal.audio = v
+    this.internal.overlay.duration = v.length / FS
+
+    this.internal.overlay.reset()
     this.redraw()
   }
 
@@ -71,6 +83,16 @@ class Overview {
 
   get canvas () {
     return this.internal.canvas
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
+  set onchange (v) {
+    this.internal.overlay.onchange = v
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
+  set onchanged (v) {
+    this.internal.overlay.onchanged = v
   }
 
   redraw () {

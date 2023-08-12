@@ -67,6 +67,15 @@ export async function initialise () {
     canvas.redraw()
   }
 
+  overview.onchange = (start, end) => {
+  }
+
+  overview.onchanged = (start, end) => {
+    canvas.start = start
+    canvas.end = end
+    canvas.redraw()
+  }
+
   const refresh = () => {
     if (stale) {
       redraw()

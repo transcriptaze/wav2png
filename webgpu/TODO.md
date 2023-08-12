@@ -7,10 +7,13 @@
 - [ ] start:end
       - [x] drag handles independently
       - [x] fix hit test area so that only head is draggable
+      - [x] onChange
+      - [x] onChanged
       - [ ] alt-drag drag together
       - [ ] label start, end, interval
-      - [ ] onChange
-      - [ ] onChanged
+      - [ ] genericize overlay start:end as [0..1] interval
+      - [ ] Weird rendering on subarrays
+      - [ ] Set offscreen start:end
 
 - [ ] Two point gradient
 - [ ] Render in ServiceWorker

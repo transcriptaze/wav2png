@@ -3,11 +3,12 @@ import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { black, green, transparent, rgba } from './colours.js'
 
+const FS = 44100
+
 class Canvas {
   constructor () {
     this.internal = {
       device: null,
-      audio: new Float32Array(),
       canvas: document.querySelector('#canvas canvas'),
 
       fill: black,
@@ -21,7 +22,12 @@ class Canvas {
       waveform: {
         vscale: 1.0,
         colour: rgba('#80ccffff')
-      }
+      },
+
+      audio: new Float32Array(),
+      duration: 0,
+      start: 0,
+      end: 0
     }
   }
 
@@ -39,6 +45,10 @@ class Canvas {
 
   set audio (v) {
     this.internal.audio = v
+    this.internal.duration = v.length / FS
+    this.internal.start = 0
+    this.internal.end = this.internal.duration
+
     this.redraw()
   }
 
@@ -67,14 +77,36 @@ class Canvas {
     this.internal.waveform.colour = colour
   }
 
+  /* eslint-disable-next-line accessor-pairs */
+  set start (v) {
+    const start = Number.parseFloat(`${v}`)
+
+    if (!Number.isNaN(start)) {
+      this.internal.start = Math.max(Math.min(start, this.internal.duration), 0)
+    }
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
+  set end (v) {
+    const end = Number.parseFloat(`${v}`)
+
+    if (!Number.isNaN(end)) {
+      this.internal.end = Math.max(Math.min(end, this.internal.duration), 0)
+    }
+  }
+
   get canvas () {
     return this.internal.canvas
   }
 
   redraw () {
+    const duration = this.internal.duration
+    const start = duration === 0 ? 0 : this.audio.length * this.internal.start / duration
+    const end = duration === 0 ? 0 : this.audio.length * this.internal.end / duration
+
     const ctx = this.canvas.getContext('webgpu')
     const device = this.device
-    const audio = this.audio
+    const audio = this.audio.subarray(start, end)
     const format = navigator.gpu.getPreferredCanvasFormat()
     const layers = []
 

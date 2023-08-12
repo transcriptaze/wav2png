@@ -1,3 +1,5 @@
+import { Drag } from './drag.js'
+
 export class Overlay extends HTMLElement {
   static get observedAttributes () {
     return ['width', 'height', 'padding']
@@ -7,14 +9,14 @@ export class Overlay extends HTMLElement {
     super()
 
     this.internal = {
-      duration: 60,
+      duration: 2,
       padding: 20,
       start: 0,
       end: 1920 - 2 * 20,
 
       handles: {
-        left: new Drag(this, () => this.start, (v) => { this.start = v }),
-        right: new Drag(this, () => this.end, (v) => { this.end = v })
+        left: new Drag(this, () => getStartXY(this), (x, y, dragging) => setStartXY(this, x, y, dragging)),
+        right: new Drag(this, () => getEndXY(this), (x, y, dragging) => setEndXY(this, x, y, dragging))
       },
 
       onChange: null,
@@ -143,10 +145,13 @@ export class Overlay extends HTMLElement {
   }
 
   set start (v) {
+    const shadow = this.shadowRoot
+    const canvas = shadow.querySelector('canvas')
     const start = Number.parseInt(`${v}`)
 
     if (!Number.isNaN(start)) {
       this.internal.start = Math.min(Math.max(start, 0), this.end)
+      redraw(this, canvas)
     }
   }
 
@@ -155,10 +160,13 @@ export class Overlay extends HTMLElement {
   }
 
   set end (v) {
+    const shadow = this.shadowRoot
+    const canvas = shadow.querySelector('canvas')
     const end = Number.parseInt(`${v}`)
 
     if (!Number.isNaN(end)) {
       this.internal.end = Math.max(Math.min(end, 1920 - 2 * 20), this.start)
+      redraw(this, canvas)
     }
   }
 
@@ -166,7 +174,6 @@ export class Overlay extends HTMLElement {
     const shadow = this.shadowRoot
     const canvas = shadow.querySelector('canvas')
 
-    this.duration = 0
     this.start = 0
     this.end = this.width - 2 * this.padding
 
@@ -174,69 +181,49 @@ export class Overlay extends HTMLElement {
   }
 }
 
-class Drag {
-  constructor (overlay, getX, setX) {
-    this.overlay = overlay
-    this.getX = getX
-    this.setX = setX
-    this.dragging = false
+function getStartXY (overlay) {
+  return { x: overlay.start, y: 0 }
+}
 
-    this.internal = {
-      hscale: 2, // FIXME calculate from client width
-      vscale: 2, // FIXME calculate from client height
-      origin: { x: 0 },
-      start: { x: 0 }
-    }
+function setStartXY (overlay, x, y, dragging) {
+  overlay.start = x
+
+  if (dragging) {
+    onChange(overlay)
+  } else {
+    onChanged(overlay)
   }
+}
 
-  get origin () {
-    return this.internal.origin
+function getEndXY (overlay) {
+  return { x: overlay.end, y: 0 }
+}
+
+function setEndXY (overlay, x, y, dragging) {
+  overlay.end = x
+
+  if (dragging) {
+    onChange(overlay)
+  } else {
+    onChanged(overlay)
   }
+}
 
-  get startXY () {
-    return this.internal.start
+function onChange (overlay) {
+  if (overlay.onchange != null) {
+    const s = overlay.duration * overlay.start / (1920 - 40)
+    const t = overlay.duration * overlay.end / (1920 - 40)
+
+    overlay.onchange(s, t)
   }
+}
 
-  start (event, canvas) {
-    this.dragging = true
-    this.internal.origin = { x: this.getX() }
-    this.internal.start = { x: this.internal.hscale * event.offsetX, y: this.internal.vscale * event.offsetY }
+function onChanged (overlay) {
+  if (overlay.onchanged != null) {
+    const s = overlay.duration * overlay.start / (1920 - 40)
+    const t = overlay.duration * overlay.end / (1920 - 40)
 
-    canvas.onpointermove = (event) => this.onPointerMove(event, canvas)
-    canvas.onpointerup = (event) => this.onPointerUp(event, canvas)
-
-    canvas.setPointerCapture(event.pointerId)
-  }
-
-  onPointerMove (event, canvas) {
-    if (this.dragging) {
-      const hscale = 2 // FIXME calculate from client width
-      const vscale = 2 // FIXME calculate from client height
-      const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
-      const dx = xy.x - this.startXY.x
-
-      this.setX(this.origin.x + dx)
-
-      redraw(this.overlay, canvas)
-    }
-  }
-
-  onPointerUp (event, canvas, drag) {
-    canvas.onpointermove = null
-    canvas.onpointerup = null
-    canvas.releasePointerCapture(event.pointerId)
-
-    if (this.dragging) {
-      const hscale = 2 // FIXME calculate from client width
-      const vscale = 2 // FIXME calculate from client height
-      const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
-      const dx = xy.x - this.startXY.x
-
-      this.dragging = false
-      this.setX(this.origin.x + dx)
-
-      redraw(this.overlay, canvas)
-    }
+    overlay.onchanged(s, t)
   }
 }
 
@@ -317,12 +304,6 @@ function onPointerDown (component, canvas, handles, event) {
     }
   }
 }
-
-// function onChange (component) {
-// }
-
-// function onChanged (component) {
-// }
 
 // Ref. https://wrfranklin.org/Research/Short_Notes/pnpoly.html
 function hittest (xy, polygon) {
