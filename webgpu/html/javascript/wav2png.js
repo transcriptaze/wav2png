@@ -74,6 +74,9 @@ export async function initialise () {
     canvas.start = start
     canvas.end = end
     canvas.redraw()
+
+    offscreen.start = start
+    offscreen.end = end
   }
 
   const refresh = () => {
@@ -102,14 +105,16 @@ export function load (filename, blob) {
   busy()
     .then(b => blob.arrayBuffer())
     .then(b => transcode(b))
-    .then(b => b.getChannelData(0))
-    .then(audio => {
+    .then(b => {
+      return { fs: b.sampleRate, audio: b.getChannelData(0) }
+    })
+    .then(({ fs, audio }) => {
       context.loading = false
       context.loaded = true
 
-      overview.audio = audio
-      canvas.audio = audio
-      offscreen.audio = audio
+      overview.audio = { fs, audio }
+      canvas.audio = { fs, audio }
+      offscreen.audio = { fs, audio }
 
       save.disabled = false
       fill.disabled = false

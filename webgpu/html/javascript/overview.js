@@ -3,8 +3,6 @@ import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { black, rgba } from './colours.js'
 
-const FS = 44100
-
 class Overview {
   constructor () {
     this.internal = {
@@ -46,11 +44,11 @@ class Overview {
     return this.internal.audio
   }
 
-  set audio (v) {
-    this.internal.audio = v
-    this.internal.overlay.duration = v.length / FS
-
+  set audio ({ fs, audio }) {
+    this.internal.audio = audio
+    this.internal.overlay.duration = audio.length / fs
     this.internal.overlay.reset()
+
     this.redraw()
   }
 

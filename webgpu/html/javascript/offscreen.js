@@ -11,7 +11,6 @@ class Offscreen {
 
     this.internal = {
       device: null,
-      audio: new Float32Array(),
       canvas: new OffscreenCanvas(width, height),
 
       fill: black,
@@ -25,7 +24,13 @@ class Offscreen {
       waveform: {
         vscale: 1.0,
         colour: rgba('#80ccffff')
-      }
+      },
+
+      audio: new Float32Array(),
+      fs: 44100,
+      duration: 0,
+      start: 0,
+      end: 0
     }
   }
 
@@ -41,8 +46,12 @@ class Offscreen {
     return this.internal.audio
   }
 
-  set audio (v) {
-    this.internal.audio = v
+  set audio ({ fs, audio }) {
+    this.internal.fs = fs
+    this.internal.audio = audio
+    this.internal.duration = audio.length / fs
+    this.internal.start = 0
+    this.internal.end = this.internal.duration
   }
 
   get fill () {
@@ -69,14 +78,36 @@ class Offscreen {
     this.internal.waveform.vscale = vscale
   }
 
+  /* eslint-disable-next-line accessor-pairs */
+  set start (v) {
+    const start = Number.parseFloat(`${v}`)
+
+    if (!Number.isNaN(start)) {
+      this.internal.start = Math.max(Math.min(start, this.internal.duration), 0)
+    }
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
+  set end (v) {
+    const end = Number.parseFloat(`${v}`)
+
+    if (!Number.isNaN(end)) {
+      this.internal.end = Math.max(Math.min(end, this.internal.duration), 0)
+    }
+  }
+
   get canvas () {
     return this.internal.canvas
   }
 
   render () {
+    const duration = this.internal.duration
+    const start = duration === 0 ? 0 : this.audio.length * this.internal.start / duration
+    const end = duration === 0 ? 0 : this.audio.length * this.internal.end / duration
+
     const ctx = this.canvas.getContext('webgpu')
     const device = this.device
-    const audio = this.audio
+    const audio = this.audio.subarray(start, end)
     const format = navigator.gpu.getPreferredCanvasFormat()
     const layers = []
 

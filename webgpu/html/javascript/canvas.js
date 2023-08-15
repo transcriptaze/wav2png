@@ -3,8 +3,6 @@ import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { black, green, transparent, rgba } from './colours.js'
 
-const FS = 44100
-
 class Canvas {
   constructor () {
     this.internal = {
@@ -25,6 +23,7 @@ class Canvas {
       },
 
       audio: new Float32Array(),
+      fs: 44100,
       duration: 0,
       start: 0,
       end: 0
@@ -43,9 +42,10 @@ class Canvas {
     return this.internal.audio
   }
 
-  set audio (v) {
-    this.internal.audio = v
-    this.internal.duration = v.length / FS
+  set audio ({ fs, audio }) {
+    this.internal.fs = fs
+    this.internal.audio = audio
+    this.internal.duration = audio.length / fs
     this.internal.start = 0
     this.internal.end = this.internal.duration
 

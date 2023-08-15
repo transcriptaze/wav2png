@@ -1,19 +1,16 @@
 # TODO
 
-- [x] Fix Firefox compilation errors
 - [ ] Fix Firefox flickering
-- [x] Grid alpha blend
-- [x] Waveform alpha blend
 - [ ] start:end
       - [x] drag handles independently
       - [x] fix hit test area so that only head is draggable
       - [x] onChange
       - [x] onChanged
-      - [ ] alt-drag drag together
+      - [x] Set offscreen start:end
       - [ ] label start, end, interval
+      - [ ] alt-drag drag together
       - [ ] genericize overlay start:end as [0..1] interval
       - [ ] Weird rendering on subarrays
-      - [ ] Set offscreen start:end
 
 - [ ] Two point gradient
 - [ ] Render in ServiceWorker
