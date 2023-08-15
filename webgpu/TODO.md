@@ -7,7 +7,8 @@
       - [x] onChange
       - [x] onChanged
       - [x] Set offscreen start:end
-      - [ ] label start, end, interval
+      - [x] label start, end
+      - [ ] label interval
       - [ ] alt-drag drag together
       - [ ] genericize overlay start:end as [0..1] interval
       - [ ] Weird rendering on subarrays

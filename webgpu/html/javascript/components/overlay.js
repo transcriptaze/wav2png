@@ -179,6 +179,18 @@ export class Overlay extends HTMLElement {
 
     redraw(this, canvas)
   }
+
+  format (v) {
+    const ms = Math.trunc(v * 1000) % 1000
+    const ss = Math.trunc(v) % 60
+    const mm = Math.trunc(v / 60)
+
+    if (mm > 0) {
+      return `${mm}:${ss}.${ms.toString().padStart(3, '0')}\u2009s`
+    } else {
+      return `${ss}.${ms.toString().padStart(3, '0')}\u2009s`
+    }
+  }
 }
 
 function getStartXY (overlay) {
@@ -240,7 +252,7 @@ function redraw (component, canvas) {
   // ... draw sizing handles
   ctx.fillStyle = '#80ccff80'
   ctx.strokeStyle = '#80ccff80'
-  ctx.lineWidth = 0
+  ctx.lineWidth = 2
 
   ctx.beginPath()
   ctx.moveTo(0, 0)
@@ -267,6 +279,44 @@ function redraw (component, canvas) {
   ctx.lineTo(padding + end, height / 2 - 32)
   ctx.lineTo(padding + end, height / 2 + 32)
   ctx.fill()
+
+  ctx.beginPath()
+  ctx.moveTo(padding + start, 0)
+  ctx.lineTo(padding + start, height)
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.moveTo(padding + end, 0)
+  ctx.lineTo(padding + end, height)
+  ctx.stroke()
+
+  // ... labels
+  ctx.font = '18px sans-serif'
+  ctx.fillStyle = '#80ccffc0'
+
+  const labels = {
+    start: component.format(component.duration * component.start / component.width),
+    end: component.format(component.duration * component.end / component.width)
+  }
+
+  const fm = {
+    start: ctx.measureText(labels.start),
+    end: ctx.measureText(labels.end)
+  }
+
+  const extent = 8 + fm.start.width + 8 + fm.end.width + 8
+  const middle = (start + end) / 2
+
+  const x = {
+    start: Math.min(padding + start + 8, padding + middle - extent / 2),
+    end: Math.max(padding + end - 8, padding + middle + extent / 2)
+  }
+
+  ctx.textAlign = 'left'
+  ctx.fillText(labels.start, x.start, 0 + fm.start.fontBoundingBoxAscent)
+
+  ctx.textAlign = 'right'
+  ctx.fillText(labels.end, x.end, 0 + fm.end.fontBoundingBoxAscent)
 }
 
 function onPointerDown (component, canvas, handles, event) {
