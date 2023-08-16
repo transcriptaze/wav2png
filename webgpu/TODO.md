@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] Fix Firefox flickering
 - [ ] start:end
       - [x] drag handles independently
       - [x] fix hit test area so that only head is draggable
@@ -8,18 +7,19 @@
       - [x] onChanged
       - [x] Set offscreen start:end
       - [x] label start, end
-      - [ ] label interval
+      - [x] label interval
       - [ ] alt-drag drag together
       - [ ] genericize overlay start:end as [0..1] interval
       - [ ] Weird rendering on subarrays
 
+- [ ] Fix Firefox flickering
 - [ ] Two point gradient
-- [ ] Render in ServiceWorker
+- [ ] Render in Worker
+- [ ] Restyle range controls       
 
 - [ ]  Better colour picker
        - https://rgbacolorpicker.com/
 
-- [ ] Restyle range controls       
 
 - [ ] github workflow
 - [ ] Distributable Go app

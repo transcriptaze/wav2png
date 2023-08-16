@@ -186,9 +186,9 @@ export class Overlay extends HTMLElement {
     const mm = Math.trunc(v / 60)
 
     if (mm > 0) {
-      return `${mm}:${ss}.${ms.toString().padStart(3, '0')}\u2009s`
+      return `${mm}:${ss}.${ms.toString().padStart(3, '0')}`
     } else {
-      return `${ss}.${ms.toString().padStart(3, '0')}\u2009s`
+      return `${ss}.${ms.toString().padStart(3, '0')}`
     }
   }
 }
@@ -293,23 +293,26 @@ function redraw (component, canvas) {
   // ... labels
   ctx.font = '18px sans-serif'
   ctx.fillStyle = '#80ccffc0'
+  ctx.strokeStyle = '#80ccffc0'
 
   const labels = {
     start: component.format(component.duration * component.start / component.width),
-    end: component.format(component.duration * component.end / component.width)
+    end: component.format(component.duration * component.end / component.width),
+    duration: component.format(component.duration * (component.end - component.start) / component.width)
   }
 
   const fm = {
     start: ctx.measureText(labels.start),
-    end: ctx.measureText(labels.end)
+    end: ctx.measureText(labels.end),
+    duration: ctx.measureText(labels.duration)
   }
 
-  const extent = 8 + fm.start.width + 8 + fm.end.width + 8
+  const w = 8 + fm.start.width + 8 + fm.end.width + 8
   const middle = (start + end) / 2
 
   const x = {
-    start: Math.min(padding + start + 8, padding + middle - extent / 2),
-    end: Math.max(padding + end - 8, padding + middle + extent / 2)
+    start: Math.min(padding + start + 8, padding + middle - w / 2),
+    end: Math.max(padding + end - 8, padding + middle + w / 2)
   }
 
   ctx.textAlign = 'left'
@@ -317,6 +320,21 @@ function redraw (component, canvas) {
 
   ctx.textAlign = 'right'
   ctx.fillText(labels.end, x.end, 0 + fm.end.fontBoundingBoxAscent)
+
+  ctx.textAlign = 'center'
+  ctx.fillText(labels.duration, padding + middle, height - fm.duration.fontBoundingBoxDescent)
+
+  const dl = middle - start - fm.duration.width / 2 - 16
+  const dr = middle - end + fm.duration.width / 2 + 16
+
+  if (dl > 0 && dr < 0) {
+    ctx.beginPath()
+    ctx.moveTo(padding + start + 8, height - fm.duration.fontBoundingBoxAscent / 2)
+    ctx.lineTo(padding + start + 8 + dl, height - fm.duration.fontBoundingBoxAscent / 2)
+    ctx.moveTo(padding + end - 8, height - fm.duration.fontBoundingBoxAscent / 2)
+    ctx.lineTo(padding + end - 8 + dr, height - fm.duration.fontBoundingBoxAscent / 2)
+    ctx.stroke()
+  }
 }
 
 function onPointerDown (component, canvas, handles, event) {
