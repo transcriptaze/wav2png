@@ -9,7 +9,7 @@ export class Overlay extends HTMLElement {
     super()
 
     this.internal = {
-      duration: 2,
+      duration: 0,
       padding: 20,
       start: 0,
       end: 1920 - 2 * 20,
@@ -249,91 +249,93 @@ function redraw (component, canvas) {
 
   ctx.clearRect(0, 0, width, height)
 
+  if (component.duration > 0) {
   // ... draw sizing handles
-  ctx.fillStyle = '#80ccff80'
-  ctx.strokeStyle = '#80ccff80'
-  ctx.lineWidth = 2
+    ctx.fillStyle = '#80ccff80'
+    ctx.strokeStyle = '#80ccff80'
+    ctx.lineWidth = 2
 
-  ctx.beginPath()
-  ctx.moveTo(0, 0)
-  ctx.lineTo(padding + start, 0)
-  ctx.lineTo(padding + start, height)
-  ctx.lineTo(0, height)
-  ctx.fill()
-
-  ctx.beginPath()
-  ctx.moveTo(padding + start - 32, height / 2)
-  ctx.lineTo(padding + start, height / 2 - 32)
-  ctx.lineTo(padding + start, height / 2 + 32)
-  ctx.fill()
-
-  ctx.beginPath()
-  ctx.moveTo(width, 0)
-  ctx.lineTo(padding + end, 0)
-  ctx.lineTo(padding + end, height)
-  ctx.lineTo(width, height)
-  ctx.fill()
-
-  ctx.beginPath()
-  ctx.moveTo(padding + end + 32, height / 2)
-  ctx.lineTo(padding + end, height / 2 - 32)
-  ctx.lineTo(padding + end, height / 2 + 32)
-  ctx.fill()
-
-  ctx.beginPath()
-  ctx.moveTo(padding + start, 0)
-  ctx.lineTo(padding + start, height)
-  ctx.stroke()
-
-  ctx.beginPath()
-  ctx.moveTo(padding + end, 0)
-  ctx.lineTo(padding + end, height)
-  ctx.stroke()
-
-  // ... labels
-  ctx.font = '18px sans-serif'
-  ctx.fillStyle = '#80ccffc0'
-  ctx.strokeStyle = '#80ccffc0'
-
-  const labels = {
-    start: component.format(component.duration * component.start / component.width),
-    end: component.format(component.duration * component.end / component.width),
-    duration: component.format(component.duration * (component.end - component.start) / component.width)
-  }
-
-  const fm = {
-    start: ctx.measureText(labels.start),
-    end: ctx.measureText(labels.end),
-    duration: ctx.measureText(labels.duration)
-  }
-
-  const w = 8 + fm.start.width + 8 + fm.end.width + 8
-  const middle = (start + end) / 2
-
-  const x = {
-    start: Math.min(padding + start + 8, padding + middle - w / 2),
-    end: Math.max(padding + end - 8, padding + middle + w / 2)
-  }
-
-  ctx.textAlign = 'left'
-  ctx.fillText(labels.start, x.start, 0 + fm.start.fontBoundingBoxAscent)
-
-  ctx.textAlign = 'right'
-  ctx.fillText(labels.end, x.end, 0 + fm.end.fontBoundingBoxAscent)
-
-  ctx.textAlign = 'center'
-  ctx.fillText(labels.duration, padding + middle, height - fm.duration.fontBoundingBoxDescent)
-
-  const dl = middle - start - fm.duration.width / 2 - 16
-  const dr = middle - end + fm.duration.width / 2 + 16
-
-  if (dl > 0 && dr < 0) {
     ctx.beginPath()
-    ctx.moveTo(padding + start + 8, height - fm.duration.fontBoundingBoxAscent / 2)
-    ctx.lineTo(padding + start + 8 + dl, height - fm.duration.fontBoundingBoxAscent / 2)
-    ctx.moveTo(padding + end - 8, height - fm.duration.fontBoundingBoxAscent / 2)
-    ctx.lineTo(padding + end - 8 + dr, height - fm.duration.fontBoundingBoxAscent / 2)
+    ctx.moveTo(0, 0)
+    ctx.lineTo(padding + start, 0)
+    ctx.lineTo(padding + start, height)
+    ctx.lineTo(0, height)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(padding + start - 32, height / 2)
+    ctx.lineTo(padding + start, height / 2 - 32)
+    ctx.lineTo(padding + start, height / 2 + 32)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(width, 0)
+    ctx.lineTo(padding + end, 0)
+    ctx.lineTo(padding + end, height)
+    ctx.lineTo(width, height)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(padding + end + 32, height / 2)
+    ctx.lineTo(padding + end, height / 2 - 32)
+    ctx.lineTo(padding + end, height / 2 + 32)
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(padding + start, 0)
+    ctx.lineTo(padding + start, height)
     ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(padding + end, 0)
+    ctx.lineTo(padding + end, height)
+    ctx.stroke()
+
+    // ... labels
+    ctx.font = '18px sans-serif'
+    ctx.fillStyle = '#80ccffc0'
+    ctx.strokeStyle = '#80ccffc0'
+
+    const labels = {
+      start: component.format(component.duration * component.start / component.width),
+      end: component.format(component.duration * component.end / component.width),
+      duration: component.format(component.duration * (component.end - component.start) / component.width)
+    }
+
+    const fm = {
+      start: ctx.measureText(labels.start),
+      end: ctx.measureText(labels.end),
+      duration: ctx.measureText(labels.duration)
+    }
+
+    const w = 8 + fm.start.width + 8 + fm.end.width + 8
+    const middle = (start + end) / 2
+
+    const x = {
+      start: Math.min(padding + start + 8, padding + middle - w / 2),
+      end: Math.max(padding + end - 8, padding + middle + w / 2)
+    }
+
+    ctx.textAlign = 'left'
+    ctx.fillText(labels.start, x.start, 0 + fm.start.fontBoundingBoxAscent)
+
+    ctx.textAlign = 'right'
+    ctx.fillText(labels.end, x.end, 0 + fm.end.fontBoundingBoxAscent)
+
+    ctx.textAlign = 'center'
+    ctx.fillText(labels.duration, padding + middle, height - fm.duration.fontBoundingBoxDescent)
+
+    const dl = middle - start - fm.duration.width / 2 - 16
+    const dr = middle - end + fm.duration.width / 2 + 16
+
+    if (dl > 0 && dr < 0) {
+      ctx.beginPath()
+      ctx.moveTo(padding + start + 8, height - fm.duration.fontBoundingBoxAscent / 2)
+      ctx.lineTo(padding + start + 8 + dl, height - fm.duration.fontBoundingBoxAscent / 2)
+      ctx.moveTo(padding + end - 8, height - fm.duration.fontBoundingBoxAscent / 2)
+      ctx.lineTo(padding + end - 8 + dr, height - fm.duration.fontBoundingBoxAscent / 2)
+      ctx.stroke()
+    }
   }
 }
 
@@ -342,7 +344,7 @@ function onPointerDown (component, canvas, handles, event) {
   const height = canvas.height
   const padding = component.padding
 
-  if (event.button === 0) {
+  if (event.button === 0 && component.duration > 0) {
     event.preventDefault()
 
     const hscale = 2 // FIXME calculate from client width
