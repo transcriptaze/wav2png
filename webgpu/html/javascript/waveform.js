@@ -10,7 +10,10 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
   const yscale = (height - 2 * PADDING) / height
 
   const pixels = Math.min(width - 2 * PADDING, samples.length)
-  const stride = Math.max(Math.ceil(samples.length / pixels), 1)
+  const stride = Math.max(Math.floor(samples.length / pixels), 1)
+
+  console.log('waveform', width, samples.length, samples.length/44100)
+  console.log({pixels},{stride})
 
   const vertices = new Float32Array([
     0.0, +1.0,
@@ -272,8 +275,9 @@ const COMPUTE = `
 
     @compute  @workgroup_size(${WORKGROUP_SIZE})
     fn computeMain(@builtin(global_invocation_id) pixel: vec3u) {
-       let stride = u32(uconstants.stride);
        let samples = u32(uconstants.samples);
+       let pixels = u32(uconstants.pixels);
+       let stride = u32(f32(samples)/f32(pixels));
        var offset = pixel.x * stride;
 
        var p = f32(0); 

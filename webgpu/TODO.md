@@ -11,6 +11,9 @@
       - [ ] alt-drag drag together
       - [ ] genericize overlay start:end as [0..1] interval
       - [ ] Weird rendering on subarrays
+            - because stride is fractional
+      - [ ] onChanged start:end does not match overview 
+            - (?) redraw on pointer up
 
 - [ ] Fix Firefox flickering
 - [ ] Two point gradient
