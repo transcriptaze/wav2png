@@ -43,7 +43,7 @@ export class Overlay extends HTMLElement {
 
     canvas.onpointerdown = (event) => onPointerDown(this, canvas, handles, event)
 
-    redraw(this, canvas)
+    redraw(this)
   }
 
   disconnectedCallback () {
@@ -141,43 +141,44 @@ export class Overlay extends HTMLElement {
   }
 
   get start () {
-    return this.internal.start
+    const start = this.internal.start
+    const w = this.width - 2 * this.padding
+
+    return start / w
   }
 
   set start (v) {
-    const shadow = this.shadowRoot
-    const canvas = shadow.querySelector('canvas')
     const start = Number.parseInt(`${v}`)
+    const w = this.width - 2 * this.padding
 
     if (!Number.isNaN(start)) {
-      this.internal.start = Math.min(Math.max(start, 0), this.end)
-      redraw(this, canvas)
+      this.internal.start = Math.min(Math.max(start, 0), this.end) * w
+      redraw(this)
     }
   }
 
   get end () {
-    return this.internal.end
+    const end = this.internal.end
+    const w = this.width - 2 * this.padding
+
+    return end / w
   }
 
   set end (v) {
-    const shadow = this.shadowRoot
-    const canvas = shadow.querySelector('canvas')
     const end = Number.parseInt(`${v}`)
+    const w = this.width - 2 * this.padding
 
     if (!Number.isNaN(end)) {
-      this.internal.end = Math.max(Math.min(end, 1920 - 2 * 20), this.start)
-      redraw(this, canvas)
+      this.internal.end = Math.max(Math.min(end, 1), this.start) * w
+      redraw(this)
     }
   }
 
   reset () {
-    const shadow = this.shadowRoot
-    const canvas = shadow.querySelector('canvas')
-
     this.start = 0
-    this.end = this.width - 2 * this.padding
+    this.end = 1
 
-    redraw(this, canvas)
+    redraw(this)
   }
 
   format (v) {
@@ -194,11 +195,15 @@ export class Overlay extends HTMLElement {
 }
 
 function getStartXY (overlay) {
-  return { x: overlay.start, y: 0 }
+  const w = overlay.width - 2 * overlay.padding
+
+  return { x: overlay.start * w, y: 0 }
 }
 
 function setStartXY (overlay, x, y, dragging) {
-  overlay.start = x
+  overlay.internal.start = Math.min(Math.max(x, 0), overlay.internal.end)
+
+  redraw(overlay)
 
   if (dragging) {
     onChange(overlay)
@@ -208,11 +213,17 @@ function setStartXY (overlay, x, y, dragging) {
 }
 
 function getEndXY (overlay) {
-  return { x: overlay.end, y: 0 }
+  const w = overlay.width - 2 * overlay.padding
+
+  return { x: overlay.end * w, y: 0 }
 }
 
 function setEndXY (overlay, x, y, dragging) {
-  overlay.end = x
+  const w = overlay.width - 2 * overlay.padding
+
+  overlay.internal.end = Math.max(Math.min(x, w), overlay.internal.start)
+
+  redraw(overlay)
 
   if (dragging) {
     onChange(overlay)
@@ -223,34 +234,31 @@ function setEndXY (overlay, x, y, dragging) {
 
 function onChange (overlay) {
   if (overlay.onchange != null) {
-    const s = overlay.duration * overlay.start / (1920 - 40)
-    const t = overlay.duration * overlay.end / (1920 - 40)
-
-    overlay.onchange(s, t)
+    overlay.onchange(overlay.start, overlay.end)
   }
 }
 
 function onChanged (overlay) {
   if (overlay.onchanged != null) {
-    const s = overlay.duration * overlay.start / (1920 - 40)
-    const t = overlay.duration * overlay.end / (1920 - 40)
-
-    overlay.onchanged(s, t)
+    overlay.onchanged(overlay.start, overlay.end)
   }
 }
 
-function redraw (component, canvas) {
+function redraw (overlay) {
+  const shadow = overlay.shadowRoot
+  const canvas = shadow.querySelector('canvas')
   const width = canvas.width
   const height = canvas.height
-  const padding = component.padding
-  const start = component.start
-  const end = Math.min(width - 2 * padding, component.end)
+  const padding = overlay.padding
+  const w = canvas.width - 2 * overlay.padding
+  const start = overlay.start * w
+  const end = overlay.end * w
   const ctx = canvas.getContext('2d')
 
   ctx.clearRect(0, 0, width, height)
 
-  if (component.duration > 0) {
-  // ... draw sizing handles
+  if (overlay.duration > 0) {
+    // ... draw sizing handles
     ctx.fillStyle = '#80ccff80'
     ctx.strokeStyle = '#80ccff80'
     ctx.lineWidth = 2
@@ -297,9 +305,9 @@ function redraw (component, canvas) {
     ctx.strokeStyle = '#80ccffc0'
 
     const labels = {
-      start: component.format(component.duration * component.start / component.width),
-      end: component.format(component.duration * component.end / component.width),
-      duration: component.format(component.duration * (component.end - component.start) / component.width)
+      start: overlay.format(overlay.start * overlay.duration),
+      end: overlay.format(overlay.end * overlay.duration),
+      duration: overlay.format((overlay.end - overlay.start) * overlay.duration)
     }
 
     const fm = {
@@ -339,19 +347,20 @@ function redraw (component, canvas) {
   }
 }
 
-function onPointerDown (component, canvas, handles, event) {
+function onPointerDown (overlay, canvas, handles, event) {
   const width = canvas.width
   const height = canvas.height
-  const padding = component.padding
+  const padding = overlay.padding
+  const w = width - 2 * padding
 
-  if (event.button === 0 && component.duration > 0) {
+  if (event.button === 0 && overlay.duration > 0) {
     event.preventDefault()
 
     const hscale = 2 // FIXME calculate from client width
     const vscale = 2 // FIXME calculate from client height
     const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
-    const start = Math.max(component.start, 0)
-    const end = Math.min(component.end, width - 2 * padding)
+    const start = overlay.start * w
+    const end = overlay.end * w
 
     const left = [
       { x: padding + start, y: 0 },

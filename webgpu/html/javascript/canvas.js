@@ -82,7 +82,7 @@ class Canvas {
     const start = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(start)) {
-      this.internal.start = Math.max(Math.min(start, this.internal.duration), 0)
+      this.internal.start = Math.max(Math.min(start, 1), 0) * this.internal.duration
     }
   }
 
@@ -91,7 +91,7 @@ class Canvas {
     const end = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(end)) {
-      this.internal.end = Math.max(Math.min(end, this.internal.duration), 0)
+      this.internal.end = Math.max(Math.min(end, 1), 0) * this.internal.duration
     }
   }
 
@@ -101,8 +101,8 @@ class Canvas {
 
   redraw () {
     const duration = this.internal.duration
-    const start = duration === 0 ? 0 : this.audio.length * this.internal.start / duration
-    const end = duration === 0 ? 0 : this.audio.length * this.internal.end / duration
+    const start = duration === 0 ? 0 : Math.floor(this.audio.length * this.internal.start / duration)
+    const end = duration === 0 ? 0 : Math.floor(this.audio.length * this.internal.end / duration)
 
     const ctx = this.canvas.getContext('webgpu')
     const device = this.device

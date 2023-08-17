@@ -12,8 +12,8 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
   const pixels = Math.min(width - 2 * PADDING, samples.length)
   const stride = Math.max(Math.floor(samples.length / pixels), 1)
 
-  console.log('waveform', width, samples.length, samples.length/44100)
-  console.log({pixels},{stride})
+  // console.log('waveform', width, samples.length, samples.length / 44100)
+  // console.log({ pixels }, { stride })
 
   const vertices = new Float32Array([
     0.0, +1.0,
