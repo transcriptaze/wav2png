@@ -20,6 +20,7 @@ build: format
 	sass --no-source-map sass/themes:html/css
 
 test: build
+	npm test
 
 benchmark: build
 
