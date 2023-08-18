@@ -9,9 +9,8 @@
       - [x] label start, end
       - [x] label interval
       - [x] genericize overlay start:end as [0..1] interval
-      - [ ] Weird rendering on subarrays
-            - because stride is fractional
-            - e.g. 2.450 to 2.550 should show centre of chirp
+      - [x] Weird rendering on subarrays
+      - [ ] waveform labels
       - [ ] alt-drag drag together
 
 - [ ] Fix Firefox flickering

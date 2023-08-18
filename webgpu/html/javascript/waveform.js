@@ -10,10 +10,7 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
   const yscale = (height - 2 * PADDING) / height
 
   const pixels = Math.min(width - 2 * PADDING, samples.length)
-  const stride = Math.max(Math.floor(samples.length / pixels), 1)
-
-  // console.log('waveform', width, samples.length, samples.length / 44100)
-  // console.log({ pixels }, { stride })
+  const stride = samples.length / pixels
 
   const vertices = new Float32Array([
     0.0, +1.0,
@@ -194,7 +191,7 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
-  view.setUint32(4, stride, true)
+  view.setFloat32(4, stride, true)
   view.setUint32(8, samples, true)
   view.setUint32(12, pad, true)
   view.setFloat32(16, xscale, true) // vec2f: must be on a 16-byte boundary
@@ -211,7 +208,7 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
 const SHADER = `
     struct constants {
       pixels: u32,
-      stride: u32,
+      stride: f32,
       samples: u32,
       pad: f32,
       scale: vec2f,
@@ -263,10 +260,12 @@ const SHADER = `
 const COMPUTE = `
     struct constants {
       pixels: u32,
-      stride: u32,
+      stride: f32,
       samples: u32,
       pad: f32,
       scale: vec2f,
+      vscale: f32,
+      colour: vec4f
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;
@@ -277,8 +276,9 @@ const COMPUTE = `
     fn computeMain(@builtin(global_invocation_id) pixel: vec3u) {
        let samples = u32(uconstants.samples);
        let pixels = u32(uconstants.pixels);
-       let stride = u32(f32(samples)/f32(pixels));
-       var offset = pixel.x * stride;
+       let stride = f32(uconstants.stride);
+       let start = u32(round(f32(pixel.x) * stride));
+       let end = u32(round(f32(pixel.x + 1) * stride));
 
        var p = f32(0); 
        var q = f32(0); 
@@ -286,8 +286,8 @@ const COMPUTE = `
        var m = u32(0);
        var n = u32(0);
 
-       for (var i: u32 = u32(0); i < stride; i++) {
-          let v = audio[offset];
+       for (var i: u32 = start; i < end; i++) {
+          let v = audio[i];
 
           if (v > 0.0) {
              p += v; m++;
@@ -296,12 +296,6 @@ const COMPUTE = `
           } else {
              p += v; m++;
              q += v; n++;
-          }
-
-          offset++;
-
-          if (offset >= samples) {
-            break;
           }
        }
 

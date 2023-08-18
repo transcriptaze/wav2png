@@ -12,6 +12,7 @@ clean:
 
 format: 
 	find html/javascript -name "*.js" -exec npx eslint --fix {} +
+	find test            -name "*.js" -exec npx eslint --fix {} +
 
 sass: 
 	find sass -name "*.scss" | entr sass --no-source-map sass/themes:html/css
