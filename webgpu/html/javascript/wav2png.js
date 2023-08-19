@@ -36,6 +36,7 @@ export async function initialise () {
   const fill = document.getElementById('fill')
   const grid = document.getElementById('grid')
   const waveform = document.getElementById('waveform')
+  const xaxis = document.getElementById('x-axis')
 
   fill.onchange = (c) => {
     stale = true
@@ -71,6 +72,8 @@ export async function initialise () {
   }
 
   overview.onchanged = (start, end) => {
+    xaxis.selected = { start, end }
+
     canvas.start = start
     canvas.end = end
     canvas.redraw()
@@ -94,6 +97,7 @@ export function load (filename, blob) {
   const save = document.getElementById('save')
   const fill = document.getElementById('fill')
   const clear = document.getElementById('clear')
+  const xaxis = document.getElementById('x-axis')
 
   save.disabled = true
   fill.disabled = true
@@ -115,6 +119,7 @@ export function load (filename, blob) {
       overview.audio = { fs, audio }
       canvas.audio = { fs, audio }
       offscreen.audio = { fs, audio }
+      xaxis.audio = { fs, audio }
 
       save.disabled = false
       fill.disabled = false
@@ -139,12 +144,15 @@ export function trash () {
   const save = document.getElementById('save')
   const fill = document.getElementById('fill')
   const clear = document.getElementById('clear')
+  const xaxis = document.getElementById('x-axis')
 
   context.loading = false
   context.loaded = false
 
-  overview.audio = new Float32Array()
-  canvas.audio = new Float32Array()
+  overview.audio = { fs: 44100, audio: new Float32Array() }
+  canvas.audio = { fs: 44100, audio: new Float32Array() }
+  offscreen.audio = { fs: 44100, audio: new Float32Array() }
+  xaxis.audio = { fs: 44100, audio: new Float32Array() }
 
   save.disabled = true
   fill.disabled = true

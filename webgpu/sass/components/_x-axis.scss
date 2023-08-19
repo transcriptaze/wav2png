@@ -1,0 +1,22 @@
+div#x-axis {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px;
+    grid-template-rows: auto;
+
+    .left {
+      justify-self: start;
+    }
+
+    .middle {
+      justify-self: center;
+    }
+
+    .right {
+      justify-self: end;
+    }
+
+    .label {
+      font-family: sans-serif;
+      font-size: 0.7em;
+    }
+}

@@ -67,11 +67,7 @@
             <img src="/images/right.svg" draggable="false" disabled />
           </button>
         </div>
-        <div class="bottom">
-          <div class="label left"  ><span id="start">0.000</span></div>
-          <div class="label middle"><span id="duration">5.000</span></div>
-          <div class="label right" ><span id="end">5.000</span></div>
-        </div>
+        <wav2png-x-axis id="x-axis"></wav2png-x-axis>
       </div>
 
     </main>
@@ -112,6 +108,15 @@
         </div>
       </fieldset>
     </template>
+
+    <template id="template-x-axis">
+      <div id="x-axis">
+        <span id="start"    class="label left">&nbsp;</span>
+        <span id="duration" class="label middle">&nbsp;</span>
+        <span id="end"      class="label right">&nbsp;</span>
+      </div>
+    </template>
+
   </body>
 
   <script type="module">

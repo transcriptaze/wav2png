@@ -11,7 +11,9 @@
       - [x] genericize overlay start:end as [0..1] interval
       - [x] Weird rendering on subarrays
       - [ ] waveform labels
+            - left/right dimension arrows
       - [ ] alt-drag drag together
+      - [ ] reinstate 'trash'
 
 - [ ] Fix Firefox flickering
 - [ ] Two point gradient

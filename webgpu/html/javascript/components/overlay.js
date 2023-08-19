@@ -180,17 +180,25 @@ export class Overlay extends HTMLElement {
 
     redraw(this)
   }
+}
 
-  format (v) {
-    const ms = Math.trunc(v * 1000) % 1000
-    const ss = Math.trunc(v) % 60
-    const mm = Math.trunc(v / 60)
+function round2ms (v) {
+  const ms = Math.trunc(v * 1000) % 1000
+  const ss = Math.trunc(v) % 60
+  const mm = Math.trunc(v / 60)
 
-    if (mm > 0) {
-      return `${mm}:${ss}.${ms.toString().padStart(3, '0')}`
-    } else {
-      return `${ss}.${ms.toString().padStart(3, '0')}`
-    }
+  return mm * 60 * 1000 + ss * 1000 + ms
+}
+
+function format (v) {
+  const ms = Math.trunc(v * 1000) % 1000
+  const ss = Math.trunc(v) % 60
+  const mm = Math.trunc(v / 60)
+
+  if (mm > 0) {
+    return `${mm}:${ss}.${ms.toString().padStart(3, '0')}`
+  } else {
+    return `${ss}.${ms.toString().padStart(3, '0')}`
   }
 }
 
@@ -300,14 +308,18 @@ function redraw (overlay) {
     ctx.stroke()
 
     // ... labels
+    const s = round2ms(overlay.start * overlay.duration)
+    const t = round2ms(overlay.end * overlay.duration)
+    const dt = t - s
+
     ctx.font = '18px sans-serif'
     ctx.fillStyle = '#80ccffc0'
     ctx.strokeStyle = '#80ccffc0'
 
     const labels = {
-      start: overlay.format(overlay.start * overlay.duration),
-      end: overlay.format(overlay.end * overlay.duration),
-      duration: overlay.format((overlay.end - overlay.start) * overlay.duration)
+      start: format(s / 1000),
+      end: format(t / 1000),
+      duration: format(dt / 1000)
     }
 
     const fm = {

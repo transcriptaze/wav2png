@@ -229,7 +229,7 @@ div#handles {
   margin-top: -80px;
   display: grid;
   grid-template-columns: auto;
-  grid-template-rows: 76px auto;
+  grid-template-rows: 76px min-content;
 }
 div#handles div.top {
   width: 100%;
@@ -238,25 +238,8 @@ div#handles div.top {
   justify-content: space-between;
   align-items: bottom;
 }
-div#handles div.bottom {
+div#handles wav2png-x-axis {
   width: 100%;
-  height: fit-content;
-  display: grid;
-  grid-template-columns: 100px 1fr 100px;
-  grid-template-rows: auto;
-}
-div#handles div.bottom div.left {
-  justify-self: start;
-}
-div#handles div.bottom div.middle {
-  justify-self: center;
-}
-div#handles div.bottom div.right {
-  justify-self: end;
-}
-div#handles div.bottom .label span {
-  font-family: sans-serif;
-  font-size: 0.7em;
 }
 div#handles button {
   filter: invert(88%) sepia(0%) saturate(1%) hue-rotate(168deg) brightness(78%) contrast(87%);
