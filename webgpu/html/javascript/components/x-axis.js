@@ -79,23 +79,32 @@ export class XAxis extends HTMLElement {
     }
   }
 
+  get duration () {
+    return this.internal.duration / 1000
+  }
+
   get start () {
     return this.internal.start / 1000
   }
 
   set start (v) {
     const shadow = this.shadowRoot
-    const t = Number.parseFloat(`${v}`)
     const start = shadow.querySelector('#start')
+    const t = Number.parseFloat(`${v}`)
 
-    if (Number.isNaN(t) || this.internal.duration === 0) {
-      start.innerHTML = '&nbsp;'
+    if (Number.isNaN(t) || this.duration === 0) {
+      this.internal.start = 0
     } else {
       this.internal.start = constrain(Math.round(t * 1000), 0, this.internal.end)
-      this.reselect()
+    }
 
+    if (Number.isNaN(t) || this.duration === 0) {
+      start.innerHTML = ''
+    } else {
       start.innerHTML = format(this.start)
     }
+
+    this.reselect()
   }
 
   get end () {
@@ -104,17 +113,22 @@ export class XAxis extends HTMLElement {
 
   set end (v) {
     const shadow = this.shadowRoot
-    const t = Number.parseFloat(`${v}`)
     const end = shadow.querySelector('#end')
+    const t = Number.parseFloat(`${v}`)
 
     if (Number.isNaN(t) || this.internal.duration === 0) {
-      end.innerHTML = '&nbsp;'
+      this.internal.end = 0
     } else {
-      this.internal.end = constrain(Math.round(t * 1000), this.internal.start, this.internal.duration)
-      this.reselect()
+      this.internal.end = constrain(Math.round(t * 1000), 0, this.internal.duration)
+    }
 
+    if (Number.isNaN(t) || this.internal.duration === 0) {
+      end.innerHTML = ''
+    } else {
       end.innerHTML = format(this.end)
     }
+
+    this.reselect()
   }
 
   /* eslint-disable-next-line accessor-pairs */
@@ -126,7 +140,7 @@ export class XAxis extends HTMLElement {
     const dt = end - start
 
     if (this.internal.duration === 0) {
-      duration.innerHTML = '&nbsp;'
+      duration.innerHTML = ''
     } else {
       duration.innerHTML = format(dt / 1000)
     }
@@ -154,4 +168,5 @@ function format (v) {
 function constrain (v, min, max) {
   return Math.min(Math.max(v, min), max)
 }
+
 customElements.define('wav2png-x-axis', XAxis)

@@ -128,88 +128,65 @@ export class Overlay extends HTMLElement {
     }
   }
 
-  get duration () {
-    return this.internal.duration
+  /* eslint-disable-next-line accessor-pairs */
+  set audio ({ start, end, duration }) {
+    const t = Number.parseFloat(`${duration}`)
+
+    if (!Number.isNaN(t)) {
+      this.internal.duration = Math.round(t * 1000)
+      this.start = start
+      this.end = end
+    }
   }
 
-  set duration (v) {
-    const duration = Number.parseFloat(`${v}`)
-
-    if (!Number.isNaN(duration)) {
-      this.internal.duration = duration
-    }
+  get duration () {
+    return this.internal.duration / 1000
   }
 
   get start () {
-    const start = this.internal.start
-    const w = this.width - 2 * this.padding
-
-    return start / w
+    return this.internal.start / 1000
   }
 
   set start (v) {
-    const start = Number.parseInt(`${v}`)
-    const w = this.width - 2 * this.padding
+    const t = Number.parseFloat(`${v}`)
 
-    if (!Number.isNaN(start)) {
-      this.internal.start = Math.min(Math.max(start, 0), this.end) * w
-      redraw(this)
+    if (Number.isNaN(t) || this.duration === 0) {
+      this.internal.start = 0
+    } else {
+      this.internal.start = constrain(Math.round(t * 1000), 0, this.internal.end)
     }
-  }
-
-  get end () {
-    const end = this.internal.end
-    const w = this.width - 2 * this.padding
-
-    return end / w
-  }
-
-  set end (v) {
-    const end = Number.parseInt(`${v}`)
-    const w = this.width - 2 * this.padding
-
-    if (!Number.isNaN(end)) {
-      this.internal.end = Math.max(Math.min(end, 1), this.start) * w
-      redraw(this)
-    }
-  }
-
-  reset () {
-    this.start = 0
-    this.end = 1
 
     redraw(this)
   }
-}
 
-function round2ms (v) {
-  const ms = Math.trunc(v * 1000) % 1000
-  const ss = Math.trunc(v) % 60
-  const mm = Math.trunc(v / 60)
+  get end () {
+    return this.internal.end / 1000
+  }
 
-  return mm * 60 * 1000 + ss * 1000 + ms
-}
+  set end (v) {
+    const t = Number.parseFloat(`${v}`)
 
-function format (v) {
-  const ms = Math.trunc(v * 1000) % 1000
-  const ss = Math.trunc(v) % 60
-  const mm = Math.trunc(v / 60)
+    if (Number.isNaN(t) || this.duration === 0) {
+      this.internal.end = 0
+    } else {
+      this.internal.end = constrain(Math.round(t * 1000), this.internal.start, this.internal.duration)
+    }
 
-  if (mm > 0) {
-    return `${mm}:${ss}.${ms.toString().padStart(3, '0')}`
-  } else {
-    return `${ss}.${ms.toString().padStart(3, '0')}`
+    redraw(this)
   }
 }
 
 function getStartXY (overlay) {
   const w = overlay.width - 2 * overlay.padding
 
-  return { x: overlay.start * w, y: 0 }
+  return { x: w * overlay.start / overlay.duration, y: 0 }
 }
 
 function setStartXY (overlay, x, y, dragging) {
-  overlay.internal.start = Math.min(Math.max(x, 0), overlay.internal.end)
+  const w = overlay.width - 2 * overlay.padding
+  const start = overlay.duration * x / w
+
+  overlay.internal.start = constrain(Math.round(start * 1000), 0, overlay.internal.end)
 
   redraw(overlay)
 
@@ -223,13 +200,14 @@ function setStartXY (overlay, x, y, dragging) {
 function getEndXY (overlay) {
   const w = overlay.width - 2 * overlay.padding
 
-  return { x: overlay.end * w, y: 0 }
+  return { x: w * overlay.end / overlay.duration, y: 0 }
 }
 
 function setEndXY (overlay, x, y, dragging) {
   const w = overlay.width - 2 * overlay.padding
+  const end = overlay.duration * x / w
 
-  overlay.internal.end = Math.max(Math.min(x, w), overlay.internal.start)
+  overlay.internal.end = constrain(Math.round(end * 1000), overlay.internal.start, overlay.internal.duration)
 
   redraw(overlay)
 
@@ -259,8 +237,8 @@ function redraw (overlay) {
   const height = canvas.height
   const padding = overlay.padding
   const w = canvas.width - 2 * overlay.padding
-  const start = overlay.start * w
-  const end = overlay.end * w
+  const start = w * overlay.start / overlay.duration
+  const end = w * overlay.end / overlay.duration
   const ctx = canvas.getContext('2d')
 
   ctx.clearRect(0, 0, width, height)
@@ -308,18 +286,14 @@ function redraw (overlay) {
     ctx.stroke()
 
     // ... labels
-    const s = round2ms(overlay.start * overlay.duration)
-    const t = round2ms(overlay.end * overlay.duration)
-    const dt = t - s
-
     ctx.font = '18px sans-serif'
     ctx.fillStyle = '#80ccffc0'
     ctx.strokeStyle = '#80ccffc0'
 
     const labels = {
-      start: format(s / 1000),
-      end: format(t / 1000),
-      duration: format(dt / 1000)
+      start: format(overlay.start),
+      end: format(overlay.end),
+      duration: format((overlay.internal.end - overlay.internal.start) / 1000)
     }
 
     const fm = {
@@ -371,8 +345,8 @@ function onPointerDown (overlay, canvas, handles, event) {
     const hscale = 2 // FIXME calculate from client width
     const vscale = 2 // FIXME calculate from client height
     const xy = { x: hscale * event.offsetX, y: vscale * event.offsetY }
-    const start = overlay.start * w
-    const end = overlay.end * w
+    const start = w * overlay.start / overlay.duration
+    const end = w * overlay.end / overlay.duration
 
     const left = [
       { x: padding + start, y: 0 },
@@ -409,6 +383,22 @@ function hittest (xy, polygon) {
   }
 
   return hit
+}
+
+function format (v) {
+  const ms = Math.trunc(v * 1000) % 1000
+  const ss = Math.trunc(v) % 60
+  const mm = Math.trunc(v / 60)
+
+  if (mm > 0) {
+    return `${mm}:${ss}.${ms.toString().padStart(3, '0')}`
+  } else {
+    return `${ss}.${ms.toString().padStart(3, '0')}`
+  }
+}
+
+function constrain (v, min, max) {
+  return Math.min(Math.max(v, min), max)
 }
 
 customElements.define('wav2png-overlay', Overlay)

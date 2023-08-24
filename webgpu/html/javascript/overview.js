@@ -46,8 +46,7 @@ class Overview {
 
   set audio ({ fs, audio }) {
     this.internal.audio = audio
-    this.internal.overlay.duration = audio.length / fs
-    this.internal.overlay.reset()
+    this.internal.overlay.audio = { start: 0, end: audio.length / fs, duration: audio.length / fs }
 
     this.redraw()
   }
