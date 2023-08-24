@@ -10,10 +10,13 @@
       - [x] label interval
       - [x] genericize overlay start:end as [0..1] interval
       - [x] Weird rendering on subarrays
-      - [ ] waveform labels
-            - left/right dimension arrows
+      - [x] reinstate 'trash'
+      - [x] waveform labels
+      - [ ] waveform left/right dimension arrows
+      - [ ] waveform left/right
+      - [ ] waveform +/-
       - [ ] alt-drag drag together
-      - [ ] reinstate 'trash'
+      - [ ] fix jump on load/trash
 
 - [ ] Fix Firefox flickering
 - [ ] Two point gradient

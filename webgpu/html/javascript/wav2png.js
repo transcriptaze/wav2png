@@ -154,10 +154,12 @@ export function trash () {
   context.loading = false
   context.loaded = false
 
+  duration = 0
+
   overview.audio = { fs: 44100, audio: new Float32Array() }
   canvas.audio = { fs: 44100, audio: new Float32Array() }
   offscreen.audio = { fs: 44100, audio: new Float32Array() }
-  xaxis.audio = { fs: 44100, audio: new Float32Array() }
+  xaxis.audio = { start: 0, end: 0, duration: 0 }
 
   save.disabled = true
   fill.disabled = true
