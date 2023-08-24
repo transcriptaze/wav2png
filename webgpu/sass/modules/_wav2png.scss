@@ -76,9 +76,9 @@ main {
   display: grid;
   grid-template-columns: auto auto auto;
   grid-template-rows: auto auto auto;
-  grid-template-areas: "overview unused1 unused2" "canvas toolbar toolbox" "handles unused3 unused4";
+  grid-template-areas: "overview unused1 unused2" "canvas toolbar toolbox" "xaxis unused3 unused4";
   column-gap: 8px;
-  row-gap: 8px;
+  row-gap: 2px;
 }
 
 div#overview {
@@ -132,8 +132,8 @@ div#toolbox {
   grid-area: toolbox;
 }
 
-div#handles {
-  grid-area: handles;
+#x-axis {
+  grid-area: xaxis;
 }
 
 div#workspace {
@@ -246,47 +246,8 @@ div#toolbox {
   }
 }
 
-div#handles {
-  margin-top: -80px;
-  display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: 76px min-content;
-
-  div.top {
+wav2png-xaxis {
     width: 100%;
-    height: 100%;
-  
-    display: flex;
-    justify-content: space-between;
-    align-items: bottom;
-  }
-
-  wav2png-x-axis {
-    width: 100%;
-  }
-
-  button {
-      filter: invert(88%) sepia(0%) saturate(1%) hue-rotate(168deg) brightness(78%) contrast(87%);
-      outline: none;
-      user-select: none;
-  }
-
-  button:enabled {
-      cursor: pointer;
-      filter: none;
-  }
-
-  img {
-    width: 24px;
-  }
-
-  button#left {
-    margin-left: -32px;
-  }
-
-  button#right {
-    margin-right: -32px;
-  }
 }
 
 div#picker {

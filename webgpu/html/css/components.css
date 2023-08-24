@@ -138,8 +138,29 @@ canvas.overlay {
 
 div#x-axis {
   display: grid;
-  grid-template-columns: 100px 1fr 100px;
+  grid-template-columns: auto 100px 1fr 100px auto;
   grid-template-rows: auto;
+}
+div#x-axis button {
+  border: none;
+  outline: none;
+  user-select: none;
+  visibility: hidden;
+}
+div#x-axis button img {
+  width: 24px;
+}
+div#x-axis button:enabled {
+  visibility: visible;
+  cursor: pointer;
+}
+div#x-axis button#left {
+  margin-top: -80px;
+  margin-left: -32px;
+}
+div#x-axis button#right {
+  margin-top: -80px;
+  margin-right: -32px;
 }
 div#x-axis .left {
   justify-self: start;

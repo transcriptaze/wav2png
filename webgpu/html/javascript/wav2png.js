@@ -9,6 +9,7 @@ const context = {
 }
 
 let stale = true
+let duration = 0
 
 export async function initialise () {
   if (!navigator.gpu) {
@@ -72,7 +73,8 @@ export async function initialise () {
   }
 
   overview.onchanged = (start, end) => {
-    xaxis.selected = { start, end }
+    xaxis.start = start * duration
+    xaxis.end = end * duration
 
     canvas.start = start
     canvas.end = end
@@ -116,10 +118,13 @@ export function load (filename, blob) {
       context.loading = false
       context.loaded = true
 
+      duration = audio.length / fs
+
       overview.audio = { fs, audio }
       canvas.audio = { fs, audio }
       offscreen.audio = { fs, audio }
-      xaxis.audio = { fs, audio }
+
+      xaxis.audio = { start: 0, end: duration, duration }
 
       save.disabled = false
       fill.disabled = false

@@ -58,17 +58,7 @@
         <wav2png-waveform id="waveform" vscale='1.0' colour="#80ccffff"></wav2png-waveform>
       </div>
 
-      <div id="handles">
-        <div class="top">
-          <button id="left" disabled>
-            <img src="/images/left.svg" draggable="false" disabled />
-          </button>
-          <button id="right" disabled>
-            <img src="/images/right.svg" draggable="false" disabled />
-          </button>
-        </div>
-        <wav2png-x-axis id="x-axis"></wav2png-x-axis>
-      </div>
+      <wav2png-x-axis id="x-axis"></wav2png-x-axis>
 
     </main>
 
@@ -111,9 +101,15 @@
 
     <template id="template-x-axis">
       <div id="x-axis">
+        <button id="left" disabled>
+          <img src="/images/left.svg" draggable="false" disabled />
+        </button>
         <span id="start"    class="label left">&nbsp;</span>
         <span id="duration" class="label middle">&nbsp;</span>
         <span id="end"      class="label right">&nbsp;</span>
+        <button id="right" disabled>
+          <img src="/images/right.svg" draggable="false" disabled />
+        </button>
       </div>
     </template>
 

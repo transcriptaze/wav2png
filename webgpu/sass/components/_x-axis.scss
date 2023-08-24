@@ -1,7 +1,33 @@
 div#x-axis {
     display: grid;
-    grid-template-columns: 100px 1fr 100px;
+    grid-template-columns: auto 100px 1fr 100px auto;
     grid-template-rows: auto;
+
+    button {
+        border: none;
+        outline: none;
+        user-select: none;
+        visibility: hidden;
+
+        img {
+            width: 24px;
+        }
+    }
+
+    button:enabled {
+        visibility: visible;
+        cursor: pointer;
+    }
+
+    button#left {
+      margin-top: -80px;
+      margin-left: -32px;
+    }
+
+    button#right {
+      margin-top: -80px;
+      margin-right: -32px;
+    }
 
     .left {
       justify-self: start;
