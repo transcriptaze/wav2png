@@ -11,7 +11,6 @@ export class XAxis extends HTMLElement {
       start: 0,
       end: 0,
 
-      onChange: null,
       onChanged: null
     }
 
@@ -46,14 +45,6 @@ export class XAxis extends HTMLElement {
   attributeChangedCallback (name, from, to) {
   }
 
-  get onchange () {
-    return this.internal.onChange
-  }
-
-  set onchange (v) {
-    this.internal.onChange = v
-  }
-
   get onchanged () {
     return this.internal.onChanged
   }
@@ -67,6 +58,8 @@ export class XAxis extends HTMLElement {
     const shadow = this.shadowRoot
     const left = shadow.querySelector('#left')
     const right = shadow.querySelector('#right')
+    const plus = shadow.querySelector('#plus')
+    const minus = shadow.querySelector('#minus')
     const t = Number.parseFloat(`${duration}`)
 
     if (!Number.isNaN(t)) {
@@ -76,6 +69,8 @@ export class XAxis extends HTMLElement {
 
       left.disabled = this.internal.duration === 0
       right.disabled = this.internal.duration === 0
+      plus.disabled = this.internal.duration === 0
+      minus.disabled = this.internal.duration === 0
     }
   }
 
@@ -88,20 +83,12 @@ export class XAxis extends HTMLElement {
   }
 
   set start (v) {
-    const shadow = this.shadowRoot
-    const start = shadow.querySelector('#start')
     const t = Number.parseFloat(`${v}`)
 
     if (Number.isNaN(t) || this.duration === 0) {
       this.internal.start = 0
     } else {
       this.internal.start = constrain(Math.round(t * 1000), 0, this.internal.end)
-    }
-
-    if (Number.isNaN(t) || this.duration === 0) {
-      start.innerHTML = ''
-    } else {
-      start.innerHTML = format(this.start)
     }
 
     this.reselect()
@@ -112,8 +99,6 @@ export class XAxis extends HTMLElement {
   }
 
   set end (v) {
-    const shadow = this.shadowRoot
-    const end = shadow.querySelector('#end')
     const t = Number.parseFloat(`${v}`)
 
     if (Number.isNaN(t) || this.internal.duration === 0) {
@@ -122,35 +107,59 @@ export class XAxis extends HTMLElement {
       this.internal.end = constrain(Math.round(t * 1000), 0, this.internal.duration)
     }
 
-    if (Number.isNaN(t) || this.internal.duration === 0) {
-      end.innerHTML = ''
-    } else {
-      end.innerHTML = format(this.end)
-    }
-
     this.reselect()
   }
 
   /* eslint-disable-next-line accessor-pairs */
   reselect () {
     const shadow = this.shadowRoot
+    const start = shadow.querySelector('#start')
+    const end = shadow.querySelector('#end')
     const duration = shadow.querySelector('#duration')
-    const start = this.internal.start
-    const end = this.internal.end
-    const dt = end - start
+    const from = this.internal.start
+    const to = this.internal.end
+    const delta = to - from
 
-    if (this.internal.duration === 0) {
+    if (this.duration === 0) {
+      start.innerHTML = ''
+      end.innerHTML = ''
       duration.innerHTML = ''
     } else {
-      duration.innerHTML = format(dt / 1000)
+      start.innerHTML = format(this.start)
+      end.innerHTML = format(this.end)
+      duration.innerHTML = format(delta / 1000)
     }
   }
 }
 
 function onLeft (xaxis, event) {
+  const p = xaxis.internal.start
+  const q = constrain(p - 1, 0, xaxis.internal.end)
+  const delta = q - p
+
+  xaxis.internal.start += delta
+  xaxis.internal.end += delta
+
+  xaxis.reselect()
+
+  if (xaxis.onchanged != null) {
+    xaxis.onchanged(xaxis.start, xaxis.end)
+  }
 }
 
 function onRight (xaxis, event) {
+  const p = xaxis.internal.end
+  const q = constrain(p + 1, xaxis.internal.start, xaxis.internal.duration)
+  const delta = q - p
+
+  xaxis.internal.start += delta
+  xaxis.internal.end += delta
+
+  xaxis.reselect()
+
+  if (xaxis.onchanged != null) {
+    xaxis.onchanged(xaxis.start, xaxis.end)
+  }
 }
 
 function format (v) {

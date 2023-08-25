@@ -1,6 +1,6 @@
 div#x-axis {
     display: grid;
-    grid-template-columns: auto 100px 1fr 100px auto;
+    grid-template-columns: auto 100px 1fr auto auto auto 1fr 100px auto;
     grid-template-rows: auto;
 
     button {
@@ -8,9 +8,28 @@ div#x-axis {
         outline: none;
         user-select: none;
         visibility: hidden;
+    }
 
+    button.arrow {
+        margin-top: -92px;
         img {
             width: 24px;
+        }
+    }
+
+    button.size {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-left: 2px;
+        padding-right: 2px;
+        border: 1px solid black;
+        border-radius: 4px;
+
+        img {
+            width: 20px;
         }
     }
 
@@ -20,13 +39,26 @@ div#x-axis {
     }
 
     button#left {
-      margin-top: -80px;
       margin-left: -32px;
     }
 
     button#right {
-      margin-top: -80px;
       margin-right: -32px;
+    }
+
+    button#minus {
+      margin-right: 32px;
+    }
+
+    button#plus {
+      margin-left: 32px;
+    }
+
+    .strut {
+    }
+
+    .label {
+      align-self: center;    
     }
 
     .left {
@@ -39,6 +71,7 @@ div#x-axis {
 
     .right {
       justify-self: end;
+      text-align: right;
     }
 
     .label {

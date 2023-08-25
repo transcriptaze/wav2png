@@ -83,6 +83,16 @@ class Overview {
   }
 
   /* eslint-disable-next-line accessor-pairs */
+  set start (v) {
+    this.internal.overlay.start = v
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
+  set end (v) {
+    this.internal.overlay.end = v
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
   set onchange (v) {
     this.internal.overlay.onchange = v
   }

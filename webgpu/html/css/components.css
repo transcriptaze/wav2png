@@ -138,7 +138,7 @@ canvas.overlay {
 
 div#x-axis {
   display: grid;
-  grid-template-columns: auto 100px 1fr 100px auto;
+  grid-template-columns: auto 100px 1fr auto auto auto 1fr 100px auto;
   grid-template-rows: auto;
 }
 div#x-axis button {
@@ -147,20 +147,44 @@ div#x-axis button {
   user-select: none;
   visibility: hidden;
 }
-div#x-axis button img {
+div#x-axis button.arrow {
+  margin-top: -92px;
+}
+div#x-axis button.arrow img {
   width: 24px;
+}
+div#x-axis button.size {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid black;
+  border-radius: 4px;
+}
+div#x-axis button.size img {
+  width: 20px;
 }
 div#x-axis button:enabled {
   visibility: visible;
   cursor: pointer;
 }
 div#x-axis button#left {
-  margin-top: -80px;
   margin-left: -32px;
 }
 div#x-axis button#right {
-  margin-top: -80px;
   margin-right: -32px;
+}
+div#x-axis button#minus {
+  margin-right: 32px;
+}
+div#x-axis button#plus {
+  margin-left: 32px;
+}
+div#x-axis .label {
+  align-self: center;
 }
 div#x-axis .left {
   justify-self: start;
@@ -170,6 +194,7 @@ div#x-axis .middle {
 }
 div#x-axis .right {
   justify-self: end;
+  text-align: right;
 }
 div#x-axis .label {
   font-family: sans-serif;

@@ -101,13 +101,27 @@
 
     <template id="template-x-axis">
       <div id="x-axis">
-        <button id="left" disabled>
+        <button id="left" class="arrow" disabled>
           <img src="/images/left.svg" draggable="false" disabled />
         </button>
-        <span id="start"    class="label left">&nbsp;</span>
+
+        <span id="start" class="label left">&nbsp;</span>
+        <span class="strut"></span>
+
+        <button id="minus" class="size" disabled>
+          <img src="/images/minus.svg" draggable="false" disabled />
+        </button>
+
         <span id="duration" class="label middle">&nbsp;</span>
-        <span id="end"      class="label right">&nbsp;</span>
-        <button id="right" disabled>
+
+        <button id="plus" class="size" disabled>
+          <img src="/images/plus.svg" draggable="false" disabled />
+        </button>
+
+        <span class="strut"></span>
+        <span id="end" class="label right">&nbsp;</span>
+
+        <button id="right" class="arrow" disabled>
           <img src="/images/right.svg" draggable="false" disabled />
         </button>
       </div>
