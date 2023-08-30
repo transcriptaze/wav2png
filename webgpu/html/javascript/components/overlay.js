@@ -1,5 +1,7 @@
 import { Drag } from './drag.js'
 
+const TIMESCALE = 1000
+
 export class Overlay extends HTMLElement {
   static get observedAttributes () {
     return ['width', 'height', 'padding']
@@ -133,18 +135,18 @@ export class Overlay extends HTMLElement {
     const t = Number.parseFloat(`${duration}`)
 
     if (!Number.isNaN(t)) {
-      this.internal.duration = Math.round(t * 1000)
+      this.internal.duration = Math.round(t * TIMESCALE)
       this.start = start
       this.end = end
     }
   }
 
   get duration () {
-    return this.internal.duration / 1000
+    return this.internal.duration / TIMESCALE
   }
 
   get start () {
-    return this.internal.start / 1000
+    return this.internal.start / TIMESCALE
   }
 
   set start (v) {
@@ -153,14 +155,14 @@ export class Overlay extends HTMLElement {
     if (Number.isNaN(t) || this.duration === 0) {
       this.internal.start = 0
     } else {
-      this.internal.start = constrain(Math.round(t * 1000), 0, this.internal.end)
+      this.internal.start = constrain(Math.round(t * TIMESCALE), 0, this.internal.end)
     }
 
     redraw(this)
   }
 
   get end () {
-    return this.internal.end / 1000
+    return this.internal.end / TIMESCALE
   }
 
   set end (v) {
@@ -169,7 +171,7 @@ export class Overlay extends HTMLElement {
     if (Number.isNaN(t) || this.duration === 0) {
       this.internal.end = 0
     } else {
-      this.internal.end = constrain(Math.round(t * 1000), this.internal.start, this.internal.duration)
+      this.internal.end = constrain(Math.round(t * TIMESCALE), this.internal.start, this.internal.duration)
     }
 
     redraw(this)
@@ -186,7 +188,7 @@ function setStartXY (overlay, x, y, dragging) {
   const w = overlay.width - 2 * overlay.padding
   const start = overlay.duration * x / w
 
-  overlay.internal.start = constrain(Math.round(start * 1000), 0, overlay.internal.end)
+  overlay.internal.start = constrain(Math.round(start * TIMESCALE), 0, overlay.internal.end)
 
   redraw(overlay)
 
@@ -207,7 +209,7 @@ function setEndXY (overlay, x, y, dragging) {
   const w = overlay.width - 2 * overlay.padding
   const end = overlay.duration * x / w
 
-  overlay.internal.end = constrain(Math.round(end * 1000), overlay.internal.start, overlay.internal.duration)
+  overlay.internal.end = constrain(Math.round(end * TIMESCALE), overlay.internal.start, overlay.internal.duration)
 
   redraw(overlay)
 
@@ -293,7 +295,7 @@ function redraw (overlay) {
     const labels = {
       start: format(overlay.start),
       end: format(overlay.end),
-      duration: format((overlay.internal.end - overlay.internal.start) / 1000)
+      duration: format((overlay.internal.end - overlay.internal.start) / TIMESCALE)
     }
 
     const fm = {

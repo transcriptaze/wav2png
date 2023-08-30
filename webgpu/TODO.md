@@ -12,10 +12,12 @@
       - [x] Weird rendering on subarrays
       - [x] reinstate 'trash'
       - [x] waveform labels
+      - [x] waveform +/-
+      - [x] waveform left/right
+      - [x] alt-click to micro adjust
+      - [x] ctrl-click to macro adjust
       - [ ] waveform left/right dimension arrows
-      - [ ] waveform left/right
-      - [ ] waveform +/-
-      - [ ] alt-drag drag together
+      - [ ] overlay: alt-drag drag together
       - [ ] fix jump on load/trash
 
 - [ ] Fix Firefox flickering

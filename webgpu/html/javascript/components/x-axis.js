@@ -1,3 +1,6 @@
+const TIMESCALE = 10000
+const DT = 10
+
 export class XAxis extends HTMLElement {
   static get observedAttributes () {
     return []
@@ -38,6 +41,11 @@ export class XAxis extends HTMLElement {
     right.onclick = (event) => onRight(this, event)
     plus.onclick = (event) => onPlus(this, event)
     minus.onclick = (event) => onMinus(this, event)
+
+    left.oncontextmenu = (event) => onLeft(this, event)
+    right.oncontextmenu = (event) => onRight(this, event)
+    plus.oncontextmenu = (event) => onPlus(this, event)
+    minus.oncontextmenu = (event) => onMinus(this, event)
   }
 
   disconnectedCallback () {
@@ -67,7 +75,7 @@ export class XAxis extends HTMLElement {
     const t = Number.parseFloat(`${duration}`)
 
     if (!Number.isNaN(t)) {
-      this.internal.duration = Math.round(t * 1000)
+      this.internal.duration = Math.round(t * TIMESCALE)
       this.start = start
       this.end = end
 
@@ -79,11 +87,11 @@ export class XAxis extends HTMLElement {
   }
 
   get duration () {
-    return this.internal.duration / 1000
+    return this.internal.duration / TIMESCALE
   }
 
   get start () {
-    return this.internal.start / 1000
+    return this.internal.start / TIMESCALE
   }
 
   set start (v) {
@@ -92,14 +100,14 @@ export class XAxis extends HTMLElement {
     if (Number.isNaN(t) || this.duration === 0) {
       this.internal.start = 0
     } else {
-      this.internal.start = constrain(Math.round(t * 1000), 0, this.internal.end)
+      this.internal.start = constrain(Math.round(t * TIMESCALE), 0, this.internal.end)
     }
 
     this.reselect()
   }
 
   get end () {
-    return this.internal.end / 1000
+    return this.internal.end / TIMESCALE
   }
 
   set end (v) {
@@ -108,7 +116,7 @@ export class XAxis extends HTMLElement {
     if (Number.isNaN(t) || this.internal.duration === 0) {
       this.internal.end = 0
     } else {
-      this.internal.end = constrain(Math.round(t * 1000), 0, this.internal.duration)
+      this.internal.end = constrain(Math.round(t * TIMESCALE), 0, this.internal.duration)
     }
 
     this.reselect()
@@ -131,14 +139,17 @@ export class XAxis extends HTMLElement {
     } else {
       start.innerHTML = format(this.start)
       end.innerHTML = format(this.end)
-      duration.innerHTML = format(delta / 1000)
+      duration.innerHTML = format(delta / TIMESCALE)
     }
   }
 }
 
 function onLeft (xaxis, event) {
+  event.preventDefault()
+
+  const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
   const p = xaxis.internal.start
-  const q = constrain(p - 1, 0, xaxis.internal.end)
+  const q = constrain(p - dt, 0, xaxis.internal.end)
   const delta = q - p
 
   xaxis.internal.start += delta
@@ -152,8 +163,11 @@ function onLeft (xaxis, event) {
 }
 
 function onRight (xaxis, event) {
+  event.preventDefault()
+
+  const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
   const p = xaxis.internal.end
-  const q = constrain(p + 1, xaxis.internal.start, xaxis.internal.duration)
+  const q = constrain(p + dt, xaxis.internal.start, xaxis.internal.duration)
   const delta = q - p
 
   xaxis.internal.start += delta
@@ -167,8 +181,10 @@ function onRight (xaxis, event) {
 }
 
 function onPlus (xaxis, event) {
-  const dt = xaxis.internal.end - xaxis.internal.start
-  const delta = constrain(dt - 1, 0, xaxis.internal.duration)
+  event.preventDefault()
+
+  const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
+  const delta = constrain(xaxis.internal.end - xaxis.internal.start - dt, 0, xaxis.internal.duration)
 
   const q = constrain(xaxis.internal.start + delta, xaxis.internal.start, xaxis.internal.duration)
   const p = constrain(q - delta, 0, xaxis.internal.end)
@@ -184,8 +200,10 @@ function onPlus (xaxis, event) {
 }
 
 function onMinus (xaxis, event) {
-  const dt = xaxis.internal.end - xaxis.internal.start
-  const delta = constrain(dt + 1, 0, xaxis.internal.duration)
+  event.preventDefault()
+
+  const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
+  const delta = constrain(xaxis.internal.end - xaxis.internal.start + dt, 0, xaxis.internal.duration)
 
   const q = constrain(xaxis.internal.start + delta, xaxis.internal.start, xaxis.internal.duration)
   const p = constrain(q - delta, 0, xaxis.internal.end)
@@ -201,15 +219,14 @@ function onMinus (xaxis, event) {
 }
 
 function format (v) {
-  const ms = Math.trunc(v * 1000) % 1000
-  const ss = Math.trunc(v) % 60
   const mm = Math.trunc(v / 60)
+  const ss = Math.trunc(v) % 60
+  const ms = Math.trunc(v * 1000) % 1000
+  const µs = Math.trunc(v * 10000) % 10000 % 10
 
-  if (mm > 0) {
-    return `${mm}:${ss}.${ms.toString().padStart(3, '0')}`
-  } else {
-    return `${ss}.${ms.toString().padStart(3, '0')}`
-  }
+  const mmssms = mm > 0 ? `${mm}:${ss}.${ms.toString().padStart(3, '0')}` : `${ss}.${ms.toString().padStart(3, '0')}`
+
+  return µs > 0 ? `${mmssms}.${µs}` : `${mmssms}`
 }
 
 function constrain (v, min, max) {
