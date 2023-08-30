@@ -31,9 +31,13 @@ export class XAxis extends HTMLElement {
     const shadow = this.shadowRoot
     const left = shadow.querySelector('#left')
     const right = shadow.querySelector('#right')
+    const plus = shadow.querySelector('#plus')
+    const minus = shadow.querySelector('#minus')
 
     left.onclick = (event) => onLeft(this, event)
     right.onclick = (event) => onRight(this, event)
+    plus.onclick = (event) => onPlus(this, event)
+    minus.onclick = (event) => onMinus(this, event)
   }
 
   disconnectedCallback () {
@@ -154,6 +158,40 @@ function onRight (xaxis, event) {
 
   xaxis.internal.start += delta
   xaxis.internal.end += delta
+
+  xaxis.reselect()
+
+  if (xaxis.onchanged != null) {
+    xaxis.onchanged(xaxis.start, xaxis.end)
+  }
+}
+
+function onPlus (xaxis, event) {
+  const dt = xaxis.internal.end - xaxis.internal.start
+  const delta = constrain(dt - 1, 0, xaxis.internal.duration)
+
+  const q = constrain(xaxis.internal.start + delta, xaxis.internal.start, xaxis.internal.duration)
+  const p = constrain(q - delta, 0, xaxis.internal.end)
+
+  xaxis.internal.start = p
+  xaxis.internal.end = q
+
+  xaxis.reselect()
+
+  if (xaxis.onchanged != null) {
+    xaxis.onchanged(xaxis.start, xaxis.end)
+  }
+}
+
+function onMinus (xaxis, event) {
+  const dt = xaxis.internal.end - xaxis.internal.start
+  const delta = constrain(dt + 1, 0, xaxis.internal.duration)
+
+  const q = constrain(xaxis.internal.start + delta, xaxis.internal.start, xaxis.internal.duration)
+  const p = constrain(q - delta, 0, xaxis.internal.end)
+
+  xaxis.internal.start = p
+  xaxis.internal.end = q
 
   xaxis.reselect()
 
