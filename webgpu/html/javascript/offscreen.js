@@ -83,7 +83,7 @@ class Offscreen {
     const start = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(start)) {
-      this.internal.start = Math.max(Math.min(start, this.internal.duration), 0)
+      this.internal.start = constrain(start,0,this.internal.duration)
     }
   }
 
@@ -92,7 +92,7 @@ class Offscreen {
     const end = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(end)) {
-      this.internal.end = Math.max(Math.min(end, this.internal.duration), 0)
+      this.internal.end = constrain(end, 0,this.internal.duration)
     }
   }
 
@@ -158,3 +158,7 @@ function draw (context, device, layers) {
 
   device.queue.submit([encoder.finish()])
 }
+
+function constrain(v,min,max)  {
+  return  Math.max(Math.min(v, max), min)
+}    

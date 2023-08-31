@@ -82,7 +82,7 @@ class Canvas {
     const start = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(start)) {
-      this.internal.start = Math.max(Math.min(start, 1), 0) * this.internal.duration
+      this.internal.start = constrain(start, 0, this.internal.duration)
     }
   }
 
@@ -91,7 +91,7 @@ class Canvas {
     const end = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(end)) {
-      this.internal.end = Math.max(Math.min(end, 1), 0) * this.internal.duration
+      this.internal.end = constrain(end, 0, this.internal.duration)
     }
   }
 
@@ -155,3 +155,7 @@ function draw (context, device, layers) {
 
   device.queue.submit([encoder.finish()])
 }
+
+function constrain(v,min,max)  {
+  return  Math.max(Math.min(v, max), min)
+}    

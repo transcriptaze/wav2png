@@ -149,7 +149,7 @@ function onLeft (xaxis, event) {
 
   const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
   const p = xaxis.internal.start
-  const q = constrain(p - dt, 0, xaxis.internal.end)
+  const q = constrain(p + dt, 0, xaxis.internal.end)
   const delta = q - p
 
   xaxis.internal.start += delta
@@ -167,7 +167,7 @@ function onRight (xaxis, event) {
 
   const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
   const p = xaxis.internal.end
-  const q = constrain(p + dt, xaxis.internal.start, xaxis.internal.duration)
+  const q = constrain(p - dt, xaxis.internal.start, xaxis.internal.duration)
   const delta = q - p
 
   xaxis.internal.start += delta
@@ -184,7 +184,7 @@ function onPlus (xaxis, event) {
   event.preventDefault()
 
   const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
-  const delta = constrain(xaxis.internal.end - xaxis.internal.start - dt, 0, xaxis.internal.duration)
+  const delta = constrain(xaxis.internal.end - xaxis.internal.start + dt, 0, xaxis.internal.duration)
 
   const q = constrain(xaxis.internal.start + delta, xaxis.internal.start, xaxis.internal.duration)
   const p = constrain(q - delta, 0, xaxis.internal.end)
@@ -203,7 +203,7 @@ function onMinus (xaxis, event) {
   event.preventDefault()
 
   const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
-  const delta = constrain(xaxis.internal.end - xaxis.internal.start + dt, 0, xaxis.internal.duration)
+  const delta = constrain(xaxis.internal.end - xaxis.internal.start - dt, 0, xaxis.internal.duration)
 
   const q = constrain(xaxis.internal.start + delta, xaxis.internal.start, xaxis.internal.duration)
   const p = constrain(q - delta, 0, xaxis.internal.end)

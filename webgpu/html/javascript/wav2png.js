@@ -73,24 +73,24 @@ export async function initialise () {
     xaxis.start = start
     xaxis.end = end
 
-    canvas.start = start / duration
-    canvas.end = end / duration
+    canvas.start = start
+    canvas.end = end
     canvas.redraw()
 
-    offscreen.start = start / duration
-    offscreen.end = end / duration
+    offscreen.start = start
+    offscreen.end = end
   }
 
   xaxis.onchanged = (start, end) => {
     overview.start = start
     overview.end = end
 
-    canvas.start = start / duration
-    canvas.end = end / duration
+    canvas.start = start
+    canvas.end = end
     canvas.redraw()
 
-    offscreen.start = start / duration
-    offscreen.end = end / duration
+    offscreen.start = start
+    offscreen.end = end
   }
 
   const refresh = () => {
