@@ -16,8 +16,8 @@
       - [x] waveform left/right
       - [x] alt-click to micro adjust
       - [x] ctrl-click to macro adjust
+      - [x] overlay: alt-drag drag together
       - [ ] waveform left/right dimension arrows
-      - [ ] overlay: alt-drag drag together
       - [ ] fix jump on load/trash
 
 - [ ] Fix Firefox flickering

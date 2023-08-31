@@ -5,6 +5,7 @@ export class Drag {
     this.setXY = setXY
 
     this.dragging = false
+    this.pan = false
     this.hscale = 2 // FIXME calculate from client width
     this.vscale = 2 // FIXME calculate from client height
 
@@ -14,6 +15,7 @@ export class Drag {
 
   start (event, canvas) {
     this.dragging = true
+    this.pan = event.altKey
     this.origin = this.getXY()
     this.startXY = { x: this.hscale * event.offsetX, y: this.vscale * event.offsetY }
 
@@ -33,7 +35,7 @@ export class Drag {
       const dx = xy.x - this.startXY.x
       const dy = xy.y - this.startXY.y
 
-      this.setXY(this.origin.x + dx, this.origin.y + dy, this.dragging)
+      this.setXY(this.origin.x + dx, this.origin.y + dy, this.dragging, this.pan)
     }
   }
 
@@ -48,7 +50,7 @@ export class Drag {
       const dy = xy.y - this.startXY.y
 
       this.dragging = false
-      this.setXY(this.origin.x + dx, this.origin.y + dy, this.dragging)
+      this.setXY(this.origin.x + dx, this.origin.y + dy, this.dragging, this.pan)
     }
   }
 }

@@ -17,8 +17,8 @@ export class Overlay extends HTMLElement {
       end: 1920 - 2 * 20,
 
       handles: {
-        left: new Drag(this, () => getStartXY(this), (x, y, dragging) => setStartXY(this, x, y, dragging)),
-        right: new Drag(this, () => getEndXY(this), (x, y, dragging) => setEndXY(this, x, y, dragging))
+        left: new Drag(this, () => getStartXY(this), (x, y, dragging, pan) => setStartXY(this, x, y, dragging, pan)),
+        right: new Drag(this, () => getEndXY(this), (x, y, dragging, pan) => setEndXY(this, x, y, dragging, pan))
       },
 
       onChange: null,
@@ -184,11 +184,21 @@ function getStartXY (overlay) {
   return { x: w * overlay.start / overlay.duration, y: 0 }
 }
 
-function setStartXY (overlay, x, y, dragging) {
+function setStartXY (overlay, x, y, dragging, pan) {
   const w = overlay.width - 2 * overlay.padding
-  const start = overlay.duration * x / w
 
-  overlay.internal.start = constrain(Math.round(start * TIMESCALE), 0, overlay.internal.end)
+  if (pan) {
+    const delta = constrain(overlay.end - overlay.start, 0, overlay.duration)
+    const start = constrain(overlay.duration * x / w, 0, overlay.duration)
+    const end = constrain(start + delta, 0, overlay.duration)
+
+    overlay.internal.end = constrain(Math.round(end * TIMESCALE), 0, overlay.internal.duration)
+    overlay.internal.start = constrain(Math.round((end - delta) * TIMESCALE), 0, overlay.internal.duration)
+  } else {
+    const start = overlay.duration * x / w
+
+    overlay.internal.start = constrain(Math.round(start * TIMESCALE), 0, overlay.internal.end)
+  }
 
   redraw(overlay)
 
@@ -205,11 +215,21 @@ function getEndXY (overlay) {
   return { x: w * overlay.end / overlay.duration, y: 0 }
 }
 
-function setEndXY (overlay, x, y, dragging) {
+function setEndXY (overlay, x, y, dragging, pan) {
   const w = overlay.width - 2 * overlay.padding
-  const end = overlay.duration * x / w
 
-  overlay.internal.end = constrain(Math.round(end * TIMESCALE), overlay.internal.start, overlay.internal.duration)
+  if (pan) {
+    const delta = constrain(overlay.end - overlay.start, 0, overlay.duration)
+    const end = constrain(overlay.duration * x / w, 0, overlay.duration)
+    const start = constrain(end - delta, 0, overlay.duration)
+
+    overlay.internal.start = constrain(Math.round(start * TIMESCALE), 0, overlay.internal.duration)
+    overlay.internal.end = constrain(Math.round((start + delta) * TIMESCALE), 0, overlay.internal.duration)
+  } else {
+    const end = overlay.duration * x / w
+
+    overlay.internal.end = constrain(Math.round(end * TIMESCALE), overlay.internal.start, overlay.internal.duration)
+  }
 
   redraw(overlay)
 
