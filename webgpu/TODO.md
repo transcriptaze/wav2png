@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] start:end
+- [x] start:end
       - [x] drag handles independently
       - [x] fix hit test area so that only head is draggable
       - [x] onChange
@@ -17,8 +17,8 @@
       - [x] alt-click to micro adjust
       - [x] ctrl-click to macro adjust
       - [x] overlay: alt-drag drag together
-      - [ ] waveform left/right dimension arrows
-      - [ ] fix jump on load/trash
+      - [x] fix jump on load/trash
+      - [x] waveform left/right dimension arrows
 
 - [ ] Fix Firefox flickering
 - [ ] Two point gradient
@@ -36,6 +36,8 @@
 - [ ] lines:median
 - [ ] lines:multi-point gradient
 - [ ] lines:pixelated
+- [ ] audio mixing
+
 - (?) Create different bind group layouts for compute/render shaders to avoid confusion
 - (?) Experiment with border image for windmill
       - https://developer.mozilla.org/en-US/docs/Web/CSS/border-image

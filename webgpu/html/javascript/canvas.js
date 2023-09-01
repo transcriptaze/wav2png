@@ -156,6 +156,6 @@ function draw (context, device, layers) {
   device.queue.submit([encoder.finish()])
 }
 
-function constrain(v,min,max)  {
-  return  Math.max(Math.min(v, max), min)
-}    
+function constrain (v, min, max) {
+  return Math.max(Math.min(v, max), min)
+}

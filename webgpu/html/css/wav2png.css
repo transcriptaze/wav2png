@@ -52,7 +52,7 @@ body {
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr;
   justify-items: center;
-  align-items: center;
+  align-items: start;
   column-gap: 16px;
 }
 
@@ -86,6 +86,7 @@ main {
   grid-template-areas: "overview unused1 unused2" "canvas toolbar toolbox" "xaxis unused3 unused4";
   column-gap: 8px;
   row-gap: 2px;
+  margin-top: 32px;
 }
 
 div#overview {

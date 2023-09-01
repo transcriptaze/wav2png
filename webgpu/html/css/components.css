@@ -183,20 +183,39 @@ div#x-axis button#minus {
 div#x-axis button#plus {
   margin-left: 32px;
 }
-div#x-axis .label {
-  align-self: center;
-}
-div#x-axis .left {
-  justify-self: start;
-}
-div#x-axis .middle {
-  justify-self: center;
-}
-div#x-axis .right {
-  justify-self: end;
-  text-align: right;
-}
-div#x-axis .label {
+div#x-axis label {
   font-family: sans-serif;
   font-size: 0.7em;
+}
+div#x-axis img.dimension {
+  height: 12px;
+}
+div#x-axis #start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  column-gap: 4px;
+  visibility: hidden;
+}
+div#x-axis #start.visible {
+  visibility: visible;
+}
+div#x-axis #end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  column-gap: 4px;
+  visibility: hidden;
+}
+div#x-axis #end.visible {
+  visibility: visible;
+}
+div#x-axis #duration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+}
+div#x-axis #duration.visible {
+  visibility: visible;
 }

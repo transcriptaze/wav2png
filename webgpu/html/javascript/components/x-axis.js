@@ -132,14 +132,18 @@ export class XAxis extends HTMLElement {
     const to = this.internal.end
     const delta = to - from
 
+    start.querySelector('label').innerHTML = format(this.start)
+    end.querySelector('label').innerHTML = format(this.end)
+    duration.querySelector('label').innerHTML = format(delta / TIMESCALE)
+
     if (this.duration === 0) {
-      start.innerHTML = ''
-      end.innerHTML = ''
-      duration.innerHTML = ''
+      start.classList.remove('visible')
+      end.classList.remove('visible')
+      duration.classList.remove('visible')
     } else {
-      start.innerHTML = format(this.start)
-      end.innerHTML = format(this.end)
-      duration.innerHTML = format(delta / TIMESCALE)
+      start.classList.add('visible')
+      end.classList.add('visible')
+      duration.classList.add('visible')
     }
   }
 }
