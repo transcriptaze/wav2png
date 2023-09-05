@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     version="1.1"
+     viewBox="-128 -128 256 256">
+  <defs>
+    <!-- Ref. https://stackoverflow.com/questions/13223636/svg-gradient-for-perfectly-horizontal-path -->
+    <linearGradient id="gradient" x1="0%" x2="0%" y1="50%" y2="0%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#c00000ff"/>
+      <stop offset="100%" stop-color="#c0000040"/>
+    </linearGradient>
+
+  </defs>     
+  <line x1="-108" y1="128" x2="-108" y2="32"   stroke-width="24" stroke="url(#gradient)" />     
+  <line x1="-72"  y1="128" x2="-72"  y2="-48"  stroke-width="24" stroke="url(#gradient)" />     
+  <line x1="-36"  y1="128" x2="-36"  y2="-96"  stroke-width="24" stroke="url(#gradient)" />     
+  <line x1="0"    y1="128" x2="0"    y2="-128" stroke-width="24" stroke="url(#gradient)" />     
+  <line x1="36"   y1="128" x2="36"   y2="-96"  stroke-width="24" stroke="url(#gradient)" />     
+  <line x1="72"   y1="128" x2="72"   y2="-48"  stroke-width="24" stroke="url(#gradient)" />     
+  <line x1="108"  y1="128" x2="108"  y2="32"   stroke-width="24" stroke="url(#gradient)" />     
+</svg>

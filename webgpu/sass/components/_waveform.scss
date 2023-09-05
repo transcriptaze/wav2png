@@ -20,11 +20,6 @@ fieldset.waveform {
         white-space: nowrap;  
     }
 
-    div {
-        display: flex;
-        flex-direction: column;
-    }
-
     input[type="color"] {
         width: 48px;
         height: 48px;
@@ -35,4 +30,33 @@ fieldset.waveform {
         width: 128px;
     }
 
+    div#waveforms {
+        display: flex;
+        flex-direction: row;
+        column-gap: 4px;
+
+        label img {
+            width: 24px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            padding-left: 2px;
+            padding-right: 2px;
+
+            border: $border-unselected;
+            border-radius: 2px;
+        }
+
+        label.selected img {
+            border: $border-selected;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+    }
+
+    div#settings {
+        display: flex;
+        flex-direction: column;
+    }
 }

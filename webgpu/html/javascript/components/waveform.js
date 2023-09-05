@@ -28,17 +28,22 @@ export class Waveform extends HTMLElement {
 
   connectedCallback () {
     const shadow = this.shadowRoot
-    const vscale = shadow.querySelector('input#vscale')
     const rgb = shadow.querySelector('input#rgb')
     const alpha = shadow.querySelector('input#alpha')
+    const vscale = shadow.querySelector('input#vscale')
+    const pickers = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
 
-    vscale.oninput = (event) => onChange(this)
     rgb.oninput = (event) => onChange(this)
     alpha.oninput = (event) => onChange(this)
+    vscale.oninput = (event) => onChange(this)
 
-    vscale.onchange = (event) => onChanged(this)
     rgb.onchange = (event) => onChanged(this)
     alpha.onchange = (event) => onChanged(this)
+    vscale.onchange = (event) => onChanged(this)
+
+    pickers.forEach((e) => {
+      e.oninput = (event) => onWaveForm(this, event)
+    })
   }
 
   disconnectedCallback () {
@@ -141,6 +146,21 @@ function onChanged (component) {
   if (component.onchanged) {
     component.onchanged(waveform)
   }
+}
+
+function onWaveForm (component, event) {
+  const shadow = component.shadowRoot
+  const pickers = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
+
+  pickers.forEach((e) => {
+    const label = shadow.querySelector(`label[for="${e.id}"`)
+
+    if (e.id === event.target.id) {
+      label.classList.add('selected')
+    } else {
+      label.classList.remove('selected')
+    }
+  })
 }
 
 customElements.define('wav2png-waveform', Waveform)

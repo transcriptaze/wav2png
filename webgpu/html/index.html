@@ -91,10 +91,18 @@
     <template id="template-waveform">
       <fieldset class="waveform">
         <legend>Waveform</legend>
-        <div>
-          <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
+        <div id="waveforms">
+          <label for="one-point" class="selected"><img src="/images/waveforms/one-point.svg" /></label>
+          <label for="two-point"><img src="/images/waveforms/two-point.svg" /></label>
+          <label for="three-point"><img src="/images/waveforms/three-point.svg" /></label>
+          <input id="one-point"   name="waveform" type="radio" value="1-point" checked />
+          <input id="two-point"   name="waveform" type="radio" value="2-point" />
+          <input id="three-point" name="waveform" type="radio" value="3-point" />
+        </div>
+        <div id="settings">
           <input id="rgb"   type="color" value="#80ccff" />
           <input id="alpha" type="range" step="any" min="0.0" max="1.0" value="1.0" />
+          <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
         </div>
       </fieldset>
     </template>

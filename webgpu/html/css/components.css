@@ -117,10 +117,6 @@ fieldset.waveform legend {
   font-size: 0.8em;
   white-space: nowrap;
 }
-fieldset.waveform div {
-  display: flex;
-  flex-direction: column;
-}
 fieldset.waveform input[type=color] {
   width: 48px;
   height: 48px;
@@ -128,6 +124,30 @@ fieldset.waveform input[type=color] {
 }
 fieldset.waveform input[type=range] {
   width: 128px;
+}
+fieldset.waveform div#waveforms {
+  display: flex;
+  flex-direction: row;
+  column-gap: 4px;
+}
+fieldset.waveform div#waveforms label img {
+  width: 24px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid grey;
+  border-radius: 2px;
+}
+fieldset.waveform div#waveforms label.selected img {
+  border: 1.5px solid black;
+}
+fieldset.waveform div#waveforms input[type=radio] {
+  display: none;
+}
+fieldset.waveform div#settings {
+  display: flex;
+  flex-direction: column;
 }
 
 canvas.overlay {

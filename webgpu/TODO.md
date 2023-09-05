@@ -1,30 +1,15 @@
 # TODO
 
-- [x] start:end
-      - [x] drag handles independently
-      - [x] fix hit test area so that only head is draggable
-      - [x] onChange
-      - [x] onChanged
-      - [x] Set offscreen start:end
-      - [x] label start, end
-      - [x] label interval
-      - [x] genericize overlay start:end as [0..1] interval
-      - [x] Weird rendering on subarrays
-      - [x] reinstate 'trash'
-      - [x] waveform labels
-      - [x] waveform +/-
-      - [x] waveform left/right
-      - [x] alt-click to micro adjust
-      - [x] ctrl-click to macro adjust
-      - [x] overlay: alt-drag drag together
-      - [x] fix jump on load/trash
-      - [x] waveform left/right dimension arrows
-
-- [ ] Fix Firefox flickering
 - [ ] Two point gradient
+
+- [ ] Draggable for left/right/plus/minus
+- [ ] Github build workflow
 - [ ] Render in Worker
 - [ ] Restyle range controls       
-
+- [ ] Fix Firefox flickering
+- [ ] Futhark
+      - https://futhark-lang.org/index.html
+      
 - [ ]  Better colour picker
        - https://rgbacolorpicker.com/
 
