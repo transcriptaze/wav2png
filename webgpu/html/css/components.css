@@ -119,7 +119,6 @@ fieldset.waveform legend {
 }
 fieldset.waveform input[type=color] {
   width: 48px;
-  height: 48px;
   border: none;
 }
 fieldset.waveform input[type=range] {
@@ -148,6 +147,31 @@ fieldset.waveform div#waveforms input[type=radio] {
 fieldset.waveform div#settings {
   display: flex;
   flex-direction: column;
+}
+fieldset.waveform div#settings div.card {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  grid-template-areas: "exemplar swatch" "exemplar alpha";
+  column-gap: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border: 1px solid grey;
+  border-radius: 4px;
+}
+fieldset.waveform div#settings div.card .exemplar {
+  grid-area: exemplar;
+  height: 48px;
+}
+fieldset.waveform div#settings div.card input.swatch {
+  grid-area: swatch;
+}
+fieldset.waveform div#settings div.card input.alpha {
+  grid-area: alpha;
 }
 
 canvas.overlay {

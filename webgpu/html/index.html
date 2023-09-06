@@ -10,7 +10,7 @@
   </head>
 
   <body>
-    <img id="logo" src="/images/logo.png" />
+    <img id="logo" src="./images/logo.png" />
     <div id="samples">
       <ul>
         <li><a href="/audio/noise.wav" onclick="onSample(event)">noise</a></li>
@@ -44,10 +44,10 @@
 
       <div id="toolbar" class="toolbar">
         <button id="save" disabled>
-          <img src="/images/save.svg" onclick="onDownload(event)" draggable="false" />
+          <img src="./images/save.svg" onclick="onDownload(event)" draggable="false" />
         </button>
         <button id="clear" disabled>
-          <img src="/images/trash.svg" onclick="onTrash(event)" draggable="false" />
+          <img src="./images/trash.svg" onclick="onTrash(event)" draggable="false" />
         </button>
         <a id="download" href="" style="display:none" download></a>
       </div>
@@ -92,16 +92,21 @@
       <fieldset class="waveform">
         <legend>Waveform</legend>
         <div id="waveforms">
-          <label for="one-point" class="selected"><img src="/images/waveforms/one-point.svg" /></label>
-          <label for="two-point"><img src="/images/waveforms/two-point.svg" /></label>
-          <label for="three-point"><img src="/images/waveforms/three-point.svg" /></label>
+          <label for="one-point" class="selected"><img src="./images/waveforms/icon-one-point.svg" /></label>
+          <label for="two-point"><img src="./images/waveforms/icon-two-point.svg" /></label>
+          <label for="three-point"><img src="./images/waveforms/icon-three-point.svg" /></label>
           <input id="one-point"   name="waveform" type="radio" value="1-point" checked />
           <input id="two-point"   name="waveform" type="radio" value="2-point" />
           <input id="three-point" name="waveform" type="radio" value="3-point" />
         </div>
         <div id="settings">
-          <input id="rgb"   type="color" value="#80ccff" />
-          <input id="alpha" type="range" step="any" min="0.0" max="1.0" value="1.0" />
+          <div class="card">
+            <svg class="exemplar" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-64 0 128 512">
+              <rect id="bar" x="-24" y="0" width="48" height="512" fill="#80ccff" stroke="#444444" stroke-width="8" rx="20"/>
+            </svg>
+            <input id="rgb"   class="swatch" type="color" value="#80ccff" />
+            <input id="alpha" class="alpha"  type="range" step="any" min="0.0" max="1.0" value="1.0" />
+          </div>
           <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
         </div>
       </fieldset>

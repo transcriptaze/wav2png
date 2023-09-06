@@ -110,6 +110,7 @@ export class Waveform extends HTMLElement {
     const shadow = this.shadowRoot
     const input = shadow.querySelector('input#rgb')
     const range = shadow.querySelector('input#alpha')
+    const exemplar = shadow.querySelector('svg.exemplar #bar')
     const match = `${v}`.match(/^#([a-fA-F0-9]{6})([a-fA-F0-9]{2})?$/)
 
     if (match != null) {
@@ -117,6 +118,7 @@ export class Waveform extends HTMLElement {
       const alpha = Number.parseInt(match[2], 16)
 
       input.value = `#${rgb}`
+      exemplar.style.fill = `"#${rgb}"`
 
       if (!Number.isNaN(alpha)) {
         range.value = Math.min(Math.max(alpha, 0), 255) / 255
@@ -135,14 +137,24 @@ export class Waveform extends HTMLElement {
 }
 
 function onChange (component) {
+  const shadow = component.shadowRoot
   const waveform = component.waveform
+  const exemplar = shadow.querySelector('svg.exemplar #bar')
+
+  exemplar.style.fill = component.colour
+
   if (component.onchange) {
     component.onchange(waveform)
   }
 }
 
 function onChanged (component) {
+  const shadow = component.shadowRoot
   const waveform = component.waveform
+  const exemplar = shadow.querySelector('svg.exemplar #bar')
+
+  exemplar.style.fill = component.colour
+
   if (component.onchanged) {
     component.onchanged(waveform)
   }
