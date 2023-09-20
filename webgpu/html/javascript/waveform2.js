@@ -14,6 +14,8 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
 
   const vertices = new Float32Array([
     0.0, +1.0,
+    0.0, +0.0,
+    0.0, -0.0,
     0.0, -1.0
   ])
 
@@ -225,7 +227,6 @@ const SHADER = `
     struct VertexOutput {
         @builtin(position) pos: vec4f,
         @location(0) colour: vec4f, 
-        @location(1) height: f32, 
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;
@@ -243,33 +244,24 @@ const SHADER = `
        let height = vscale * abs(waveform[input.instance]);
        let origin = vec2f(-1.0, 0.0); 
        let offset = origin + 2.0*i/w; 
+       let rgb = vec3f(uconstants.colour.x,uconstants.colour.y, uconstants.colour.z);
        let x = input.pos.x + offset.x;
-       // let y = input.pos.y*height[input.vertex];
-       let y = input.pos.y * 0.5;
+       let y = input.pos.y*height[input.vertex/2];
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
-       output.colour = uconstants.colour;
-       output.height = -0.25;
+
+       if (input.vertex == 0 || input.vertex == 3) {
+           output.colour = vec4f(rgb,0.25);
+       } else {
+           output.colour = vec4f(rgb,1);
+       }
 
        return output;
     }
 
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       // return input.colour; 
-
-       // let h = -130.0; // abs(0.5*input.height*1080.0);
-       let h = input.height*540.0;
-       let xyz = input.pos;
-       let y = xyz.y - 540;
-
-       if (y < h) {
-          return vec4f(0,0,1,1); 
-       } else if (y < 0) {
-          return vec4f(1,0,0,1); 
-       } else {
-          return vec4f(0,1,0,1); 
-       }
+       return input.colour; 
     }
 `
 
