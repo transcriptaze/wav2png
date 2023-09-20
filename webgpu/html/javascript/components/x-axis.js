@@ -153,11 +153,13 @@ function onLeft (xaxis, event) {
 
   const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
   const p = xaxis.internal.start
-  const q = constrain(p + dt, 0, xaxis.internal.end)
-  const delta = q - p
+  const delta = xaxis.internal.end - xaxis.internal.start
 
-  xaxis.internal.start += delta
-  xaxis.internal.end += delta
+  const end = Math.min(p + dt + delta, xaxis.internal.duration)
+  const start = end - delta
+
+  xaxis.internal.start = start
+  xaxis.internal.end = end
 
   xaxis.reselect()
 
@@ -171,11 +173,13 @@ function onRight (xaxis, event) {
 
   const dt = event.altKey ? DT / 10 : (event.ctrlKey ? DT * 10 : DT)
   const p = xaxis.internal.end
-  const q = constrain(p - dt, xaxis.internal.start, xaxis.internal.duration)
-  const delta = q - p
+  const delta = xaxis.internal.end - xaxis.internal.start
 
-  xaxis.internal.start += delta
-  xaxis.internal.end += delta
+  const start = Math.max(p - dt - delta, 0)
+  const end = start + delta
+
+  xaxis.internal.start = start
+  xaxis.internal.end = end
 
   xaxis.reselect()
 

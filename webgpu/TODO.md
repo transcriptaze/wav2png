@@ -3,6 +3,7 @@
 - [ ] Two point gradient
 
 - [ ] Quantize audio on pixel boundaries (so that it doesn't change when shifting left and right)
+- [ ] Clip to grid (e.g. noise)
 - [ ] Draggable for left/right/plus/minus
 - [ ] Github build workflow
 - [ ] Render in Worker
