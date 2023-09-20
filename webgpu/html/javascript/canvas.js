@@ -1,6 +1,6 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
-import { waveform } from './waveform.js'
+import { waveform } from './waveform2.js'
 import { black, green, transparent, rgba } from './colours.js'
 
 class Canvas {

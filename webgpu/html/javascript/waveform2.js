@@ -244,11 +244,12 @@ const SHADER = `
        let origin = vec2f(-1.0, 0.0); 
        let offset = origin + 2.0*i/w; 
        let x = input.pos.x + offset.x;
-       let y = input.pos.y*height[input.vertex];
+       // let y = input.pos.y*height[input.vertex];
+       let y = input.pos.y * 0.5;
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
        output.colour = uconstants.colour;
-       output.height = scale.y*y;
+       output.height = -0.25;
 
        return output;
     }
@@ -257,11 +258,12 @@ const SHADER = `
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
        // return input.colour; 
 
-       let h = abs(0.5*input.height*1080.0);
+       // let h = -130.0; // abs(0.5*input.height*1080.0);
+       let h = input.height*540.0;
        let xyz = input.pos;
        let y = xyz.y - 540;
 
-       if (abs(y) > h) {
+       if (y < h) {
           return vec4f(0,0,1,1); 
        } else if (y < 0) {
           return vec4f(1,0,0,1); 
