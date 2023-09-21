@@ -19,7 +19,10 @@ class Canvas {
 
       waveform: {
         vscale: 1.0,
-        colour: rgba('#80ccffff')
+        colours: [
+          rgba('#80ccffff'),
+          rgba('#80ccff40')
+        ]
       },
 
       audio: new Float32Array(),
@@ -72,9 +75,9 @@ class Canvas {
     return this.internal.waveform
   }
 
-  set waveform ({ vscale, colour }) {
+  set waveform ({ vscale, colours }) {
     this.internal.waveform.vscale = vscale
-    this.internal.waveform.colour = colour
+    this.internal.waveform.colours = colours
   }
 
   /* eslint-disable-next-line accessor-pairs */

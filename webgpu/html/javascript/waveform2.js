@@ -3,7 +3,7 @@
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function waveform (context, device, format, samples, { vscale, colour }) {
+export function waveform (context, device, format, samples, { vscale, colours }) {
   const width = context.canvas.width
   const height = context.canvas.height
   const xscale = (width - 2 * PADDING) / width
@@ -116,7 +116,7 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colour })
+  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colours })
   const waveform = new Float32Array(pixels * 2)
   const audio = new Float32Array(samples)
 
@@ -187,9 +187,9 @@ export function waveform (context, device, format, samples, { vscale, colour }) 
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
+function pack ({ pixels, stride, samples, xscale, yscale, vscale, colours }) {
   const pad = 0
-  const buffer = new ArrayBuffer(48)
+  const buffer = new ArrayBuffer(32 + 16 * colours.length)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -199,10 +199,16 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
   view.setFloat32(16, xscale, true) // vec2f: must be on a 16-byte boundary
   view.setFloat32(20, yscale, true) //
   view.setFloat32(24, vscale, true)
-  view.setFloat32(32, colour[0], true) // vec4f: must be on a 16-byte boundary
-  view.setFloat32(36, colour[1], true) //
-  view.setFloat32(40, colour[2], true) //
-  view.setFloat32(44, colour[3], true) //
+
+  for (let i = 0; i < colours.length; i++) {
+    const colour = colours[i]
+    const ix = 32 + i * 16
+
+    view.setFloat32(ix, colour[0], true) // vec4f: must be on a 16-byte boundary
+    view.setFloat32(ix + 4, colour[1], true) //
+    view.setFloat32(ix + 8, colour[2], true) //
+    view.setFloat32(ix + 12, colour[3], true) //
+  }
 
   return new Uint8Array(buffer)
 }
@@ -215,7 +221,8 @@ const SHADER = `
       pad: f32,
       scale: vec2f,
       vscale: f32,
-      colour: vec4f
+      colour1: vec4f,
+      colour2: vec4f
     };
 
     struct VertexInput {
@@ -244,16 +251,15 @@ const SHADER = `
        let height = vscale * abs(waveform[input.instance]);
        let origin = vec2f(-1.0, 0.0); 
        let offset = origin + 2.0*i/w; 
-       let rgb = vec3f(uconstants.colour.x,uconstants.colour.y, uconstants.colour.z);
        let x = input.pos.x + offset.x;
        let y = input.pos.y*height[input.vertex/2];
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
 
        if (input.vertex == 0 || input.vertex == 3) {
-           output.colour = vec4f(rgb,0.25);
+           output.colour = uconstants.colour2;
        } else {
-           output.colour = vec4f(rgb,1);
+           output.colour = uconstants.colour1;
        }
 
        return output;

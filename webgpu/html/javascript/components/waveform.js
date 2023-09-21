@@ -129,9 +129,14 @@ export class Waveform extends HTMLElement {
   }
 
   get waveform () {
+    const colour = rgba(this.colour)
+
     return {
       vscale: this.vscale,
-      colour: rgba(this.colour)
+      colours: [
+        colour,
+        [colour[0], colour[1], colour[2], 0.25]
+      ]
     }
   }
 }

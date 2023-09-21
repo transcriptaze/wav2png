@@ -1,6 +1,6 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
-import { waveform } from './waveform.js'
+import { waveform } from './waveform2.js'
 import { black, green, transparent, rgba } from './colours.js'
 
 class Offscreen {
@@ -23,7 +23,10 @@ class Offscreen {
 
       waveform: {
         vscale: 1.0,
-        colour: rgba('#80ccffff')
+        colours: [
+          rgba('#80ccffff'),
+          rgba('#80ccff40')
+        ]
       },
 
       audio: new Float32Array(),
