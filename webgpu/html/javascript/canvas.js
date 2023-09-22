@@ -1,7 +1,7 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
-import { waveform } from './waveform2.js'
-import { black, green, transparent, rgba } from './colours.js'
+import { waveform, WAVEFORM } from './waveform2.js'
+import { black, green, transparent } from './colours.js'
 
 class Canvas {
   constructor () {
@@ -9,20 +9,14 @@ class Canvas {
       device: null,
       canvas: document.querySelector('#canvas canvas'),
 
-      fill: black,
-
-      grid: {
-        colour: green,
-        gridx: 8,
-        gridy: 4
-      },
-
-      waveform: {
-        vscale: 1.0,
-        colours: [
-          rgba('#80ccffff'),
-          rgba('#80ccff40')
-        ]
+      styles: {
+        fill: black,
+        grid: {
+          colour: green,
+          gridx: 8,
+          gridy: 4
+        },
+        waveform: WAVEFORM
       },
 
       audio: new Float32Array(),
@@ -55,29 +49,23 @@ class Canvas {
     this.redraw()
   }
 
-  get fill () {
-    return this.internal.fill
+  get styles () {
+    return this.internal.styles
   }
 
+  /* eslint-disable-next-line accessor-pairs */
   set fill (v) {
-    this.internal.fill = v
+    this.internal.styles.fill = v
   }
 
-  get grid () {
-    return this.internal.grid
-  }
-
+  /* eslint-disable-next-line accessor-pairs */
   set grid ({ colour }) {
-    this.internal.grid.colour = colour
+    this.internal.styles.grid.colour = colour
   }
 
-  get waveform () {
-    return this.internal.waveform
-  }
-
-  set waveform ({ vscale, colours }) {
-    this.internal.waveform.vscale = vscale
-    this.internal.waveform.colours = colours
+  /* eslint-disable-next-line accessor-pairs */
+  set waveform (v) {
+    this.internal.styles.waveform = v
   }
 
   /* eslint-disable-next-line accessor-pairs */
@@ -115,11 +103,11 @@ class Canvas {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, this.fill))
-    layers.push(grid(ctx, device, format, this.grid))
+    layers.push(background(ctx, device, format, this.styles.fill))
+    layers.push(grid(ctx, device, format, this.styles.grid))
 
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio, this.waveform))
+      layers.push(waveform(ctx, device, format, audio, this.styles.waveform))
     }
 
     draw(ctx, this.device, layers)

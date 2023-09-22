@@ -1,9 +1,20 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
+import { rgba } from './colours.js'
+
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function waveform (context, device, format, samples, { vscale, colours }) {
+export const WAVEFORM = {
+  type: 'line',
+  vscale: 1.0,
+  colours: [
+    rgba('#80ccffff'),
+    rgba('#80ccff40')
+  ]
+}
+
+export function waveform (context, device, format, samples, style) {
   const width = context.canvas.width
   const height = context.canvas.height
   const xscale = (width - 2 * PADDING) / width
@@ -18,6 +29,12 @@ export function waveform (context, device, format, samples, { vscale, colours })
     0.0, -0.0,
     0.0, -1.0
   ])
+
+  const {
+    _type = 'line',
+    vscale = '1.0',
+    colours = [rgba('#80ccffff'), rgba('#80ccff40')]
+  } = style
 
   const vertexBuffer = device.createBuffer({
     label: 'waveform vertices',
