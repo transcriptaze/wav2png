@@ -112,7 +112,7 @@ export class Waveform extends HTMLElement {
       const alpha = settings.querySelector('input#alpha')
 
       rgb.value = v
-      alpha.value = 1
+      alpha.value = 255
     }
 
     // ... gradient
@@ -122,14 +122,14 @@ export class Waveform extends HTMLElement {
         const alpha = settings.querySelector('input#alpha1')
 
         rgb.value = v
-        alpha.value = 1
+        alpha.value = 255
       }
 
       { const rgb = settings.querySelector('input#rgb2')
         const alpha = settings.querySelector('input#alpha2')
 
         rgb.value = v
-        alpha.value = 0.5
+        alpha.value = 128
       }
     }
   }
@@ -176,11 +176,7 @@ export class Waveform extends HTMLElement {
 }
 
 function onChange (component, e) {
-  // const shadow = component.shadowRoot
-  // const parent = e.parentNode
-  // const exemplar = parent.querySelector('svg.exemplar #bar')
-
-  // exemplar.style.fill = component.colour
+  recolour(component)
 
   if (component.onchange) {
     component.onchange(component.style)
@@ -188,10 +184,7 @@ function onChange (component, e) {
 }
 
 function onChanged (component, e) {
-  // const shadow = component.shadowRoot
-  // const exemplar = shadow.querySelector('svg.exemplar #bar')
-
-  // exemplar.style.fill = component.colour
+  recolour(component)
 
   if (component.onchanged) {
     component.onchanged(component.style)
@@ -226,11 +219,47 @@ function onStyle (component, e) {
   }
 }
 
+function recolour (component) {
+  const shadow = component.shadowRoot
+
+  // ... line
+  {
+    const settings = shadow.querySelector('div[for="line"]')
+    const svg = settings.querySelector('svg')
+    const bar = svg.querySelector('rect')
+    const rgb = settings.querySelector('input#rgb').value
+    const alpha = settings.querySelector('input#alpha').value
+
+    bar.setAttributeNS(null, 'fill', rgba(rgb, alpha))
+  }
+
+  // ... gradient
+  {
+    const settings = shadow.querySelector('div[for="gradient"]')
+    const svg = settings.querySelector('svg')
+    const gradient = svg.querySelector('#gradient')
+    const stops = gradient.querySelectorAll('stop')
+
+    {
+      const rgb = settings.querySelector('input#rgb2').value
+      const alpha = settings.querySelector('input#alpha2').value
+      stops[0].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+    }
+
+    {
+      const rgb = settings.querySelector('input#rgb1').value
+      const alpha = settings.querySelector('input#alpha1').value
+      stops[1].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+    }
+  }
+}
+
 function rgba (rgb, alpha) {
   const match = `${rgb}`.match(/^#([a-fA-F0-9]{6})$/)
 
   const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
-  const v = Number.parseInt(`${255 * Number.parseFloat(`${alpha}`)}`).toString(16).padStart(2, '0')
+  const v = Number.parseInt(`${alpha}`).toString(16).padStart(2, '0')
+  // const v = Number.parseInt(`${255 * Number.parseFloat(`${alpha}`)}`).toString(16).padStart(2, '0')
 
   return `#${u}${v}`
 }
