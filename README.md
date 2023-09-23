@@ -12,9 +12,9 @@ There are three implementations:
 - (**under development**) A WebGPU version in the _webgpu_ directory) for a faster interactive experience, 
   hosted on [CloudFlare Pages](https://wav2png.pages.dev).
 
-[<img width="256" src="cli/acoustic.png">](gallery/cli/acoustic.png)
-[<img width="256" src="webgpu/line-bw.png">](gallery/webgpu/line-bw.png)
-[<img width="256" src="webgpu/gradient-red.png">](gallery/webgpu/gradient-red.png)
+[<img width="256" src="gallery/cli/acoustic.png">](gallery/cli/acoustic.png)
+[<img width="256" src="gallery/webgpu/line-bw.png">](gallery/webgpu/line-bw.png)
+[<img width="256" src="gallery/webgpu/gradient-red.png">](gallery/webgpu/gradient-red.png)
 
 ## Raison d'être
 
