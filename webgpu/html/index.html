@@ -95,18 +95,43 @@
           <label for="one-point" class="selected"><img src="./images/waveforms/icon-one-point.svg" /></label>
           <label for="two-point"><img src="./images/waveforms/icon-two-point.svg" /></label>
           <label for="three-point"><img src="./images/waveforms/icon-three-point.svg" /></label>
-          <input id="one-point"   name="waveform" type="radio" value="1-point" checked />
-          <input id="two-point"   name="waveform" type="radio" value="2-point" />
-          <input id="three-point" name="waveform" type="radio" value="3-point" />
+          <input id="one-point"   name="waveform" type="radio" value="line" checked />
+          <input id="two-point"   name="waveform" type="radio" value="gradient" />
+          <input id="three-point" name="waveform" type="radio" value="gradient3" />
         </div>
         <div id="settings">
-          <div class="card">
+          <div for="line" class="line">
             <svg class="exemplar" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-64 0 128 512">
               <rect id="bar" x="-24" y="0" width="48" height="512" fill="#80ccff" stroke="#444444" stroke-width="8" rx="20"/>
             </svg>
             <input id="rgb"   class="swatch" type="color" value="#80ccff" />
             <input id="alpha" class="alpha"  type="range" step="any" min="0.0" max="1.0" value="1.0" />
           </div>
+
+          <div for="gradient" class="gradient hidden">
+            <svg class="exemplar" 
+                 xmlns="http://www.w3.org/2000/svg" 
+                 version="1.1" 
+                 viewBox="-64 0 128 512" 
+                 preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="xxx" gradientTransform="rotate(90)">
+                  <stop offset="0%"   stop-color="#ff0000ff" />
+                  <stop offset="100%" stop-color="#00ff00ff" />
+                </linearGradient>
+              </defs>                 
+              <rect id="bar" x="-24" y="0" width="48" height="512" stroke="#444444" stroke-width="8" rx="20"
+                    fill="url('#xxx')" />
+            </svg>
+            <input id="rgb2"   class="swatch" type="color" value="#ff0000" />
+            <input id="alpha2" class="alpha"  type="range" step="any" min="0.0" max="1.0" value="1.0" />
+            <input id="rgb1"   class="swatch" type="color" value="#00ff00" />
+            <input id="alpha1" class="alpha"  type="range" step="any" min="0.0" max="1.0" value="1.0" />
+          </div>
+
+          <div for="gradient3" class="gradient hidden">
+          </div>
+
           <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
         </div>
       </fieldset>

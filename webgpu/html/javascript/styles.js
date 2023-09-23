@@ -15,3 +15,13 @@ export function lineStyle (vscale, colour) {
     }
   }
 }
+
+export function gradientStyle (vscale, colour1, colour2) {
+  return {
+    type: 'gradient',
+    gradient: {
+      vscale,
+      colours: [colour1, colour2]
+    }
+  }
+}

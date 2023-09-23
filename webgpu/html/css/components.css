@@ -148,7 +148,7 @@ fieldset.waveform div#settings {
   display: flex;
   flex-direction: column;
 }
-fieldset.waveform div#settings div.card {
+fieldset.waveform div#settings div.line {
   margin-top: 8px;
   margin-bottom: 8px;
   display: grid;
@@ -163,15 +163,53 @@ fieldset.waveform div#settings div.card {
   border: 1px solid grey;
   border-radius: 4px;
 }
-fieldset.waveform div#settings div.card .exemplar {
+fieldset.waveform div#settings div.line .exemplar {
   grid-area: exemplar;
   height: 48px;
 }
-fieldset.waveform div#settings div.card input.swatch {
+fieldset.waveform div#settings div.line input.swatch {
   grid-area: swatch;
 }
-fieldset.waveform div#settings div.card input.alpha {
+fieldset.waveform div#settings div.line input.alpha {
   grid-area: alpha;
+}
+fieldset.waveform div#settings div.line.hidden {
+  display: none;
+}
+fieldset.waveform div#settings div.gradient {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto auto auto;
+  grid-template-areas: "exemplar swatch2" "exemplar alpha2" "exemplar swatch1" "exemplar alpha1";
+  column-gap: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border: 1px solid grey;
+  border-radius: 4px;
+}
+fieldset.waveform div#settings div.gradient .exemplar {
+  grid-area: exemplar;
+  width: 14px;
+  height: 100%;
+}
+fieldset.waveform div#settings div.gradient input.rgb1 {
+  grid-area: swatch1;
+}
+fieldset.waveform div#settings div.gradient input.alpha1 {
+  grid-area: alpha1;
+}
+fieldset.waveform div#settings div.gradient input.rgb2 {
+  grid-area: swatch2;
+}
+fieldset.waveform div#settings div.gradient input.alpha2 {
+  grid-area: alpha2;
+}
+fieldset.waveform div#settings div.gradient.hidden {
+  display: none;
 }
 
 canvas.overlay {
