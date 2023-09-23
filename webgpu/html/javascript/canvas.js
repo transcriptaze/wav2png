@@ -1,6 +1,7 @@
 import { background } from './background.js'
 import { grid } from './grid.js'
-import { waveform, WAVEFORM } from './waveform2.js'
+import { waveform } from './waveform.js'
+import { LINE } from './styles.js'
 import { black, green, transparent } from './colours.js'
 
 class Canvas {
@@ -16,7 +17,7 @@ class Canvas {
           gridx: 8,
           gridy: 4
         },
-        waveform: WAVEFORM
+        waveform: LINE
       },
 
       audio: new Float32Array(),

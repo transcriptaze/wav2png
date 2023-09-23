@@ -1,22 +1,9 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
-import { rgba } from './colours.js'
-
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export const WAVEFORM = {
-  type: 'line',
-  vscale: 1.0,
-  colours: [
-    rgba('#80ccffff'),
-    rgba('#80ccff40')
-  ]
-}
-
-export function waveform (context, device, format, samples, style) {
-  const width = context.canvas.width
-  const height = context.canvas.height
+export function gradient (device, format, samples, width, height, vscale, colour1, colour2) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
 
@@ -29,12 +16,6 @@ export function waveform (context, device, format, samples, style) {
     0.0, -0.0,
     0.0, -1.0
   ])
-
-  const {
-    _type = 'line',
-    vscale = '1.0',
-    colours = [rgba('#80ccffff'), rgba('#80ccff40')]
-  } = style
 
   const vertexBuffer = device.createBuffer({
     label: 'waveform vertices',
@@ -133,7 +114,7 @@ export function waveform (context, device, format, samples, style) {
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colours })
+  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colour1, colour2 })
   const waveform = new Float32Array(pixels * 2)
   const audio = new Float32Array(samples)
 
@@ -204,9 +185,9 @@ export function waveform (context, device, format, samples, style) {
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale, vscale, colours }) {
+function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour1, colour2 }) {
   const pad = 0
-  const buffer = new ArrayBuffer(32 + 16 * colours.length)
+  const buffer = new ArrayBuffer(64)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -217,15 +198,15 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colours }) {
   view.setFloat32(20, yscale, true) //
   view.setFloat32(24, vscale, true)
 
-  for (let i = 0; i < colours.length; i++) {
-    const colour = colours[i]
-    const ix = 32 + i * 16
+  view.setFloat32(32, colour1[0], true) // vec4f: must be on a 16-byte boundary
+  view.setFloat32(36 + 4, colour1[1], true) //
+  view.setFloat32(40 + 8, colour1[2], true) //
+  view.setFloat32(44 + 12, colour1[3], true) //
 
-    view.setFloat32(ix, colour[0], true) // vec4f: must be on a 16-byte boundary
-    view.setFloat32(ix + 4, colour[1], true) //
-    view.setFloat32(ix + 8, colour[2], true) //
-    view.setFloat32(ix + 12, colour[3], true) //
-  }
+  view.setFloat32(48, colour2[0], true) // vec4f: must be on a 16-byte boundary
+  view.setFloat32(52 + 4, colour2[1], true) //
+  view.setFloat32(56 + 8, colour2[2], true) //
+  view.setFloat32(50 + 12, colour2[3], true) //
 
   return new Uint8Array(buffer)
 }

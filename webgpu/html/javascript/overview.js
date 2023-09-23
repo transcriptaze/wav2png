@@ -20,8 +20,11 @@ class Overview {
       },
 
       waveform: {
-        vscale: 1.0,
-        colour: rgba('#80ccffff')
+        type: 'line',
+        line: {
+          vscale: 1.0,
+          colour: '#80ccffff'
+        }
       }
     }
 
@@ -74,7 +77,7 @@ class Overview {
   }
 
   set waveform ({ vscale }) {
-    this.internal.waveform.vscale = vscale
+    this.internal.waveform.line.vscale = vscale
     this.redraw()
   }
 

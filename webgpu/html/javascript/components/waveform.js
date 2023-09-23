@@ -1,4 +1,4 @@
-import { rgba } from '../colours.js'
+import * as styles from '../styles.js'
 
 export class Waveform extends HTMLElement {
   static get observedAttributes () {
@@ -129,15 +129,7 @@ export class Waveform extends HTMLElement {
   }
 
   get waveform () {
-    const colour = rgba(this.colour)
-
-    return {
-      vscale: this.vscale,
-      colours: [
-        colour,
-        [colour[0], colour[1], colour[2], 0.25]
-      ]
-    }
+    return styles.lineStyle(this.vscale, this.colour)
   }
 }
 

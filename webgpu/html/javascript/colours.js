@@ -2,6 +2,7 @@ export const transparent = [0, 0, 0, 0]
 export const black = [0, 0, 0, 1]
 export const green = [0, 1, 0, 1]
 export const darkgreen = [0, 0.5, 0, 1]
+export const lightblue = [0.5, 0.8, 1, 1]
 
 export function rgba (colour) {
   const match = `${colour}`.match(/^#([a-fA-F0-9]{8})$/)
