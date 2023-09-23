@@ -250,7 +250,7 @@ const SHADER = `
 
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       return input.colour; 
+       return input.colour;
     }
 `
 

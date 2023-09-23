@@ -231,7 +231,7 @@ const SHADER = `
 
     struct VertexOutput {
         @builtin(position) pos: vec4f,
-        @location(0) colour: vec4f, 
+        @location(0) colour: vec4f,
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;
@@ -247,8 +247,8 @@ const SHADER = `
        let w = f32(uconstants.pixels - u32(1));
 
        let height = vscale * abs(waveform[input.instance]);
-       let origin = vec2f(-1.0, 0.0); 
-       let offset = origin + 2.0*i/w; 
+       let origin = vec2f(-1.0, 0.0);
+       let offset = origin + 2.0*i/w;
        let x = input.pos.x + offset.x;
        let y = input.pos.y*height[input.vertex/2];
 
@@ -265,7 +265,7 @@ const SHADER = `
 
     @fragment
     fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-       return input.colour; 
+       return input.colour;
     }
 `
 
@@ -292,8 +292,8 @@ const COMPUTE = `
        let start = u32(round(f32(pixel.x) * stride));
        let end = u32(round(f32(pixel.x + 1) * stride));
 
-       var p = f32(0); 
-       var q = f32(0); 
+       var p = f32(0);
+       var q = f32(0);
 
        var m = u32(0);
        var n = u32(0);
