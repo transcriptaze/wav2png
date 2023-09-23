@@ -12,6 +12,9 @@ There are three implementations:
 - (**under development**) A WebGPU version in the _webgpu_ directory) for a faster interactive experience, 
   hosted on [CloudFlare Pages](https://wav2png.pages.dev).
 
+[<img width="256" src="cli/acoustic.png">](gallery/cli/acoustic.png)
+[<img width="256" src="webgpu/line-bw.png">](gallery/webgpu/line-bw.png)
+[<img width="256" src="webgpu/gradient-red.png">](gallery/webgpu/gradient-red.png)
 
 ## Raison d'être
 
@@ -264,13 +267,6 @@ Example:
   ffmpeg -framerate 30 -i frame-%05d.png -c:v libx264 -pix_fmt yuv420p -crf 23 -y out.mp4
   ffmpeg -i out.mp4    -i ./samples/chirp.wav -c:v copy -c:a aac -y ../chirp.mp4
 ```
-
-
-### Samples
-
-![acoustic](samples/acoustic.png)
-
-![chirp](samples/chirp.png)
 
 ## References & Related Projects
 
