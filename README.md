@@ -20,7 +20,7 @@ implementation for better interactivity.
 
 [<img width="256" src="gallery/cli/acoustic.png">](gallery/cli/acoustic.png)
 [<img width="256" src="gallery/webgpu/line-bw.png">](gallery/webgpu/line-bw.png)
-[<img width="256" src="gallery/webgpu/gradient-red.png">](gallery/webgpu/gradient-red.png)
+[<img width="256" src="gallery/webgpu/gradient-yellow.png">](gallery/webgpu/gradient-yellow.png)
 
 
 ## Releases
