@@ -11,19 +11,21 @@ class Overview {
       canvas: document.querySelector('#overview canvas'),
       overlay: document.querySelector('#overview wav2png-overlay'),
 
-      fill: black,
+      styles: {
+        fill: black,
 
-      grid: {
-        colour: rgba('#ffff00a0'),
-        gridx: 64,
-        gridy: 4
-      },
+        grid: {
+          colour: rgba('#ffff00a0'),
+          gridx: 64,
+          gridy: 4
+        },
 
-      waveform: {
-        type: 'line',
-        line: {
-          vscale: 1.0,
-          colour: '#80ccffff'
+        waveform: {
+          type: 'line',
+          line: {
+            vscale: 1.0,
+            colour: '#80ccffff'
+          }
         }
       }
     }
@@ -54,30 +56,21 @@ class Overview {
     this.redraw()
   }
 
-  get fill () {
-    return this.internal.fill
-  }
-
+  /* eslint-disable-next-line accessor-pairs */
   set fill (v) {
-    this.internal.fill = v
+    this.internal.styles.fill = v
     this.redraw()
   }
 
-  get grid () {
-    return this.internal.grid
-  }
-
+  /* eslint-disable-next-line accessor-pairs */
   set grid ({ colour }) {
-    this.internal.grid.colour = colour
+    this.internal.styles.grid.colour = colour
     this.redraw()
   }
 
-  get waveform () {
-    return this.internal.waveform
-  }
-
+  /* eslint-disable-next-line accessor-pairs */
   set waveform ({ vscale }) {
-    this.internal.waveform.line.vscale = vscale
+    this.internal.styles.waveform.line.vscale = vscale
     this.redraw()
   }
 
@@ -114,11 +107,11 @@ class Overview {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, this.fill))
-    layers.push(grid(ctx, device, format, this.grid))
+    layers.push(background(ctx, device, format, this.internal.styles.fill))
+    layers.push(grid(ctx, device, format, this.internal.styles.grid))
 
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio, this.waveform))
+      layers.push(waveform(ctx, device, format, audio, this.internal.styles.waveform))
     }
 
     draw(ctx, this.device, layers)

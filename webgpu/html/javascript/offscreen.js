@@ -14,15 +14,15 @@ class Offscreen {
       device: null,
       canvas: new OffscreenCanvas(width, height),
 
-      fill: black,
-
-      grid: {
-        colour: green,
-        gridx: 8,
-        gridy: 4
+      styles: {
+        fill: black,
+        grid: {
+          colour: green,
+          gridx: 8,
+          gridy: 4
+        },
+        waveform: LINE
       },
-
-      waveform: LINE,
 
       audio: new Float32Array(),
       fs: 44100,
@@ -52,28 +52,23 @@ class Offscreen {
     this.internal.end = this.internal.duration
   }
 
-  get fill () {
-    return this.internal.fill
+  get styles () {
+    return this.internal.styles
   }
 
+  /* eslint-disable-next-line accessor-pairs */
   set fill (v) {
-    this.internal.fill = v
+    this.internal.styles.fill = v
   }
 
-  get grid () {
-    return this.internal.grid
-  }
-
+  /* eslint-disable-next-line accessor-pairs */
   set grid ({ colour }) {
-    this.internal.grid.colour = colour
+    this.internal.styles.grid.colour = colour
   }
 
-  get waveform () {
-    return this.internal.waveform
-  }
-
-  set waveform ({ vscale }) {
-    this.internal.waveform.vscale = vscale
+  /* eslint-disable-next-line accessor-pairs */
+  set waveform (v) {
+    this.internal.styles.waveform = v
   }
 
   /* eslint-disable-next-line accessor-pairs */
@@ -111,11 +106,11 @@ class Offscreen {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, this.fill))
-    layers.push(grid(ctx, device, format, this.grid))
+    layers.push(background(ctx, device, format, this.styles.fill))
+    layers.push(grid(ctx, device, format, this.styles.grid))
 
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio, this.waveform))
+      layers.push(waveform(ctx, device, format, audio, this.styles.waveform))
     }
 
     draw(ctx, this.device, layers)

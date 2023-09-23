@@ -54,8 +54,8 @@
 
       <div id="toolbox">
         <wav2png-fill     id="fill" colour="#000000ff"></wav2png-fill>
-        <wav2png-grid     id="grid" color='#00ff00ff'></wav2png-grid>
-        <wav2png-waveform id="waveform" vscale='1.0' colour="#80ccffff"></wav2png-waveform>
+        <wav2png-grid     id="grid" colour='#00ff00ff'></wav2png-grid>
+        <wav2png-waveform id="waveform" vscale='1.0' colour="#80ccff"></wav2png-waveform>
       </div>
 
       <wav2png-x-axis id="x-axis"></wav2png-x-axis>
@@ -115,13 +115,13 @@
                  viewBox="-64 0 128 512" 
                  preserveAspectRatio="none">
               <defs>
-                <linearGradient id="xxx" gradientTransform="rotate(90)">
+                <linearGradient id="gradient" gradientTransform="rotate(90)">
                   <stop offset="0%"   stop-color="#ff0000ff" />
                   <stop offset="100%" stop-color="#00ff00ff" />
                 </linearGradient>
               </defs>                 
               <rect id="bar" x="-24" y="0" width="48" height="512" stroke="#444444" stroke-width="8" rx="20"
-                    fill="url('#xxx')" />
+                    fill="url('#gradient')" />
             </svg>
             <input id="rgb2"   class="swatch" type="color" value="#ff0000" />
             <input id="alpha2" class="alpha"  type="range" step="any" min="0.0" max="1.0" value="1.0" />

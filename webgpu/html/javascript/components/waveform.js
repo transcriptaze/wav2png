@@ -29,36 +29,27 @@ export class Waveform extends HTMLElement {
 
   connectedCallback () {
     const shadow = this.shadowRoot
-    const rgb = shadow.querySelector('input#rgb')
-    const alpha = shadow.querySelector('input#alpha')
-    const rgb1 = shadow.querySelector('input#rgb1')
-    const alpha1 = shadow.querySelector('input#alpha1')
-    const rgb2 = shadow.querySelector('input#rgb2')
-    const alpha2 = shadow.querySelector('input#alpha2')
-    const vscale = shadow.querySelector('input#vscale')
-    const pickers = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
+    const styles = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
+    const swatches = Array.from(shadow.querySelectorAll('#settings input.swatch'))
+    const alphas = Array.from(shadow.querySelectorAll('#settings input.alpha'))
+    const vscale = shadow.querySelector('#settings input#vscale')
 
-    rgb.oninput = (event) => onChange(this)
-    alpha.oninput = (event) => onChange(this)
-    vscale.oninput = (event) => onChange(this)
-
-    rgb.onchange = (event) => onChanged(this)
-    alpha.onchange = (event) => onChanged(this)
-    vscale.onchange = (event) => onChanged(this)
-
-    rgb1.oninput = (event) => onChange(this)
-    rgb2.oninput = (event) => onChange(this)
-    alpha1.oninput = (event) => onChange(this)
-    alpha2.oninput = (event) => onChange(this)
-
-    rgb1.onchange = (event) => onChanged(this)
-    rgb2.onchange = (event) => onChanged(this)
-    alpha1.onchange = (event) => onChanged(this)
-    alpha2.onchange = (event) => onChanged(this)
-
-    pickers.forEach((e) => {
-      e.oninput = (event) => onWaveForm(this, event)
+    styles.forEach((e) => {
+      e.oninput = (event) => onStyle(this, e)
     })
+
+    swatches.forEach((e) => {
+      e.oninput = (event) => onChange(this, e)
+      e.onchange = (event) => onChanged(this, e)
+    })
+
+    alphas.forEach((e) => {
+      e.oninput = (event) => onChange(this, e)
+      e.onchange = (event) => onChanged(this, e)
+    })
+
+    vscale.oninput = (event) => onChange(this, vscale)
+    vscale.onchange = (event) => onChanged(this, vscale)
   }
 
   disconnectedCallback () {
@@ -111,44 +102,49 @@ export class Waveform extends HTMLElement {
     input.value = Math.min(Math.max(vscale, min), max)
   }
 
-  get colour () {
-    const shadow = this.shadowRoot
-    const input = shadow.querySelector('input#rgb')
-    const range = shadow.querySelector('input#alpha')
-    const rgb = input.value
-    const alpha = Math.trunc(range.value * 255).toString(16).padStart(2, '0')
-
-    return `${rgb}${alpha}`
-  }
-
+  /* eslint-disable-next-line accessor-pairs */
   set colour (v) {
     const shadow = this.shadowRoot
-    const input = shadow.querySelector('input#rgb')
-    const range = shadow.querySelector('input#alpha')
-    const exemplar = shadow.querySelector('svg.exemplar #bar')
-    const match = `${v}`.match(/^#([a-fA-F0-9]{6})([a-fA-F0-9]{2})?$/)
 
-    if (match != null) {
-      const rgb = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
-      const alpha = Number.parseInt(match[2], 16)
+    // ... line
+    { const settings = shadow.querySelector('div[for="line"]')
+      const rgb = settings.querySelector('input#rgb')
+      const alpha = settings.querySelector('input#alpha')
 
-      input.value = `#${rgb}`
-      exemplar.style.fill = `"#${rgb}"`
+      rgb.value = v
+      alpha.value = 1
+    }
 
-      if (!Number.isNaN(alpha)) {
-        range.value = Math.min(Math.max(alpha, 0), 255) / 255
-      } else {
-        range.value = 1.0
+    // ... gradient
+    { const settings = shadow.querySelector('div[for="gradient"]')
+
+      { const rgb = settings.querySelector('input#rgb1')
+        const alpha = settings.querySelector('input#alpha1')
+
+        rgb.value = v
+        alpha.value = 1
+      }
+
+      { const rgb = settings.querySelector('input#rgb2')
+        const alpha = settings.querySelector('input#alpha2')
+
+        rgb.value = v
+        alpha.value = 0.5
       }
     }
   }
 
-  get waveform () {
+  get style () {
     const shadow = this.shadowRoot
 
     switch (this.internal.style) {
-      case 'line':
-        return styles.lineStyle(this.vscale, this.colour)
+      case 'line': {
+        const settings = shadow.querySelector('div[for="line"]')
+        const rgb = settings.querySelector('input#rgb').value
+        const alpha = settings.querySelector('input#alpha').value
+
+        return styles.lineStyle(this.vscale, rgba(rgb, alpha))
+      }
 
       case 'gradient': {
         const settings = shadow.querySelector('div[for="gradient"]')
@@ -157,22 +153,20 @@ export class Waveform extends HTMLElement {
         const rgb2 = settings.querySelector('input#rgb2').value
         const alpha2 = settings.querySelector('input#alpha2').value
 
-        const colour1 = rgba(rgb1,alpha1)
-        const colour2 = rgba(rgb2,alpha2)
-
-        console.log({alpha1},{colour1})
-        console.log({alpha2},{colour2})
-
-
-        return styles.gradientStyle(this.vscale, colour1,colour2)
+        return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2))
       }
 
-      default:
-        return styles.lineStyle(this.vscale, this.colour)
+      default: {
+        const settings = shadow.querySelector('div[for="line"]')
+        const rgb = settings.querySelector('input#rgb').value
+        const alpha = settings.querySelector('input#alpha').value
+
+        return styles.lineStyle(this.vscale, rgba(rgb, alpha))
+      }
     }
   }
 
-  set waveform (v) {
+  set style (v) {
     if (v === 'line') {
       this.internal.style = 'line'
     } else if (v === 'gradient') {
@@ -181,65 +175,64 @@ export class Waveform extends HTMLElement {
   }
 }
 
-function onChange (component) {
-  const shadow = component.shadowRoot
-  const waveform = component.waveform
-  const exemplar = shadow.querySelector('svg.exemplar #bar')
+function onChange (component, e) {
+  // const shadow = component.shadowRoot
+  // const parent = e.parentNode
+  // const exemplar = parent.querySelector('svg.exemplar #bar')
 
-  exemplar.style.fill = component.colour
+  // exemplar.style.fill = component.colour
 
   if (component.onchange) {
-    component.onchange(waveform)
+    component.onchange(component.style)
   }
 }
 
-function onChanged (component) {
-  const shadow = component.shadowRoot
-  const waveform = component.waveform
-  const exemplar = shadow.querySelector('svg.exemplar #bar')
+function onChanged (component, e) {
+  // const shadow = component.shadowRoot
+  // const exemplar = shadow.querySelector('svg.exemplar #bar')
 
-  exemplar.style.fill = component.colour
+  // exemplar.style.fill = component.colour
 
   if (component.onchanged) {
-    component.onchanged(waveform)
+    component.onchanged(component.style)
   }
 }
 
-function onWaveForm (component, event) {
+function onStyle (component, e) {
   const shadow = component.shadowRoot
-  const pickers = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
+  const styles = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
+  const selected = styles.find((s) => s.checked)
 
-  pickers.forEach((e) => {
-    const label = shadow.querySelector(`label[for="${e.id}"]`)
-    const card = shadow.querySelector(`div[for="${e.value}"]`)
+  styles.forEach((s) => {
+    const label = shadow.querySelector(`label[for="${s.id}"]`)
+    const card = shadow.querySelector(`div[for="${s.value}"]`)
 
-    if (e.id === event.target.id) {
-      label.classList.add('selected')
-      card.classList.remove('hidden')
-    } else {
-      label.classList.remove('selected')
-      card.classList.add('hidden')
-    }
+    label.classList.remove('selected')
+    card.classList.add('hidden')
   })
 
-  const selected = pickers.find((e) => e.checked)
-
   if (selected != null) {
-    component.waveform = selected.value
+    const label = shadow.querySelector(`label[for="${selected.id}"]`)
+    const card = shadow.querySelector(`div[for="${selected.value}"]`)
+
+    label.classList.add('selected')
+    card.classList.remove('hidden')
+
+    component.style = selected.value
   }
 
   if (component.onchanged) {
-    component.onchanged(component.waveform)
+    component.onchanged(component.style)
   }
 }
 
-function rgba(rgb,alpha) {
-    const match = `${rgb}`.match(/^#([a-fA-F0-9]{6})$/)
+function rgba (rgb, alpha) {
+  const match = `${rgb}`.match(/^#([a-fA-F0-9]{6})$/)
 
-      const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
-      const v = Number.parseInt(`${255*Number.parseFloat(`${alpha}`)}`).toString(16).padStart(2, '0')
+  const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
+  const v = Number.parseInt(`${255 * Number.parseFloat(`${alpha}`)}`).toString(16).padStart(2, '0')
 
-      return `#${u}${v}`
-  }
+  return `#${u}${v}`
+}
 
 customElements.define('wav2png-waveform', Waveform)

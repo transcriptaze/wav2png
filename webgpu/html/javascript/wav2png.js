@@ -243,7 +243,7 @@ function redraw () {
   return new Promise(() => {
     const fill = document.getElementById('fill').colour
     const grid = document.getElementById('grid').colour
-    const waveform = document.getElementById('waveform').waveform
+    const waveform = document.getElementById('waveform').style
 
     canvas.fill = rgba(fill)
     canvas.grid = { colour: rgba(grid) }
