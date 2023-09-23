@@ -28,5 +28,8 @@ jobs:
     - name: Install eslint
       run: npm install eslint eslint-config-standard eslint-plugin-promise eslint-plugin-import eslint-plugin-node --save-dev
 
+    - name: Install mocha and chai
+      run: npm install mocha chai
+
     - name: Build
       run: make build-all
