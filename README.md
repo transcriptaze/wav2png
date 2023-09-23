@@ -12,14 +12,16 @@ There are three implementations:
 - (**under development**) A WebGPU version in the _webgpu_ directory) for a faster interactive experience, 
   hosted on [CloudFlare Pages](https://wav2png.pages.dev).
 
+## Raison d'être
+
+wav2png was initially created as a Go utility library to render an audio file as an anti-aliased waveform for
+a WASM project - it just seemed like a good idea to add a standalone command line version, and later a WebGPU 
+implementation for better interactivity.
+
 [<img width="256" src="gallery/cli/acoustic.png">](gallery/cli/acoustic.png)
 [<img width="256" src="gallery/webgpu/line-bw.png">](gallery/webgpu/line-bw.png)
 [<img width="256" src="gallery/webgpu/gradient-red.png">](gallery/webgpu/gradient-red.png)
 
-## Raison d'être
-
-wav2png was initially created as a Go utility library to render an audio file as an anti-aliased waveform for a
-WASM project - it just seemed like a good idea to add a standalone command line version.
 
 ## Releases
 
