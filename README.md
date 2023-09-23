@@ -1,4 +1,4 @@
-![build](https://github.com/transcriptaze/wav2png/workflows/go/badge.svg)
+![build](https://github.com/transcriptaze/wav2png/workflows/build/badge.svg)
 
 # wav2png
 
