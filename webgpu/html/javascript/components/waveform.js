@@ -132,6 +132,31 @@ export class Waveform extends HTMLElement {
         alpha.value = 128
       }
     }
+
+    // ... gradient3
+    { const settings = shadow.querySelector('div[for="gradient3"]')
+
+      { const rgb = settings.querySelector('input#rgb1')
+        const alpha = settings.querySelector('input#alpha1')
+
+        rgb.value = v
+        alpha.value = 255
+      }
+
+      { const rgb = settings.querySelector('input#rgb2')
+        const alpha = settings.querySelector('input#alpha2')
+
+        rgb.value = v
+        alpha.value = 64
+      }
+
+      { const rgb = settings.querySelector('input#rgb3')
+        const alpha = settings.querySelector('input#alpha3')
+
+        rgb.value = v
+        alpha.value = 128
+      }
+    }
   }
 
   get style () {
@@ -156,6 +181,18 @@ export class Waveform extends HTMLElement {
         return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2))
       }
 
+      case 'gradient3': {
+        const settings = shadow.querySelector('div[for="gradient3"]')
+        const rgb1 = settings.querySelector('input#rgb1').value
+        const alpha1 = settings.querySelector('input#alpha1').value
+        const rgb2 = settings.querySelector('input#rgb2').value
+        const alpha2 = settings.querySelector('input#alpha2').value
+        const rgb3 = settings.querySelector('input#rgb3').value
+        const alpha3 = settings.querySelector('input#alpha3').value
+
+        return styles.gradient3Style(this.vscale, 0.5, rgba(rgb1, alpha1), rgba(rgb2, alpha2), rgba(rgb3, alpha3))
+      }
+
       default: {
         const settings = shadow.querySelector('div[for="line"]')
         const rgb = settings.querySelector('input#rgb').value
@@ -171,6 +208,8 @@ export class Waveform extends HTMLElement {
       this.internal.style = 'line'
     } else if (v === 'gradient') {
       this.internal.style = 'gradient'
+    } else if (v === 'gradient3') {
+      this.internal.style = 'gradient3'
     }
   }
 }
@@ -252,6 +291,32 @@ function recolour (component) {
       stops[1].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
     }
   }
+
+  // ... gradient3
+  {
+    const settings = shadow.querySelector('div[for="gradient3"]')
+    const svg = settings.querySelector('svg')
+    const gradient = svg.querySelector('#gradient3')
+    const stops = gradient.querySelectorAll('stop')
+
+    {
+      const rgb = settings.querySelector('input#rgb3').value
+      const alpha = settings.querySelector('input#alpha3').value
+      stops[0].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+    }
+
+    {
+      const rgb = settings.querySelector('input#rgb2').value
+      const alpha = settings.querySelector('input#alpha2').value
+      stops[1].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+    }
+
+    {
+      const rgb = settings.querySelector('input#rgb1').value
+      const alpha = settings.querySelector('input#alpha1').value
+      stops[2].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+    }
+  }
 }
 
 function rgba (rgb, alpha) {
@@ -259,7 +324,6 @@ function rgba (rgb, alpha) {
 
   const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
   const v = Number.parseInt(`${alpha}`).toString(16).padStart(2, '0')
-  // const v = Number.parseInt(`${255 * Number.parseFloat(`${alpha}`)}`).toString(16).padStart(2, '0')
 
   return `#${u}${v}`
 }

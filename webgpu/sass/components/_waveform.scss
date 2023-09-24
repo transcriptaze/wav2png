@@ -139,5 +139,64 @@ fieldset.waveform {
             display: none;
         }
 
+
+        div.gradient3 {
+            margin-top: 8px;
+            margin-bottom: 8px;
+
+            display: grid;
+            grid-template-columns: auto auto;
+            grid-template-rows: auto auto auto auto auto auto;
+            grid-template-areas: 
+                "exemplar swatch3" 
+                "exemplar alpha3" 
+                "exemplar swatch2" 
+                "exemplar alpha2" 
+                "exemplar swatch1" 
+                "exemplar alpha1";
+            column-gap: 12px;
+
+            padding-top: 4px;
+            padding-bottom: 4px;
+            padding-left: 4px;
+            padding-right: 4px;
+
+            border: 1px solid grey;
+            border-radius: 4px;
+
+            .exemplar {
+                grid-area: exemplar;
+                width: 14px;
+                height: 100%;
+            }
+
+            input.rgb1 {
+                grid-area: swatch1;
+            }
+
+            input.alpha1 {
+                grid-area: alpha1;
+            }
+
+            input.rgb2 {
+                grid-area: swatch2;
+            }
+
+            input.alpha2 {
+                grid-area: alpha2;
+            }
+
+            input.rgb3 {
+                grid-area: swatch3;
+            }
+
+            input.alpha3 {
+                grid-area: alpha3;
+            }
+        }
+
+        div.gradient3.hidden {
+            display: none;
+        }
     }
 }

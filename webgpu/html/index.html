@@ -124,13 +124,34 @@
               <rect id="bar" x="-24" y="0" width="48" height="512" stroke="#444444" stroke-width="8" rx="20"
                     fill="url('#gradient')" />
             </svg>
-            <input id="rgb2"   class="swatch" type="color" value="#80ccff80" />
+            <input id="rgb2"   class="swatch" type="color" value="#80ccff" />
             <input id="alpha2" class="alpha"  type="range" step="1" min="0" max="255" value="128" />
-            <input id="rgb1"   class="swatch" type="color" value="#80ccffff" />
+            <input id="rgb1"   class="swatch" type="color" value="#80ccff" />
             <input id="alpha1" class="alpha"  type="range" step="any" min="0" max="255" value="255" />
           </div>
 
-          <div for="gradient3" class="gradient hidden"></div>
+          <div for="gradient3" class="gradient3 hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+                 viewBox="-64 0 128 512"
+                 preserveAspectRatio="none"
+                 class="exemplar">
+              <defs>
+                <linearGradient id="gradient3" gradientTransform="rotate(90)">
+                  <stop offset="0%"   stop-color="#80ccff80" />
+                  <stop offset="50%"  stop-color="#80ccff40" />
+                  <stop offset="100%" stop-color="#80ccffff" />
+                </linearGradient>
+              </defs>
+              <rect id="bar" x="-24" y="0" width="48" height="512" stroke="#444444" stroke-width="8" rx="20"
+                    fill="url('#gradient3')" />
+            </svg>
+            <input id="rgb3"   class="swatch" type="color" value="#80ccff" />
+            <input id="alpha3" class="alpha"  type="range" step="1" min="0" max="255" value="192" />
+            <input id="rgb2"   class="swatch" type="color" value="#80ccff" />
+            <input id="alpha2" class="alpha"  type="range" step="1" min="0" max="255" value="128" />
+            <input id="rgb1"   class="swatch" type="color" value="#80ccff" />
+            <input id="alpha1" class="alpha"  type="range" step="any" min="0" max="255" value="255" />
+          </div>
 
           <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
         </div>
