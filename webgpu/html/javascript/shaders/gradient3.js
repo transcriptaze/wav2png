@@ -13,10 +13,7 @@ export function gradient3 (device, format, samples, width, height, vscale, midpo
   const vertices = new Float32Array([
     0.0, +1.0,
     0.0, +1.0 * midpoint,
-    0.0, +1.0 * midpoint,
-    0.0, +0.0,
-    0.0, -0.0,
-    0.0, -1.0 * midpoint,
+    0.0, 0.0,
     0.0, -1.0 * midpoint,
     0.0, -1.0
   ])
@@ -105,7 +102,7 @@ export function gradient3 (device, format, samples, width, height, vscale, midpo
       ]
     },
     primitive: {
-      topology: 'line-list'
+      topology: 'line-strip'
     }
   })
 
@@ -118,7 +115,16 @@ export function gradient3 (device, format, samples, width, height, vscale, midpo
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colours: [colour1, colour2, colour3] })
+  const constants = pack({
+    pixels,
+    stride,
+    samples: samples.length,
+    xscale,
+    yscale,
+    vscale,
+    colours: [colour3, colour2, colour1, colour2, colour3]
+  })
+
   const waveform = new Float32Array(pixels * 2)
   const audio = new Float32Array(samples)
 
@@ -223,9 +229,7 @@ const SHADER = `
       pad: f32,
       scale: vec2f,
       vscale: f32,
-      colour1: vec4f,
-      colour2: vec4f,
-      colour3: vec4f
+      colours: array<vec4f,5>,
     };
 
     struct VertexInput {
@@ -258,16 +262,7 @@ const SHADER = `
        let y = clamp(input.pos.y*height[input.vertex/4],-1.0,1.0);
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
-
-       if (input.vertex == 0 || input.vertex == 7) {
-           output.colour = uconstants.colour3;
-       } else if (input.vertex == 1 || input.vertex == 6) {
-           output.colour = uconstants.colour2;
-       } else if (input.vertex == 2 || input.vertex == 5) {
-           output.colour = uconstants.colour2;
-       } else {
-           output.colour = uconstants.colour1;
-       }
+       output.colour = uconstants.colours[input.vertex];
 
        return output;
     }
@@ -286,7 +281,7 @@ const COMPUTE = `
       pad: f32,
       scale: vec2f,
       vscale: f32,
-      colour: vec4f
+      colours: array<vec4f,5>
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;

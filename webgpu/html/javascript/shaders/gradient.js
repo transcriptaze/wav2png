@@ -11,8 +11,7 @@ export function gradient (device, format, samples, width, height, vscale, colour
 
   const vertices = new Float32Array([
     0.0, +1.0,
-    0.0, +0.0,
-    0.0, -0.0,
+    0.0, 0.0,
     0.0, -1.0
   ])
 
@@ -100,7 +99,7 @@ export function gradient (device, format, samples, width, height, vscale, colour
       ]
     },
     primitive: {
-      topology: 'line-list'
+      topology: 'line-strip'
     }
   })
 
@@ -113,7 +112,16 @@ export function gradient (device, format, samples, width, height, vscale, colour
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colour1, colour2 })
+  const constants = pack({
+    pixels,
+    stride,
+    samples: samples.length,
+    xscale,
+    yscale,
+    vscale,
+    colours: [colour2, colour1, colour2]
+  })
+
   const waveform = new Float32Array(pixels * 2)
   const audio = new Float32Array(samples)
 
@@ -184,9 +192,9 @@ export function gradient (device, format, samples, width, height, vscale, colour
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour1, colour2 }) {
+function pack ({ pixels, stride, samples, xscale, yscale, vscale, colours }) {
   const pad = 0
-  const buffer = new ArrayBuffer(64)
+  const buffer = new ArrayBuffer(32 + 16 * colours.length)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -197,15 +205,15 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour1, colou
   view.setFloat32(20, yscale, true) //
   view.setFloat32(24, vscale, true)
 
-  view.setFloat32(32, colour1[0], true) // vec4f: must be on a 16-byte boundary
-  view.setFloat32(36, colour1[1], true) //
-  view.setFloat32(40, colour1[2], true) //
-  view.setFloat32(44, colour1[3], true) //
+  for (let i = 0; i < colours.length; i++) {
+    const colour = colours[i]
+    const ix = 32 + i * 16
 
-  view.setFloat32(48, colour2[0], true) // vec4f: must be on a 16-byte boundary
-  view.setFloat32(52, colour2[1], true) //
-  view.setFloat32(56, colour2[2], true) //
-  view.setFloat32(60, colour2[3], true) //
+    view.setFloat32(ix, colour[0], true) // vec4f: must be on a 16-byte boundary
+    view.setFloat32(ix + 4, colour[1], true) //
+    view.setFloat32(ix + 8, colour[2], true) //
+    view.setFloat32(ix + 12, colour[3], true) //
+  }
 
   return new Uint8Array(buffer)
 }
@@ -218,8 +226,7 @@ const SHADER = `
       pad: f32,
       scale: vec2f,
       vscale: f32,
-      colour1: vec4f,
-      colour2: vec4f
+      colours: array<vec4f,3>
     };
 
     struct VertexInput {
@@ -252,12 +259,7 @@ const SHADER = `
        let y = clamp(input.pos.y*height[input.vertex/2],-1.0,1.0);
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
-
-       if (input.vertex == 0 || input.vertex == 3) {
-           output.colour = uconstants.colour2;
-       } else {
-           output.colour = uconstants.colour1;
-       }
+       output.colour = uconstants.colours[input.vertex];
 
        return output;
     }
@@ -276,7 +278,7 @@ const COMPUTE = `
       pad: f32,
       scale: vec2f,
       vscale: f32,
-      colour: vec4f
+      colours: array<vec4f,3>
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;

@@ -98,7 +98,7 @@ export function line (device, format, samples, width, height, vscale, colour) {
       ]
     },
     primitive: {
-      topology: 'line-list'
+      topology: 'line-strip'
     }
   })
 
