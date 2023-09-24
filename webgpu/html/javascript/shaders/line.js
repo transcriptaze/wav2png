@@ -3,9 +3,10 @@
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function line (device, format, samples, width, height, vscale, colour) {
+export function line (device, format, a, width, height, vscale, colour) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
+  const samples = a.audio.subarray(a.start, a.end)
   const pixels = Math.min(width - 2 * PADDING, samples.length)
   const stride = samples.length / pixels
 

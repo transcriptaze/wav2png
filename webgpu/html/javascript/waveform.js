@@ -5,9 +5,10 @@ import { gradient3 } from './shaders/gradient3.js'
 
 export function waveform (context, device, format, audio, style) {
   const fs = Number.isNaN(audio.fs) ? 44100 : audio.fs
-  const duration = clamp(audio.duration, 0, audio.length / fs)
-  const start = duration === 0 ? 0 : clamp(Math.floor(audio.audio.length * audio.start / duration), 0, audio.length)
-  const end = duration === 0 ? 0 : clamp(Math.floor(audio.audio.length * audio.end / duration), 0, audio.length)
+  const N = audio.audio.length
+  const duration = clamp(audio.duration, 0, N / fs)
+  const start = duration === 0 ? 0 : clamp(Math.floor(N * audio.start / duration), 0, N)
+  const end = duration === 0 ? 0 : clamp(Math.floor(N * audio.end / duration), 0, N)
 
   if (duration <= 0 || end <= start) {
     return {}
@@ -15,7 +16,7 @@ export function waveform (context, device, format, audio, style) {
 
   const width = context.canvas.width
   const height = context.canvas.height
-  const samples = audio.audio.subarray(start, end)
+  const samples = audio.audio
 
   // ... line?
   if (style.type === 'line') {
@@ -24,7 +25,7 @@ export function waveform (context, device, format, audio, style) {
       colour = '#80ccffff'
     } = style.line
 
-    return line(device, format, samples, width, height, vscale, rgba(colour))
+    return line(device, format, { start, end, audio: samples }, width, height, vscale, rgba(colour))
   }
 
   // ... gradient?
@@ -34,7 +35,7 @@ export function waveform (context, device, format, audio, style) {
       colours = ['#80ccffff', '#80ccff80']
     } = style.gradient
 
-    return gradient(device, format, samples, width, height, vscale, rgba(colours[0]), rgba(colours[1]))
+    return gradient(device, format, { start, end, audio: samples }, width, height, vscale, rgba(colours[0]), rgba(colours[1]))
   }
 
   // ... gradient3?
@@ -45,11 +46,11 @@ export function waveform (context, device, format, audio, style) {
       colours = ['#80ccffff', '#80ccff40', '#80ccff80']
     } = style.gradient3
 
-    return gradient3(device, format, samples, width, height, vscale, midpoint, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]))
+    return gradient3(device, format, { start, end, audio: samples }, width, height, vscale, midpoint, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]))
   }
 
   // ... default
-  return line(device, format, samples, width, height, 1.0, lightblue)
+  return line(device, format, { start, end, audio: samples }, width, height, 1.0, lightblue)
 }
 
 function clamp (v, min, max) {
