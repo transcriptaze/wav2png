@@ -12,5 +12,4 @@
 [<img width="256" src="webgpu/gradient-purple.png">](webgpu/gradient-purple.png)
 
 [<img width="256" src="webgpu/gradient3.png">](webgpu/gradient3.png)
-[<img width="256" src="webgpu/gradient3A.png">](webgpu/gradient3A.png)
 [<img width="256" src="webgpu/gradient3C.png">](webgpu/gradient3C.png)
