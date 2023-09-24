@@ -9,7 +9,7 @@ There are three implementations:
 - A command line version (in the _go_ subdirectory), mostly intended for scripting and batch processing
 - An online version implemented by compiling this library to WASM, which can be found
   [here](https://transcriptaze.github.io/W2P.html).
-- (**under development**) A WebGPU version in the _webgpu_ directory) for a faster interactive experience, 
+- A WebGPU version in the _webgpu_ directory) for a faster interactive experience, 
   hosted on [CloudFlare Pages](https://wav2png.pages.dev).
 
 ## Raison d'être

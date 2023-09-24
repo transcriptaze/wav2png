@@ -4,6 +4,7 @@
 
 ### Added
 1. Columns renderer
+2. WebGPU implementation
 
 ### Updated
 1. Moved Go renderer to _github.com/transcriptaze/wav2png/go_ package.
