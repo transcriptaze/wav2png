@@ -7,9 +7,16 @@ class Overview {
   constructor () {
     this.internal = {
       device: null,
-      audio: new Float32Array(),
       canvas: document.querySelector('#overview canvas'),
       overlay: document.querySelector('#overview wav2png-overlay'),
+
+      audio: {
+        start: 0,
+        end: 0,
+        duration: 0,
+        fs: 44100,
+        audio: new Float32Array()
+      },
 
       styles: {
         fill: black,
@@ -50,10 +57,25 @@ class Overview {
   }
 
   set audio ({ fs, audio }) {
-    this.internal.audio = audio
-    this.internal.overlay.audio = { start: 0, end: audio.length / fs, duration: audio.length / fs }
+    this.internal.audio = {
+      start: 0,
+      end: audio.length / fs,
+      duration: audio.length / fs,
+      fs,
+      audio
+    }
+
+    this.internal.overlay.audio = {
+      start: 0,
+      end: audio.length / fs,
+      duration: audio.length / fs
+    }
 
     this.redraw()
+  }
+
+  get styles () {
+    return this.internal.styles
   }
 
   /* eslint-disable-next-line accessor-pairs */
@@ -101,17 +123,18 @@ class Overview {
   redraw () {
     const ctx = this.canvas.getContext('webgpu')
     const device = this.device
-    const audio = this.audio
     const format = navigator.gpu.getPreferredCanvasFormat()
+    const audio = this.audio
+    const styles = this.styles
     const layers = []
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, this.internal.styles.fill))
-    if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio, this.internal.styles.waveform))
+    layers.push(background(ctx, device, format, styles.fill))
+    if (audio.duration > 0 && audio.end > audio.start) {
+      layers.push(waveform(ctx, device, format, audio, styles.waveform))
     }
-    layers.push(grid(ctx, device, format, this.internal.styles.grid))
+    layers.push(grid(ctx, device, format, styles.grid))
 
     draw(ctx, this.device, layers)
   }

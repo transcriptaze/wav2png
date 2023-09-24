@@ -24,11 +24,13 @@ class Offscreen {
         waveform: LINE
       },
 
-      audio: new Float32Array(),
-      fs: 44100,
-      duration: 0,
-      start: 0,
-      end: 0
+      audio: {
+        start: 0,
+        end: 0,
+        duration: 0,
+        fs: 44100,
+        audio: new Float32Array()
+      }
     }
   }
 
@@ -45,11 +47,13 @@ class Offscreen {
   }
 
   set audio ({ fs, audio }) {
-    this.internal.fs = fs
-    this.internal.audio = audio
-    this.internal.duration = audio.length / fs
-    this.internal.start = 0
-    this.internal.end = this.internal.duration
+    this.internal.audio = {
+      start: 0,
+      end: audio.length / fs,
+      duration: audio.length / fs,
+      fs,
+      audio
+    }
   }
 
   get styles () {
@@ -76,7 +80,7 @@ class Offscreen {
     const start = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(start)) {
-      this.internal.start = constrain(start, 0, this.internal.duration)
+      this.audio.start = constrain(start, 0, this.audio.duration)
     }
   }
 
@@ -85,7 +89,7 @@ class Offscreen {
     const end = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(end)) {
-      this.internal.end = constrain(end, 0, this.internal.duration)
+      this.audio.end = constrain(end, 0, this.audio.duration)
     }
   }
 
@@ -94,21 +98,18 @@ class Offscreen {
   }
 
   render () {
-    const duration = this.internal.duration
-    const start = duration === 0 ? 0 : this.audio.length * this.internal.start / duration
-    const end = duration === 0 ? 0 : this.audio.length * this.internal.end / duration
-
     const ctx = this.canvas.getContext('webgpu')
     const device = this.device
-    const audio = this.audio.subarray(start, end)
     const format = navigator.gpu.getPreferredCanvasFormat()
+    const audio = this.audio
+    const styles = this.styles
     const layers = []
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, this.styles.fill))
-    if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio, this.styles.waveform))
+    if (audio.duration > 0 && audio.end > audio.start) {
+      layers.push(waveform(ctx, device, format, audio, styles.waveform))
     }
     layers.push(grid(ctx, device, format, this.styles.grid))
 

@@ -3,13 +3,17 @@ import { line } from './shaders/line.js'
 import { gradient } from './shaders/gradient.js'
 import { gradient3 } from './shaders/gradient3.js'
 
-export function waveform (context, device, format, samples, style) {
+export function waveform (context, device, format, audio, style) {
   const width = context.canvas.width
   const height = context.canvas.height
-  const { type = 'line' } = style
+
+  const duration = audio.duration
+  const start = duration === 0 ? 0 : Math.floor(audio.audio.length * audio.start / duration)
+  const end = duration === 0 ? 0 : Math.floor(audio.audio.length * audio.end / duration)
+  const samples = audio.audio.subarray(start, end)
 
   // ... line?
-  if (type === 'line') {
+  if (style.type === 'line') {
     const {
       vscale = '1.0',
       colour = '#80ccffff'
@@ -19,7 +23,7 @@ export function waveform (context, device, format, samples, style) {
   }
 
   // ... gradient?
-  if (type === 'gradient') {
+  if (style.type === 'gradient') {
     const {
       vscale = '1.0',
       colours = ['#80ccffff', '#80ccff80']
@@ -29,7 +33,7 @@ export function waveform (context, device, format, samples, style) {
   }
 
   // ... gradient3?
-  if (type === 'gradient3') {
+  if (style.type === 'gradient3') {
     const {
       vscale = '1.0',
       midpoint = 0.5,
