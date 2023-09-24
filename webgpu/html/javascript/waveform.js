@@ -4,16 +4,17 @@ import { gradient } from './shaders/gradient.js'
 import { gradient3 } from './shaders/gradient3.js'
 
 export function waveform (context, device, format, audio, style) {
-  if (audio.duration <= 0 || audio.end <= audio.start) {
+  const fs = Number.isNaN(audio.fs) ? 44100 : audio.fs
+  const duration = clamp(audio.duration, 0, audio.length / fs)
+  const start = duration === 0 ? 0 : clamp(Math.floor(audio.audio.length * audio.start / duration), 0, audio.length)
+  const end = duration === 0 ? 0 : clamp(Math.floor(audio.audio.length * audio.end / duration), 0, audio.length)
+
+  if (duration <= 0 || end <= start) {
     return {}
   }
 
   const width = context.canvas.width
   const height = context.canvas.height
-
-  const duration = audio.duration
-  const start = duration === 0 ? 0 : Math.floor(audio.audio.length * audio.start / duration)
-  const end = duration === 0 ? 0 : Math.floor(audio.audio.length * audio.end / duration)
   const samples = audio.audio.subarray(start, end)
 
   // ... line?
@@ -49,4 +50,8 @@ export function waveform (context, device, format, audio, style) {
 
   // ... default
   return line(device, format, samples, width, height, 1.0, lightblue)
+}
+
+function clamp (v, min, max) {
+  return (v < min) ? min : ((v > max) ? max : v)
 }
