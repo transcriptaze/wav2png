@@ -107,11 +107,10 @@ class Offscreen {
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, this.styles.fill))
-    layers.push(grid(ctx, device, format, this.styles.grid))
-
     if (audio.length > 0) {
       layers.push(waveform(ctx, device, format, audio, this.styles.waveform))
     }
+    layers.push(grid(ctx, device, format, this.styles.grid))
 
     draw(ctx, this.device, layers)
 

@@ -108,11 +108,10 @@ class Overview {
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, this.internal.styles.fill))
-    layers.push(grid(ctx, device, format, this.internal.styles.grid))
-
     if (audio.length > 0) {
-      layers.push(waveform(ctx, device, format, audio, this.internal.styles.waveform))
+          layers.push(waveform(ctx, device, format, audio, this.internal.styles.waveform))
     }
+    layers.push(grid(ctx, device, format, this.internal.styles.grid))
 
     draw(ctx, this.device, layers)
   }
