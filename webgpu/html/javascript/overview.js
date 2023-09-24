@@ -131,9 +131,7 @@ class Overview {
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
     layers.push(background(ctx, device, format, styles.fill))
-    if (audio.duration > 0 && audio.end > audio.start) {
-      layers.push(waveform(ctx, device, format, audio, styles.waveform))
-    }
+    layers.push(waveform(ctx, device, format, audio, styles.waveform))
     layers.push(grid(ctx, device, format, styles.grid))
 
     draw(ctx, this.device, layers)
@@ -148,7 +146,9 @@ function draw (context, device, layers) {
   {
     const pass = encoder.beginComputePass()
     for (const layer of layers) {
-      layer.compute(pass)
+      if (layer.compute != null) {
+        layer.compute(pass)
+      }
     }
     pass.end()
   }
@@ -164,7 +164,9 @@ function draw (context, device, layers) {
     })
 
     for (const layer of layers) {
-      layer.render(pass)
+      if (layer.render != null) {
+        layer.render(pass)
+      }
     }
 
     pass.end()

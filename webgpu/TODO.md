@@ -15,14 +15,12 @@
 - [ ] Scrubbable left/right/plus/minus
 - [ ] Render in Worker
 - [ ] Restyle range controls       
+- [ ] Better colour picker
+      - https://rgbacolorpicker.com/
 - [ ] Fix Firefox flickering
-- [ ] Futhark
+- (?) Futhark
       - https://futhark-lang.org/index.html
       
-- [ ]  Better colour picker
-       - https://rgbacolorpicker.com/
-
-
 - [ ] :hover for drag (with audio file only)
 - [ ] lines:minmax
 - [ ] lines:median

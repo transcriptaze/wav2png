@@ -4,6 +4,10 @@ import { gradient } from './shaders/gradient.js'
 import { gradient3 } from './shaders/gradient3.js'
 
 export function waveform (context, device, format, audio, style) {
+  if (audio.duration <= 0 || audio.end <= audio.start) {
+    return {}
+  }
+
   const width = context.canvas.width
   const height = context.canvas.height
 
