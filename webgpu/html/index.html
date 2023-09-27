@@ -131,6 +131,8 @@
           </div>
 
           <div for="gradient3" class="gradient3 hidden">
+            <input id="xxx" type="range" step="any" min="0.0" max="1.0" value="0.5" />
+
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
                  viewBox="-64 0 128 512"
                  preserveAspectRatio="none"
@@ -142,8 +144,7 @@
                   <stop offset="100%" stop-color="#80ccffff" />
                 </linearGradient>
               </defs>
-              <rect id="bar" x="-24" y="0" width="48" height="512" stroke="#444444" stroke-width="8" rx="20"
-                    fill="url('#gradient3')" />
+              <rect id="bar" x="-24" y="0" width="48" height="512" stroke="#444444" stroke-width="8" rx="20" fill="url('#gradient3')" />
             </svg>
             <input id="rgb3"   class="swatch" type="color" value="#80ccff" />
             <input id="alpha3" class="alpha"  type="range" step="1" min="0" max="255" value="192" />

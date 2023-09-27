@@ -14,7 +14,13 @@
 
 - [ ] Scrubbable left/right/plus/minus
 - [ ] Render in Worker
-- [ ] Restyle range controls       
+- [ ] Restyle range controls
+      - https://codepen.io/collection/DgYaMj/
+      - https://www.smashingmagazine.com/2021/12/create-custom-range-input-consistent-browsers/
+      - https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/
+      - https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-temperature/
+      - https://codepen.io/ATC-test/pen/myPNqW
+
 - [ ] Better colour picker
       - https://rgbacolorpicker.com/
 - [ ] Fix Firefox flickering

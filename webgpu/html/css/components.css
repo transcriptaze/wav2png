@@ -63,9 +63,33 @@ fieldset.fill input[type=color] {
   border: none;
 }
 fieldset.fill input[type=range] {
-  width: 128px;
+  width: 100%;
+  background: transparent;
+  -webkit-appearance: none;
 }
-
+fieldset.fill input[type=range]:focus {
+  outline: none;
+}
+fieldset.fill input[type=range]::-webkit-slider-thumb {
+  height: 16px;
+  width: 8px;
+  background: #ffffff;
+  margin-top: -4.5px;
+  border: 1px solid #000000;
+  border-radius: 3px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+fieldset.fill input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, #ffffff, #000000);
+  border-radius: 2px;
+  border: 0.2px solid #010101;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  cursor: pointer;
+}
 fieldset.grid {
   width: 100%;
   height: fit-content;
@@ -215,7 +239,7 @@ fieldset.waveform div#settings div.gradient3 {
   margin-top: 8px;
   margin-bottom: 8px;
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 14px auto;
   grid-template-rows: auto auto auto auto auto auto;
   grid-template-areas: "exemplar swatch3" "exemplar alpha3" "exemplar swatch2" "exemplar alpha2" "exemplar swatch1" "exemplar alpha1";
   column-gap: 12px;
@@ -225,6 +249,35 @@ fieldset.waveform div#settings div.gradient3 {
   padding-right: 4px;
   border: 1px solid grey;
   border-radius: 4px;
+}
+fieldset.waveform div#settings div.gradient3 #xxx {
+  display: none;
+  grid-area: exemplar;
+  transform: rotate(-90deg);
+  place-self: center;
+  -webkit-appearance: none;
+}
+fieldset.waveform div#settings div.gradient3 #xxx:focus {
+  outline: none;
+}
+fieldset.waveform div#settings div.gradient3 #xxx::-webkit-slider-thumb {
+  height: 16px;
+  width: 16px;
+  background: #ffffff;
+  margin-top: -4.5px;
+  border: 1px solid #000000;
+  border-radius: 3px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+fieldset.waveform div#settings div.gradient3 #xxx::-webkit-slider-runnable-track {
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, #00ff00, #ff0000);
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  cursor: pointer;
 }
 fieldset.waveform div#settings div.gradient3 .exemplar {
   grid-area: exemplar;
