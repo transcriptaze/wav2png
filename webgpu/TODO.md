@@ -33,6 +33,9 @@
       - https://developer.mozilla.org/en-US/docs/Web/CSS/border-image
       - https://web.dev/css-trig-functions/
 
+- wav2mp4
+  - https://developer.chrome.com/articles/webcodecs/
+
 - https://web.dev/streams/
 - https://rome.tools/
 

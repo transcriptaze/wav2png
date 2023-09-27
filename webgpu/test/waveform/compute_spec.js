@@ -1,39 +1,49 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-describe('audio start/end', function () {
-  it.only('debugging audio start/end logic', function () {
-    // const duration = 5
-    // const fs = 44100
+describe('audio pixel bucket logic', function () {
+  it.only('reference: complete buffer', function () {
+    const duration = 5
+    const fs = 44100
+    const samples = new Float64Array(duration * fs)
+
+    for (let i = 0; i < samples.length; i++) {
+      samples[i] = i * 0.1
+    }
+
     const width = 1920
     const padding = 20
     const start = 0
     const end = 220500
     const N = end - start
 
-    // const samples = duration * fs
     const pixels = width - 2 * padding
     const stride = N / pixels
 
-    const list = []
+    const buckets = []
     for (let i = 0; i < pixels; i++) {
-      const _start = Math.round(i * stride)
-      const _end = Math.round((i + 1) * stride)
+      const from = Math.round(i * stride)
+      const to = Math.round((i + 1) * stride)
+      const value = samples.slice(from, to).reduce((v, a) => a + v)
 
-      list.push([_start, _end, _end - _start])
+      buckets.push({
+        start: from,
+        end: to,
+        value
+      })
     }
 
     expect(pixels).to.equal(1880)
-    expect(list.length).to.equal(pixels)
+    expect(buckets.length).to.equal(pixels)
 
     // ... check first/last indices
-    expect(list.at(0)[0]).to.equal(start)
-    expect(list.at(-1)[1]).to.equal(end)
+    expect(buckets.at(0).start).to.equal(start)
+    expect(buckets.at(-1).end).to.equal(end)
 
     // ... check index continuity
-    for (let i = 1; i < list.length; i++) {
-      const p = list[i - 1]
-      const q = list[i]
+    for (let i = 1; i < buckets.length; i++) {
+      const p = buckets[i - 1]
+      const q = buckets[i]
 
       expect(q[0]).to.equal(p[1])
     }
@@ -42,8 +52,17 @@ describe('audio start/end', function () {
     const floor = Math.floor(stride)
     const ceil = Math.ceil(stride)
 
-    for (const v of list) {
-      expect(v[2]).to.be.oneOf([floor, ceil])
+    for (const v of buckets) {
+      expect(v.end - v.start).to.be.oneOf([floor, ceil])
+    }
+
+    // ... check pixel values
+    for (let i = 0; i < buckets.length; i++) {
+      const bucket = buckets[i]
+      const N = bucket.end - bucket.start
+      const v = N * (samples[bucket.start] + samples[bucket.end - 1]) / 2
+
+      expect(bucket.value, `${i}`).to.be.closeTo(v, 0.00001)
     }
   })
 })
