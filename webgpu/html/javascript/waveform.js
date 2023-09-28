@@ -14,6 +14,8 @@ export function waveform (context, device, format, audio, style) {
     return {}
   }
 
+  console.log(`>>>>>>> start:${audio.start}  end:${audio.end}`)
+
   const width = context.canvas.width
   const height = context.canvas.height
   const samples = audio.audio

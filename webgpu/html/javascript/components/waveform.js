@@ -295,27 +295,29 @@ function recolour (component) {
   // ... gradient3
   {
     const settings = shadow.querySelector('div[for="gradient3"]')
-    const svg = settings.querySelector('svg')
-    const gradient = svg.querySelector('#gradient3')
-    const stops = gradient.querySelectorAll('stop')
+    const stops = ['#80ccff80', '#80ccff40', '#80ccffff']
+
+    settings.style.setProperty('--gradient', 'linear-gradient(90deg, #ffff00 0%, #ff00ff 50%, #00ffff 100%)')
 
     {
       const rgb = settings.querySelector('input#rgb3').value
       const alpha = settings.querySelector('input#alpha3').value
-      stops[0].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+      stops[0] = rgba(rgb, alpha)
     }
 
     {
       const rgb = settings.querySelector('input#rgb2').value
       const alpha = settings.querySelector('input#alpha2').value
-      stops[1].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+      stops[1] = rgba(rgb, alpha)
     }
 
     {
       const rgb = settings.querySelector('input#rgb1').value
       const alpha = settings.querySelector('input#alpha1').value
-      stops[2].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+      stops[2] = rgba(rgb, alpha)
     }
+
+    settings.style.setProperty('--gradient', `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} 50%, ${stops[0]} 100%)`)
   }
 }
 

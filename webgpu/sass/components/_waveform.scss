@@ -141,6 +141,8 @@ fieldset.waveform {
 
 
         div.gradient3 {
+            --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccff40 50%, #80ccff80 100%);
+            
             margin-top: 8px;
             margin-bottom: 8px;
 
@@ -164,48 +166,41 @@ fieldset.waveform {
             border: 1px solid grey;
             border-radius: 4px;
 
-            #xxx {       
-                display: none;                    
+            input.exemplar {       
                 grid-area: exemplar;
                 transform: rotate(-90deg);
                 place-self: center;
                 -webkit-appearance: none;
             }
 
-            #xxx:focus {
+            input.exemplar:focus {
                 outline: none; 
             }
 
-            #xxx::-webkit-slider-thumb {
-                height: 16px;
-                width: 16px;
+            input.exemplar::-webkit-slider-thumb {
+                height: 12px;
+                width: 12px;
                 background: #ffffff;
-                margin-top: -4.5px;
+                margin-top: -3.5px;
+                padding-top: 2px;
                 border: 1px solid #000000;
-                border-radius: 3px;
-                box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+                border-radius: 8px;
                 cursor: pointer;
 
                 -webkit-appearance: none;
             }
 
-            #xxx::-webkit-slider-runnable-track {
+            input.exemplar::-webkit-slider-runnable-track {
                 height: 6px;
                 width: 100%;
-                background: linear-gradient(90deg, #00ff00, #ff0000);
+                background: var(--gradient);
+                border: 1px solid #000000;
                 border-radius: 2px;
-                box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
                 cursor: pointer;
             }
 
-            #xxx::focus::-webkit-slider-runnable-track {
+            input.exemplar::focus::-webkit-slider-runnable-track {
             }    
-
-            .exemplar {
-                grid-area: exemplar;
-                width: 14px;
-                height: 100%;
-            }
 
             input.rgb1 {
                 grid-area: swatch1;
@@ -230,6 +225,45 @@ fieldset.waveform {
             input.alpha3 {
                 grid-area: alpha3;
             }
+
+            input.alpha {
+                width: 100%;
+                background: transparent;
+                margin-top: 2px;
+                margin-bottom: 8px;
+
+                -webkit-appearance: none; 
+            }
+
+            input.alpha:focus {
+                outline: none; 
+            }
+
+            input.alpha::-webkit-slider-thumb {
+                height: 16px;
+                width: 8px;
+                background: #ffffff;
+
+                margin-top: -4.5px;
+
+                border: 1px solid #000000;
+                border-radius: 3px;
+                cursor: pointer;
+
+                -webkit-appearance: none;
+            }
+
+            input.alpha::-webkit-slider-runnable-track {
+                width: 100%;
+                height: 8px;
+                background: linear-gradient(90deg, #ffffff, #000000);
+                border-radius: 2px;
+                border: 0.2px solid #010101;
+                cursor: pointer;
+            }
+
+            input.alpha:focus::-webkit-slider-runnable-track {
+            }    
         }
 
         div.gradient3.hidden {
