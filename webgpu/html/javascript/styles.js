@@ -26,13 +26,13 @@ export function gradientStyle (vscale, colour1, colour2) {
   }
 }
 
-export function gradient3Style (vscale, midpoint, colour1, colour2, colour3) {
+export function gradient3Style (vscale, colour1, colour2, colour3, midpoint) {
   return {
     type: 'gradient3',
     gradient3: {
       vscale,
-      midpoint,
-      colours: [colour1, colour2, colour3]
+      colours: [colour1, colour2, colour3],
+      stops: [0.0, midpoint, 1.0]
     }
   }
 }

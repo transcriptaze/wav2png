@@ -14,8 +14,8 @@ There are three implementations:
 
 ## Raison d'être
 
-wav2png was initially created as a Go utility library to render an audio file as an anti-aliased waveform for
-a WASM project - it just seemed like a good idea to add a standalone command line version, and later a WebGPU 
+_wav2png_ was originally created as a Go utility library to render an audio file as an anti-aliased waveform for
+a WASM project - it just sseemed like a good idea to add a standalone command line version, and now a WebGPU 
 implementation for better interactivity.
 
 [<img width="256" src="gallery/cli/acoustic.png">](gallery/cli/acoustic.png)

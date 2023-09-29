@@ -32,6 +32,7 @@ export class Waveform extends HTMLElement {
     const styles = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
     const swatches = Array.from(shadow.querySelectorAll('#settings input.swatch'))
     const alphas = Array.from(shadow.querySelectorAll('#settings input.alpha'))
+    const midpoint = shadow.querySelector('#settings input#midpoint')
     const vscale = shadow.querySelector('#settings input#vscale')
 
     styles.forEach((e) => {
@@ -47,6 +48,9 @@ export class Waveform extends HTMLElement {
       e.oninput = (event) => onChange(this, e)
       e.onchange = (event) => onChanged(this, e)
     })
+
+    midpoint.oninput = (event) => onChange(this, midpoint)
+    midpoint.onchange = (event) => onChanged(this, midpoint)
 
     vscale.oninput = (event) => onChange(this, vscale)
     vscale.onchange = (event) => onChanged(this, vscale)
@@ -189,8 +193,9 @@ export class Waveform extends HTMLElement {
         const alpha2 = settings.querySelector('input#alpha2').value
         const rgb3 = settings.querySelector('input#rgb3').value
         const alpha3 = settings.querySelector('input#alpha3').value
+        const midpoint = settings.querySelector('input#midpoint').value
 
-        return styles.gradient3Style(this.vscale, 0.5, rgba(rgb1, alpha1), rgba(rgb2, alpha2), rgba(rgb3, alpha3))
+        return styles.gradient3Style(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2), rgba(rgb3, alpha3), midpoint)
       }
 
       default: {

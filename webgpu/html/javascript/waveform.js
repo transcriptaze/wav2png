@@ -14,8 +14,6 @@ export function waveform (context, device, format, audio, style) {
     return {}
   }
 
-  console.log(`>>>>>>> start:${audio.start}  end:${audio.end}`)
-
   const width = context.canvas.width
   const height = context.canvas.height
   const samples = audio.audio
@@ -44,11 +42,11 @@ export function waveform (context, device, format, audio, style) {
   if (style.type === 'gradient3') {
     const {
       vscale = '1.0',
-      midpoint = 0.5,
-      colours = ['#80ccffff', '#80ccff40', '#80ccff80']
+      colours = ['#80ccffff', '#80ccff40', '#80ccff80'],
+      stops = [0.0, 0.5, 1.0]
     } = style.gradient3
 
-    return gradient3(device, format, { start, end, audio: samples }, width, height, vscale, midpoint, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]))
+    return gradient3(device, format, { start, end, audio: samples }, width, height, vscale, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]), stops[1])
   }
 
   // ... default

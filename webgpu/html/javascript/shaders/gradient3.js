@@ -3,7 +3,7 @@
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function gradient3 (device, format, a, width, height, vscale, midpoint, colour1, colour2, colour3) {
+export function gradient3 (device, format, a, width, height, vscale, colour1, colour2, colour3, midpoint) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const samples = a.audio.subarray(a.start, a.end)
