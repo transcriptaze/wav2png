@@ -34,10 +34,15 @@ export async function initialise () {
   overview.redraw()
   canvas.redraw()
 
+  const background = document.getElementById('background')
   const fill = document.getElementById('fill')
   const grid = document.getElementById('grid')
   const waveform = document.getElementById('waveform')
   const xaxis = document.getElementById('x-axis')
+
+  background.onchange = (c) => {
+    stale = true
+  }
 
   fill.onchange = (c) => {
     stale = true
@@ -241,14 +246,17 @@ function redraw () {
   stale = false
 
   return new Promise(() => {
+    const background = document.getElementById('background').colour
     const fill = document.getElementById('fill').colour
     const grid = document.getElementById('grid').colour
     const waveform = document.getElementById('waveform').style
 
+    canvas.background = background
     canvas.fill = rgba(fill)
     canvas.grid = { colour: rgba(grid) }
     canvas.waveform = waveform
 
+    offscreen.background = background
     offscreen.fill = rgba(fill)
     offscreen.grid = { colour: rgba(grid) }
     offscreen.waveform = waveform

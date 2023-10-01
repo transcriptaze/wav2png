@@ -149,7 +149,7 @@ div#workspace #canvas {
   display: grid;
   grid-template-columns: auto;
   grid-template-rows: auto;
-  background: rgba(17, 17, 17, 0.0666666667);
+  background: #ffffff;
   border-radius: 4px;
 }
 div#workspace #canvas canvas {

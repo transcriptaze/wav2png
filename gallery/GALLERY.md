@@ -13,3 +13,8 @@
 
 [<img width="256" src="webgpu/gradient3.png">](webgpu/gradient3.png)
 [<img width="256" src="webgpu/gradient3C.png">](webgpu/gradient3C.png)
+[<img width="256" src="webgpu/gradient3E.png">](webgpu/gradient3E.png)
+
+
+[<img width="256" src="webgpu/gradient3.png">](webgpu/gradient3F.png)
+[<img width="256" src="webgpu/gradient3G.png">](webgpu/gradient3G.png)

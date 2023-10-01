@@ -1,4 +1,4 @@
-import { background } from './background.js'
+import { fill } from './fill.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { LINE } from './styles.js'
@@ -61,6 +61,10 @@ class Offscreen {
   }
 
   /* eslint-disable-next-line accessor-pairs */
+  set background (v) {
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
   set fill (v) {
     this.internal.styles.fill = v
   }
@@ -107,7 +111,7 @@ class Offscreen {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, this.styles.fill))
+    layers.push(fill(ctx, device, format, this.styles.fill))
     layers.push(waveform(ctx, device, format, audio, styles.waveform))
     layers.push(grid(ctx, device, format, this.styles.grid))
 

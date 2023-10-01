@@ -1,4 +1,4 @@
-import { background } from './background.js'
+import { fill } from './fill.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { black, rgba } from './colours.js'
@@ -130,7 +130,7 @@ class Overview {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, styles.fill))
+    layers.push(fill(ctx, device, format, styles.fill))
     layers.push(waveform(ctx, device, format, audio, styles.waveform))
     layers.push(grid(ctx, device, format, styles.grid))
 

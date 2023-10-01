@@ -34,6 +34,35 @@ legend {
   white-space: nowrap;
 }
 
+fieldset.background {
+  width: 100%;
+  height: fit-content;
+  border: 1px solid #c0c0c0;
+  border-radius: 8px;
+  padding-top: 4px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+fieldset.background legend {
+  padding-left: 2px;
+  padding-right: 2px;
+  color: grey;
+  font-family: sans-serif;
+  font-style: italic;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+fieldset.background div {
+  display: flex;
+  flex-direction: column;
+}
+fieldset.background input[type=color] {
+  width: 48px;
+  height: 48px;
+  border: none;
+}
+
 fieldset.fill {
   width: 100%;
   height: fit-content;

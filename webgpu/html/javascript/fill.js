@@ -1,6 +1,6 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
-export function background (context, device, format, colour) {
+export function fill (context, device, format, colour) {
   const vertices = new Float32Array([
     -1.0, -1.0,
     +1.0, -1.0,

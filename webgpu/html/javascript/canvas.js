@@ -1,4 +1,4 @@
-import { background } from './background.js'
+import { fill } from './fill.js'
 import { grid } from './grid.js'
 import { waveform } from './waveform.js'
 import { LINE } from './styles.js'
@@ -59,6 +59,11 @@ class Canvas {
   }
 
   /* eslint-disable-next-line accessor-pairs */
+  set background (v) {
+    this.internal.canvas.style.background = v
+  }
+
+  /* eslint-disable-next-line accessor-pairs */
   set fill (v) {
     this.internal.styles.fill = v
   }
@@ -105,7 +110,7 @@ class Canvas {
 
     ctx.configure({ device: this.device, format, alphaMode: 'premultiplied' })
 
-    layers.push(background(ctx, device, format, styles.fill))
+    layers.push(fill(ctx, device, format, styles.fill))
     layers.push(waveform(ctx, device, format, audio, styles.waveform))
     layers.push(grid(ctx, device, format, styles.grid))
 

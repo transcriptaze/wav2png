@@ -53,6 +53,7 @@
       </div>
 
       <div id="toolbox">
+        <wav2png-background id="background" colour="#ffffff"></wav2png-background>
         <wav2png-fill     id="fill" colour="#000000ff"></wav2png-fill>
         <wav2png-grid     id="grid" colour='#00ff00ff'></wav2png-grid>
         <wav2png-waveform id="waveform" vscale='1.0' colour="#80ccff"></wav2png-waveform>
@@ -66,6 +67,15 @@
 
     <template id="template-overlay">
       <canvas part="canvas" class="overlay" width="1920" height="160"></canvas>
+    </template>
+
+    <template id="template-background">
+      <fieldset class="background">
+        <legend>Background</legend>
+        <div>
+          <input id="rgb" type="color" value="#000000" />
+        </div>
+      </fieldset>
     </template>
 
     <template id="template-fill">
