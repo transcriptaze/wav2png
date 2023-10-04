@@ -4,6 +4,7 @@ const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function line (device, format, a, width, height, vscale, colour) {
+  console.log(a)
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
 
