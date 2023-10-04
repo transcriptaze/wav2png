@@ -25,7 +25,7 @@ export function waveform (context, device, format, audio, style) {
       colour = '#80ccffff'
     } = style.line
 
-    return line(device, format, { start, end, audio: samples }, width, height, vscale, rgba(colour))
+    return line(device, format, audio, width, height, vscale, rgba(colour))
   }
 
   // ... gradient?

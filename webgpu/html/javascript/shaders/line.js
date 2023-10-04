@@ -4,24 +4,28 @@ const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function line (device, format, a, width, height, vscale, colour) {
-  console.log(a)
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
 
-  const N = a.end - a.start
+  const fs = Number.isNaN(a.fs) ? 44100 : a.fs
+  const L = a.audio.length
+  const duration = clamp(a.duration, 0, L / fs)
+  const start = duration === 0 ? 0 : clamp(Math.floor(L * a.start / duration), 0, L)
+  const end = duration === 0 ? 0 : clamp(Math.floor(L * a.end / duration), 0, L)
+
+  const N = end - start
   const pixels = Math.min(width - 2 * PADDING, N)
   const stride = N / pixels
+  const startʼ = L * a.start / duration
+  const strideʼ = (L * (a.end - a.start) / duration)/ pixels
+  const Nʼ = startʼ/strideʼ
+  const nʼ = Math.floor(Nʼ)
+  const STARTʼ = Math.floor(nʼ*strideʼ)
 
-  // const start = Math.floor(stride * Math.floor(a.start/stride))
-  // const end = Math.ceil(start + pixels*stride)
-  // const samples = a.audio.subarray(start, end)
+  console.log({stride},{start})
+  console.log({strideʼ},{startʼ},{Nʼ},{nʼ},{STARTʼ})
 
-  const samples = a.audio.subarray(a.start, a.end)
-
-  // console.log(`stride ${stride}`)
-  // console.log(`start  ${a.start}  ${start}`)
-  // console.log(`end    ${a.end}    ${end}`)
-  // console.log('>>> N',N, samples.length)
+  const samples = a.audio.subarray(STARTʼ, end)
 
   const vertices = new Float32Array([
     0.0, +1.0,
@@ -214,6 +218,10 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
   view.setFloat32(44, colour[3], true) //
 
   return new Uint8Array(buffer)
+}
+
+function clamp (v, min, max) {
+  return (v < min) ? min : ((v > max) ? max : v)
 }
 
 const SHADER = `
