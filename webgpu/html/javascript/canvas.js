@@ -104,7 +104,7 @@ class Canvas {
     const ctx = this.canvas.getContext('webgpu')
     const device = this.device
     const format = navigator.gpu.getPreferredCanvasFormat()
-    const audio = this.audio // this.audio.subarray(start, end)
+    const audio = this.audio
     const styles = this.styles
     const layers = []
 

@@ -4,24 +4,13 @@ const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function line (device, format, a, width, height, vscale, colour) {
-  console.log(a)
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
 
   const N = a.end - a.start
   const pixels = Math.min(width - 2 * PADDING, N)
   const stride = N / pixels
-
-  // const start = Math.floor(stride * Math.floor(a.start/stride))
-  // const end = Math.ceil(start + pixels*stride)
-  // const samples = a.audio.subarray(start, end)
-
   const samples = a.audio.subarray(a.start, a.end)
-
-  // console.log(`stride ${stride}`)
-  // console.log(`start  ${a.start}  ${start}`)
-  // console.log(`end    ${a.end}    ${end}`)
-  // console.log('>>> N',N, samples.length)
 
   const vertices = new Float32Array([
     0.0, +1.0,
@@ -197,6 +186,7 @@ export function line (device, format, a, width, height, vscale, colour) {
 }
 
 function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
+  console.log({ pixels }, { samples }, { stride }, Math.fround(stride))
   const pad = 0
   const buffer = new ArrayBuffer(48)
   const view = new DataView(buffer)
