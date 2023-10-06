@@ -22,6 +22,7 @@ export function line (device, format, a, width, height, vscale, colour) {
   const nʼ = Math.floor(Nʼ)
   const STARTʼ = Math.floor(nʼ*strideʼ)
 
+  console.log('>>', a.start, a.end)
   const vertices = new Float32Array([
     0.0, +1.0,
     0.0, -1.0
