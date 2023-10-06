@@ -12,6 +12,7 @@ export function line (device, format, a, width, height, vscale, colour) {
   const stride = N / pixels
   const samples = a.audio.subarray(a.start, a.end)
 
+  console.log('>>', a.start, a.end)
   const vertices = new Float32Array([
     0.0, +1.0,
     0.0, -1.0
