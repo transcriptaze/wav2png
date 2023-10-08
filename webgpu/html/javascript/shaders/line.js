@@ -17,10 +17,10 @@ export function line (device, format, a, width, height, vscale, colour) {
   const pixels = Math.min(width - 2 * PADDING, N)
   const stride = N / pixels
   const startʼ = L * a.start / duration
-  const strideʼ = (L * (a.end - a.start) / duration)/ pixels
-  const Nʼ = startʼ/strideʼ
+  const strideʼ = (L * (a.end - a.start) / duration) / pixels
+  const Nʼ = startʼ / strideʼ
   const nʼ = Math.floor(Nʼ)
-  const STARTʼ = Math.floor(nʼ*strideʼ)
+  const STARTʼ = Math.floor(nʼ * strideʼ)
 
   console.log('>>', a.start, a.end)
   const vertices = new Float32Array([
