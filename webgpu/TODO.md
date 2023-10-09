@@ -1,6 +1,9 @@
 # TODO
 
 - [ ] Quantize audio on pixel boundaries (so that it doesn't change when shifting left and right)
+      - [x] Calculate start/end by indexing from 0
+      - [ ] Set start offset in compute shader 
+
 - [ ] Distributable Go app
 
 - [x] Github build workflow

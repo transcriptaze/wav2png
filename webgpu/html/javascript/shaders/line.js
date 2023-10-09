@@ -7,25 +7,74 @@ export function line (device, format, a, width, height, vscale, colour) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
 
-  const fs = Number.isNaN(a.fs) ? 44100 : a.fs
-  const L = a.audio.length
-  const duration = clamp(a.duration, 0, L / fs)
-  const start = duration === 0 ? 0 : clamp(Math.floor(L * a.start / duration), 0, L)
-  const end = duration === 0 ? 0 : clamp(Math.floor(L * a.end / duration), 0, L)
+  const N = a.audio.length
+  const duration = clamp(a.duration, 0, N / a.fs)
+  const start = duration === 0 ? 0 : clamp(Math.floor(N * a.start / duration), 0, N)
+  const end = duration === 0 ? 0 : clamp(Math.floor(N * a.end / duration), 0, N)
 
-  const N = end - start
-  const pixels = Math.min(width - 2 * PADDING, N)
-  const stride = N / pixels
-  const startʼ = L * a.start / duration
-  const strideʼ = (L * (a.end - a.start) / duration) / pixels
-  const Nʼ = startʼ / strideʼ
-  const nʼ = Math.floor(Nʼ)
-  const STARTʼ = Math.floor(nʼ * strideʼ)
+  const pixels = Math.min(width - 2 * PADDING, end - start)
+  const stride = Math.fround((end - start) / pixels)
 
-  console.log({ stride }, { start })
-  console.log({ strideʼ }, { startʼ }, { Nʼ }, { nʼ }, { STARTʼ })
+  const roundµs = function (t) {
+    return Math.round(1000_000 * duration * t / N) / 1000_000
+  }
 
-  const samples = a.audio.subarray(STARTʼ, end)
+  let index = 0
+  let startʼ = Math.round(index * stride)
+  let endʼ = Math.round((index + 1) * stride)
+  let t = { start: roundµs(startʼ), end: roundµs(endʼ) }
+
+  let START = { t, start: startʼ, end: endʼ }
+
+  while (t.start < a.start) {
+    START = { t, start: startʼ, end: endʼ }
+
+    index++
+
+    startʼ = Math.round(index * stride)
+    endʼ = Math.round((index + 1) * stride)
+    t = { start: roundµs(startʼ), end: roundµs(endʼ) }
+  }
+
+  console.log('>>> ', START.start)
+
+  let END = { t, start: startʼ, end: endʼ }
+
+  while (t.end <= a.end) {
+    END = { t, start: startʼ, end: endʼ }
+
+    index++
+
+    startʼ = Math.round(index * stride)
+    endʼ = Math.round((index + 1) * stride)
+    t = { start: roundµs(startʼ), end: roundµs(endʼ) }
+  }
+
+  console.log('>>> ', END.end)
+
+  const samples = a.audio.subarray(START.start, END.end)
+
+  // {
+  // const fs = Number.isNaN(a.fs) ? 44100 : a.fs
+  // const L = a.audio.length
+  // const duration = clamp(a.duration, 0, L / fs)
+  // const start = duration === 0 ? 0 : clamp(Math.floor(L * a.start / duration), 0, L)
+  // const end = duration === 0 ? 0 : clamp(Math.floor(L * a.end / duration), 0, L)
+
+  // const N = end - start
+  // const pixels = Math.min(width - 2 * PADDING, N)
+  // // const stride = N / pixels
+  // const startʼ = L * a.start / duration
+  // const strideʼ = (L * (a.end - a.start) / duration) / pixels
+  // const Nʼ = startʼ / strideʼ
+  // const nʼ = Math.floor(Nʼ)
+  // const STARTʼ = Math.floor(nʼ * strideʼ)
+
+  // console.log({ stride }, { STARTʼ }, { end })
+  // console.log({ strideʼ }, { startʼ }, { Nʼ }, { nʼ }, { STARTʼ })
+
+  // const samples = a.audio.subarray(STARTʼ, end)
+  // }
 
   const vertices = new Float32Array([
     0.0, +1.0,
