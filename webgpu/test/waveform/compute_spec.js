@@ -274,22 +274,132 @@ describe.only('audio pixel bucket logic', function () {
       expect(startʼ.end).to.equal(44100)
       expect(startʼ.bucket).to.eql(new Float64Array([4409.8, 4409.9]))
 
-      // NTS: 1.0001 to 1.1001
-      // expect(startʼ.index).to.equal(18801)
-      // expect(startʼ.t.start).to.be.closeTo(from, 0.0001)
-      // expect(startʼ.start).to.equal(44102)
-      // expect(startʼ.end).to.equal(44105)
-      // expect(startʼ.bucket).to.eql(new Float64Array([4410.2, 4410.3, 4410.4]))
-
       expect(endʼ.index).to.equal(20679)
       expect(endʼ.t.end).to.be.closeTo(to, 0.00005)
       expect(endʼ.start).to.equal(48508)
       expect(endʼ.end).to.equal(48510)
       expect(endʼ.bucket).to.eql(new Float64Array([4850.8, 4850.9]))
+    }
+  })
+  it('100ms slice of 2s audio from 1.000.1s to 1.100.1ms, indexed from start of audio', function () {
+    // ... setup
+    const from = 1.0001
+    const to = 1.1001
+    const N = audio.audio.length
+    const duration = clamp(audio.duration, 0, N / audio.fs)
+    const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
+    const end = duration === 0 ? 0 : clamp(Math.floor(N * to / duration), 0, N)
 
-      // console.log('>>>', index, t)
-      // console.log('>>>', buckets.slice(-2))
-      // console.log('>>> >>>', endʼ)
+    expect(N).to.equal(88200)
+    expect(duration).to.equal(2)
+    expect(start).to.equals(44104)
+    expect(end).to.equal(48514)
+
+    // ... line
+    const line = {}
+
+    line.start = start
+    line.end = end
+    line.N = line.end - line.start
+    line.pixels = Math.min(width - 2 * padding, line.N)
+    line.stride = line.N / line.pixels
+    line.samples = audio.audio.subarray(line.start, line.end)
+
+    expect(line.start).to.equal(44104)
+    expect(line.end).to.equal(48514)
+    expect(line.N).to.equal(4410)
+    expect(line.pixels).to.equal(1880)
+    expect(line.stride).to.be.closeTo(2.345744680851064, 0.0001)
+    expect(line.samples.length).to.equal(4410)
+
+    // ... compute shader
+    const expected = new Map([
+      [0, { t: 0.000000, start: 0, end: 2, bucket: [0.0, 0.1] }],
+      [1, { t: 0.000045, start: 2, end: 5, bucket: [0.2, 0.3, 0.4] }],
+      [2, { t: 0.000113, start: 5, end: 7, bucket: [0.5, 0.6] }],
+      [3, { t: 0.000159, start: 7, end: 9, bucket: [0.7, 0.8] }],
+      [4, { t: 0.000204, start: 9, end: 12, bucket: [0.9, 1.0, 1.1] }]
+    ])
+
+    const compute = {
+      stride: Math.fround(line.stride) // f32
+    }
+
+    const roundµs = function (t) {
+      return Math.round(1000_000 * duration * t / N) / 1000_000
+    }
+
+    {
+      const buckets = []
+      let index = 0
+      let start = Math.round(index * compute.stride)
+      let end = Math.round((index + 1) * compute.stride)
+      let t = { start: roundµs(start), end: roundµs(end) }
+      let bucket = audio.audio.subarray(start, end)
+
+      buckets.push({ index, t, start, end, bucket })
+
+      while (t.start < from) {
+        buckets.push({ index, t, start, end, bucket })
+
+        if (expected.has(index)) {
+          const e = expected.get(index)
+
+          expect(t.start).to.be.closeTo(e.t, 0.000001)
+          expect(start).to.equal(e.start)
+          expect(end).to.equal(e.end)
+          expect(bucket).to.eql(new Float64Array(e.bucket))
+        }
+
+        index++
+
+        start = Math.round(index * compute.stride)
+        end = Math.round((index + 1) * compute.stride)
+        t = { start: roundµs(start), end: roundµs(end) }
+        bucket = audio.audio.subarray(start, end)
+      }
+
+      const startʼ = buckets.at(-1)
+
+      while (t.end <= to) {
+        buckets.push({ index, t, start, end, bucket })
+
+        if (expected.has(index)) {
+          const e = expected.get(index)
+
+          expect(t.start).to.be.closeTo(e.t, 0.000001)
+          expect(start).to.equal(e.start)
+          expect(end).to.equal(e.end)
+          expect(bucket).to.eql(new Float64Array(e.bucket))
+        }
+
+        index++
+
+        start = Math.round(index * compute.stride)
+        end = Math.round((index + 1) * compute.stride)
+        t = { start: roundµs(start), end: roundµs(end) }
+        bucket = audio.audio.subarray(start, end)
+      }
+
+      const endʼ = buckets.at(-1)
+
+      expect(startʼ.index).to.equal(18801)
+      expect(startʼ.t.start).to.be.closeTo(from, 0.00006)
+      expect(startʼ.start).to.equal(44102)
+      expect(startʼ.end).to.equal(44105)
+      expect(startʼ.bucket).to.eql(new Float64Array([4410.2, 4410.3, 4410.4]))
+
+      expect(endʼ.index).to.equal(20680)
+      expect(endʼ.t.end).to.be.closeTo(to, 0.00006)
+      expect(endʼ.start).to.equal(48510)
+      expect(endʼ.end).to.equal(48512)
+      expect(endʼ.bucket).to.eql(new Float64Array([4851.0, 4851.1]))
+
+      expect(buckets.at(-2).index).to.equal(20679)
+      expect(buckets.at(-2).t.end).to.be.closeTo(to - 0.0001, 0.00005)
+      expect(buckets.at(-2).start).to.equal(48508)
+      expect(buckets.at(-2).end).to.equal(48510)
+      expect(buckets.at(-2).bucket).to.eql(new Float64Array([4850.8, 4850.9]))
     }
   })
 })
