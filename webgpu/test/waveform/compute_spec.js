@@ -14,8 +14,8 @@ for (let i = 0; i < audio.audio.length; i++) {
   audio.audio[i] = Math.round(i * 0.1 * 10) / 10
 }
 
-describe('audio pixel bucket logic', function () {
-  it.only('100ms slice of 2s audio from 1.000s to 1.100ms', function () {
+describe.skip('audio pixel bucket logic', function () {
+  it('100ms slice of 2s audio from 1.000s to 1.100ms', function () {
     // ... setup
     const from = 1.000
     const to = 1.100
@@ -90,7 +90,7 @@ describe('audio pixel bucket logic', function () {
     }
   })
 
-  it.only('100ms slice of 2s audio from 1.000.1s to 1.100.1ms', function () {
+  it('100ms slice of 2s audio from 1.000.1s to 1.100.1ms', function () {
     // ... setup
     const from = 1.0001
     const to = 1.1001
@@ -165,42 +165,135 @@ describe('audio pixel bucket logic', function () {
   })
 })
 
+describe.only('audio pixel bucket logic', function () {
+  it('100ms slice of 2s audio from 1.000s to 1.100ms, indexed from start of audio', function () {
+    // ... setup
+    const from = 1.000
+    const to = 1.100
+    const N = audio.audio.length
+    const duration = clamp(audio.duration, 0, N / audio.fs)
+    const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
+    const end = duration === 0 ? 0 : clamp(Math.floor(N * to / duration), 0, N)
+
+    expect(N).to.equal(88200)
+    expect(duration).to.equal(2)
+    expect(start).to.equals(44100)
+    expect(end).to.equal(48510)
+
+    // ... line
+    const line = {}
+
+    line.start = start
+    line.end = end
+    line.N = line.end - line.start
+    line.pixels = Math.min(width - 2 * padding, line.N)
+    line.stride = line.N / line.pixels
+    line.samples = audio.audio.subarray(line.start, line.end)
+
+    expect(line.start).to.equal(44100)
+    expect(line.end).to.equal(48510)
+    expect(line.N).to.equal(4410)
+    expect(line.pixels).to.equal(1880)
+    expect(line.stride).to.be.closeTo(2.345744680851064, 0.0001)
+    expect(line.samples.length).to.equal(4410)
+
+    // ... compute shader
+    const expected = new Map([
+      [0, { t: 0.000000, start: 0, end: 2, bucket: [0.0, 0.1] }],
+      [1, { t: 0.000045, start: 2, end: 5, bucket: [0.2, 0.3, 0.4] }],
+      [2, { t: 0.000113, start: 5, end: 7, bucket: [0.5, 0.6] }],
+      [3, { t: 0.000159, start: 7, end: 9, bucket: [0.7, 0.8] }],
+      [4, { t: 0.000204, start: 9, end: 12, bucket: [0.9, 1.0, 1.1] }]
+    ])
+
+    const compute = {
+      stride: Math.fround(line.stride) // f32
+    }
+
+    const roundµs = function (t) {
+      return Math.round(1000_000 * duration * t / N) / 1000_000
+    }
+
+    {
+      const buckets = []
+      let index = 0
+      let start = Math.round(index * compute.stride)
+      let end = Math.round((index + 1) * compute.stride)
+      let t = { start: roundµs(start), end: roundµs(end) }
+      let bucket = audio.audio.subarray(start, end)
+
+      buckets.push({ index, t, start, end, bucket })
+
+      while (t.start < from) {
+        buckets.push({ index, t, start, end, bucket })
+
+        if (expected.has(index)) {
+          const e = expected.get(index)
+
+          expect(t.start).to.be.closeTo(e.t, 0.000001)
+          expect(start).to.equal(e.start)
+          expect(end).to.equal(e.end)
+          expect(bucket).to.eql(new Float64Array(e.bucket))
+        }
+
+        index++
+
+        start = Math.round(index * compute.stride)
+        end = Math.round((index + 1) * compute.stride)
+        t = { start: roundµs(start), end: roundµs(end) }
+        bucket = audio.audio.subarray(start, end)
+      }
+
+      const startʼ = buckets.at(-1)
+
+      while (t.end <= to) {
+        buckets.push({ index, t, start, end, bucket })
+
+        if (expected.has(index)) {
+          const e = expected.get(index)
+
+          expect(t.start).to.be.closeTo(e.t, 0.000001)
+          expect(start).to.equal(e.start)
+          expect(end).to.equal(e.end)
+          expect(bucket).to.eql(new Float64Array(e.bucket))
+        }
+
+        index++
+
+        start = Math.round(index * compute.stride)
+        end = Math.round((index + 1) * compute.stride)
+        t = { start: roundµs(start), end: roundµs(end) }
+        bucket = audio.audio.subarray(start, end)
+      }
+
+      const endʼ = buckets.at(-1)
+
+      expect(startʼ.index).to.equal(18799)
+      expect(startʼ.t.start).to.be.closeTo(from, 0.00005)
+      expect(startʼ.start).to.equal(44098)
+      expect(startʼ.end).to.equal(44100)
+      expect(startʼ.bucket).to.eql(new Float64Array([4409.8, 4409.9]))
+
+      // NTS: 1.0001 to 1.1001
+      // expect(startʼ.index).to.equal(18801)
+      // expect(startʼ.t.start).to.be.closeTo(from, 0.0001)
+      // expect(startʼ.start).to.equal(44102)
+      // expect(startʼ.end).to.equal(44105)
+      // expect(startʼ.bucket).to.eql(new Float64Array([4410.2, 4410.3, 4410.4]))
+
+      expect(endʼ.index).to.equal(20679)
+      expect(endʼ.t.end).to.be.closeTo(to, 0.00005)
+      expect(endʼ.start).to.equal(48508)
+      expect(endʼ.end).to.equal(48510)
+      expect(endʼ.bucket).to.eql(new Float64Array([4850.8, 4850.9]))
+
+      // console.log('>>>', index, t)
+      // console.log('>>>', buckets.slice(-2))
+      // console.log('>>> >>>', endʼ)
+    }
+  })
+})
+
 function clamp (v, min, max) {
   return (v < min) ? min : ((v > max) ? max : v)
 }
-
-// COMPUTE SHADER
-// let samples = u32(uconstants.samples);
-// let pixels = u32(uconstants.pixels);
-// let stride = f32(uconstants.stride);
-// let start = u32(round(f32(pixel.x) * stride));
-// let end = u32(round(f32(pixel.x + 1) * stride));
-//
-// var p = f32(0);
-// var q = f32(0);
-//
-// var m = u32(0);
-// var n = u32(0);
-//
-// for (var i: u32 = start; i < end; i++) {
-//    let v = audio[i];
-//
-//    if (v > 0.0) {
-//       p += v; m++;
-//    } else if (v < 0.0) {
-//       q += v; n++;
-//    } else {
-//       p += v; m++;
-//       q += v; n++;
-//    }
-// }
-//
-// if (m > u32(0)) {
-//    p = p/f32(m);
-// }
-//
-// if (n > u32(0)) {
-//    q = q/f32(n);
-// }
-//
-// waveform[pixel.x] = vec2f(p,q);
