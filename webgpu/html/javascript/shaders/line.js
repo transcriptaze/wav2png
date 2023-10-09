@@ -22,7 +22,11 @@ export function line (device, format, a, width, height, vscale, colour) {
   const nʼ = Math.floor(Nʼ)
   const STARTʼ = Math.floor(nʼ * strideʼ)
 
-  console.log('>>', a.start, a.end)
+  console.log({ stride }, { start })
+  console.log({ strideʼ }, { startʼ }, { Nʼ }, { nʼ }, { STARTʼ })
+
+  const samples = a.audio.subarray(STARTʼ, end)
+
   const vertices = new Float32Array([
     0.0, +1.0,
     0.0, -1.0
@@ -197,7 +201,6 @@ export function line (device, format, a, width, height, vscale, colour) {
 }
 
 function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
-  console.log({ pixels }, { samples }, { stride }, Math.fround(stride))
   const pad = 0
   const buffer = new ArrayBuffer(48)
   const view = new DataView(buffer)
