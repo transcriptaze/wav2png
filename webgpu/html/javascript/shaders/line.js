@@ -36,8 +36,6 @@ export function line (device, format, a, width, height, vscale, colour) {
     t = { start: roundµs(startʼ), end: roundµs(endʼ) }
   }
 
-  console.log('>>> ', START.start)
-
   let END = { t, start: startʼ, end: endʼ }
 
   while (t.end <= a.end) {
@@ -50,7 +48,9 @@ export function line (device, format, a, width, height, vscale, colour) {
     t = { start: roundµs(startʼ), end: roundµs(endʼ) }
   }
 
-  console.log('>>> ', END.end)
+  console.log('>>> ', START.start, END.end)
+  console.log('>>> >>', Math.round(0 * stride), Math.round(1 * stride))
+  console.log('>>> >>', Math.round(1 * stride), Math.round(2 * stride))
 
   const samples = a.audio.subarray(START.start, END.end)
 

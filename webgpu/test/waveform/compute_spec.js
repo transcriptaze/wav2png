@@ -279,8 +279,15 @@ describe.only('audio pixel bucket logic', function () {
       expect(endʼ.start).to.equal(48508)
       expect(endʼ.end).to.equal(48510)
       expect(endʼ.bucket).to.eql(new Float64Array([4850.8, 4850.9]))
+
+      // for (let i = 1; i <= 10; i++) {
+      //   const bucket = buckets[startʼ.index + i]
+      //
+      //   console.log(i, bucket.index, bucket.start, bucket.end)
+      // }
     }
   })
+
   it('100ms slice of 2s audio from 1.000.1s to 1.100.1ms, indexed from start of audio', function () {
     // ... setup
     const from = 1.0001
@@ -400,6 +407,73 @@ describe.only('audio pixel bucket logic', function () {
       expect(buckets.at(-2).start).to.equal(48508)
       expect(buckets.at(-2).end).to.equal(48510)
       expect(buckets.at(-2).bucket).to.eql(new Float64Array([4850.8, 4850.9]))
+
+      // for (let i = 1; i <= 10; i++) {
+      //   const bucket = buckets[startʼ.index + i]
+      //
+      //   console.log(i, bucket.index, bucket.start, bucket.end)
+      // }
+    }
+  })
+
+  // 1 18799 44098 44100
+  // 2 18800 44100 44102
+  // 3 18801 44102 44105
+  // 4 18802 44105 44107
+  // 5 18803 44107 44109
+  it('offsets: 100ms slice of 2s audio from 1.000s to 1.100ms, indexed from start of audio', function () {
+    const start = 44098
+    // const end = 48508
+    const stride = Math.fround(2.345744680851064)
+    const offset = 18799
+
+    const expected = new Map([
+      [0, { start: 0, end: 2 }],
+      [1, { start: 2, end: 5 }],
+      [2, { start: 5, end: 7 }],
+      [3, { start: 7, end: 9 }],
+      [4, { start: 9, end: 12 }]
+    ])
+
+    for (let i = 0; i < 1; i++) {
+      const indices = {
+        start: Math.round((offset + i) * stride) - start,
+        end: Math.round((offset + i + 1) * stride) - start
+      }
+
+      expect(indices.start).to.equal(expected.get(i).start)
+      expect(indices.end).to.equal(expected.get(i).end)
+    }
+  })
+
+  // 1 18801 44102 44105
+  // 2 18802 44105 44107
+  // 3 18803 44107 44109
+  // 4 18804 44109 44112
+  // 5 18805 44112 44114
+  it('offsets: 100ms slice of 2s audio from 1.000.1s to 1.100.1ms, indexed from start of audio', function () {
+    const start = 44102
+    const stride = Math.fround(2.345744680851064)
+    const offset = 18801
+
+    const expected = new Map([
+      [0, { start: 0, end: 3 }],
+      [1, { start: 3, end: 5 }],
+      [2, { start: 5, end: 7 }],
+      [3, { start: 7, end: 10 }],
+      [4, { start: 10, end: 12 }]
+    ])
+
+    for (let i = 0; i < 5; i++) {
+      const indices = {
+        start: Math.round((offset + i) * stride) - start,
+        end: Math.round((offset + i + 1) * stride) - start
+      }
+
+      console.log(i, indices)
+
+      expect(indices.start).to.equal(expected.get(i).start)
+      expect(indices.end).to.equal(expected.get(i).end)
     }
   })
 })
