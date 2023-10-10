@@ -2,7 +2,8 @@
 
 - [ ] Quantize audio on pixel boundaries (so that it doesn't change when shifting left and right)
       - [x] Calculate start/end by indexing from 0
-      - [ ] Set start offset in compute shader 
+      - [x] Set start offset in compute shader 
+      - [ ] Fix jump at 1.002.2
 
 - [ ] Distributable Go app
 

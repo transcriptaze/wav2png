@@ -11,71 +11,47 @@ export function line (device, format, a, width, height, vscale, colour) {
   const duration = clamp(a.duration, 0, N / a.fs)
   const start = duration === 0 ? 0 : clamp(Math.floor(N * a.start / duration), 0, N)
   const end = duration === 0 ? 0 : clamp(Math.floor(N * a.end / duration), 0, N)
-
-  const pixels = Math.min(width - 2 * PADDING, end - start)
-  const stride = Math.fround((end - start) / pixels)
-
   const roundµs = function (t) {
     return Math.round(1000_000 * duration * t / N) / 1000_000
   }
 
-  let index = 0
-  let startʼ = Math.round(index * stride)
-  let endʼ = Math.round((index + 1) * stride)
-  let t = { start: roundµs(startʼ), end: roundµs(endʼ) }
-
-  let START = { t, start: startʼ, end: endʼ }
-
-  while (t.start < a.start) {
-    START = { t, start: startʼ, end: endʼ }
-
-    index++
-
-    startʼ = Math.round(index * stride)
-    endʼ = Math.round((index + 1) * stride)
-    t = { start: roundµs(startʼ), end: roundµs(endʼ) }
+  const pixels = Math.min(width - 2 * PADDING, end - start)
+  const stride = Math.fround((end - start) / pixels)
+  const slice = {
+    start: 0,
+    end,
+    offset: 0,
+    audio: a.audio.subarray(start, end)
   }
 
-  let END = { t, start: startʼ, end: endʼ }
+  // ... calculate start/end indices and offset
+  {
+    let index = 0
+    let start = Math.round(index * stride)
+    let end = Math.round((index + 1) * stride)
 
-  while (t.end <= a.end) {
-    END = { t, start: startʼ, end: endʼ }
+    while (roundµs(start) < a.start) {
+      slice.start = start
+      slice.offset = index
 
-    index++
+      index += 1
+      start = Math.round(index * stride)
+    }
 
-    startʼ = Math.round(index * stride)
-    endʼ = Math.round((index + 1) * stride)
-    t = { start: roundµs(startʼ), end: roundµs(endʼ) }
+    end = Math.round((index + 1) * stride)
+    slice.end = end
+
+    while (roundµs(end) <= a.end) {
+      slice.end = end
+
+      index += 1
+      end = Math.round((index + 1) * stride)
+    }
+
+    slice.audio = a.audio.subarray(slice.start, slice.end)
   }
 
-  console.log('>>> ', START.start, END.end)
-  console.log('>>> >>', Math.round(0 * stride), Math.round(1 * stride))
-  console.log('>>> >>', Math.round(1 * stride), Math.round(2 * stride))
-
-  const samples = a.audio.subarray(START.start, END.end)
-
-  // {
-  // const fs = Number.isNaN(a.fs) ? 44100 : a.fs
-  // const L = a.audio.length
-  // const duration = clamp(a.duration, 0, L / fs)
-  // const start = duration === 0 ? 0 : clamp(Math.floor(L * a.start / duration), 0, L)
-  // const end = duration === 0 ? 0 : clamp(Math.floor(L * a.end / duration), 0, L)
-
-  // const N = end - start
-  // const pixels = Math.min(width - 2 * PADDING, N)
-  // // const stride = N / pixels
-  // const startʼ = L * a.start / duration
-  // const strideʼ = (L * (a.end - a.start) / duration) / pixels
-  // const Nʼ = startʼ / strideʼ
-  // const nʼ = Math.floor(Nʼ)
-  // const STARTʼ = Math.floor(nʼ * strideʼ)
-
-  // console.log({ stride }, { STARTʼ }, { end })
-  // console.log({ strideʼ }, { startʼ }, { Nʼ }, { nʼ }, { STARTʼ })
-
-  // const samples = a.audio.subarray(STARTʼ, end)
-  // }
-
+  // ... setup geometry
   const vertices = new Float32Array([
     0.0, +1.0,
     0.0, -1.0
@@ -178,9 +154,20 @@ export function line (device, format, a, width, height, vscale, colour) {
     }
   })
 
-  const constants = pack({ pixels, stride, samples: samples.length, xscale, yscale, vscale, colour })
+  const constants = pack({
+    pixels,
+    start: slice.start,
+    offset: slice.offset,
+    stride,
+    samples: slice.audio.length,
+    xscale,
+    yscale,
+    vscale,
+    colour
+  })
+
   const waveform = new Float32Array(pixels * 2)
-  const audio = new Float32Array(samples)
+  const audio = new Float32Array(slice.audio)
 
   const storage = {
     uniforms: device.createBuffer({
@@ -249,22 +236,27 @@ export function line (device, format, a, width, height, vscale, colour) {
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale, vscale, colour }) {
+function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale, colour }) {
   const pad = 0
-  const buffer = new ArrayBuffer(48)
+  const buffer = new ArrayBuffer(64)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
-  view.setFloat32(4, stride, true)
-  view.setUint32(8, samples, true)
-  view.setUint32(12, pad, true)
-  view.setFloat32(16, xscale, true) // vec2f: must be on a 16-byte boundary
-  view.setFloat32(20, yscale, true) //
-  view.setFloat32(24, vscale, true)
-  view.setFloat32(32, colour[0], true) // vec4f: must be on a 16-byte boundary
-  view.setFloat32(36, colour[1], true) //
-  view.setFloat32(40, colour[2], true) //
-  view.setFloat32(44, colour[3], true) //
+  view.setUint32(4, start, true)
+  view.setUint32(8, offset, true)
+  view.setFloat32(12, stride, true)
+  view.setUint32(16, samples, true)
+  view.setFloat32(20, vscale, true)
+
+  view.setUint32(24, pad, true)
+  view.setUint32(28, pad, true)
+
+  view.setFloat32(32, xscale, true) // vec2f: must be on a 16-byte boundary
+  view.setFloat32(36, yscale, true) //
+  view.setFloat32(48, colour[0], true) // vec4f: must be on a 16-byte boundary
+  view.setFloat32(52, colour[1], true) //
+  view.setFloat32(56, colour[2], true) //
+  view.setFloat32(60, colour[3], true) //
 
   return new Uint8Array(buffer)
 }
@@ -276,11 +268,14 @@ function clamp (v, min, max) {
 const SHADER = `
     struct constants {
       pixels: u32,
+      origin: u32,
+      offset: u32,
       stride: f32,
       samples: u32,
-      pad: f32,
-      scale: vec2f,
       vscale: f32,
+      pad1: u32,
+      pad2: u32,
+      scale: vec2f,
       colour: vec4f
     };
 
@@ -328,11 +323,14 @@ const SHADER = `
 const COMPUTE = `
     struct constants {
       pixels: u32,
+      origin: u32,
+      offset: u32,
       stride: f32,
       samples: u32,
-      pad: f32,
-      scale: vec2f,
       vscale: f32,
+      pad1: u32,
+      pad2: u32,
+      scale: vec2f,
       colour: vec4f
     };
 
@@ -345,8 +343,8 @@ const COMPUTE = `
        let samples = u32(uconstants.samples);
        let pixels = u32(uconstants.pixels);
        let stride = f32(uconstants.stride);
-       let start = u32(round(f32(pixel.x) * stride));
-       let end = u32(round(f32(pixel.x + 1) * stride));
+       let start = u32(round(f32(uconstants.offset + pixel.x) * stride)) - uconstants.origin;
+       let end = u32(round(f32(uconstants.offset + pixel.x + 1) * stride)) - uconstants.origin;
 
        var p = f32(0);
        var q = f32(0);
