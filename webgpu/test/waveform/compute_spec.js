@@ -9,9 +9,11 @@ const audio = {
   duration: 2,
   audio: new Float64Array(2 * 44100)
 }
+
 for (let i = 0; i < audio.audio.length; i++) {
   audio.audio[i] = Math.round(i * 0.1 * 10) / 10
 }
+
 describe.skip('audio pixel bucket logic', function () {
   it('100ms slice of 2s audio from 1.000s to 1.100ms', function () {
     // ... setup
@@ -21,33 +23,40 @@ describe.skip('audio pixel bucket logic', function () {
     const duration = clamp(audio.duration, 0, N / audio.fs)
     const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
     const end = duration === 0 ? 0 : clamp(Math.floor(N * to / duration), 0, N)
+
     expect(N).to.equal(88200)
     expect(duration).to.equal(2)
     expect(start).to.equals(44100)
     expect(end).to.equal(48510)
+
     // ... line
     const line = {}
+
     line.start = start
     line.end = end
     line.N = line.end - line.start
     line.pixels = Math.min(width - 2 * padding, line.N)
     line.stride = line.N / line.pixels
     line.samples = audio.audio.subarray(line.start, line.end)
+
     expect(line.start).to.equal(44100)
     expect(line.end).to.equal(48510)
     expect(line.N).to.equal(4410)
     expect(line.pixels).to.equal(1880)
     expect(line.stride).to.be.closeTo(2.345744680851064, 0.0001)
     expect(line.samples.length).to.equal(4410)
+
     // ... compute shader
     const compute = {
       pixels: line.pixels,
       samples: line.samples.length,
       stride: Math.fround(line.stride) // f32
+    }
 
     expect(compute.pixels).to.equal(1880)
     expect(compute.samples).to.equal(4410)
     expect(compute.stride).to.be.closeTo(2.3457446098327637, 0.0001)
+
     // ... pixel buckets
     const indices = new Map([
       [0, 0],
@@ -65,7 +74,7 @@ describe.skip('audio pixel bucket logic', function () {
       [3, [4410.7, 4410.8]],
       [4, [4410.9, 4411.0, 4411.1]]
     ])
-    const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
+
     for (let x = 0; x < 5; x++) {
       const start = Math.round(x * compute.stride)
       const end = Math.round((x + 1) * compute.stride)
@@ -79,6 +88,7 @@ describe.skip('audio pixel bucket logic', function () {
       expect(end).to.equal(indices.get(x + 1))
       expect(bucket).to.eql(buckets.get(x))
     }
+  })
 
   it('100ms slice of 2s audio from 1.000.1s to 1.100.1ms', function () {
     // ... setup
@@ -93,12 +103,9 @@ describe.skip('audio pixel bucket logic', function () {
     expect(duration).to.equal(2)
     expect(start).to.equals(44104)
     expect(end).to.equal(48514)
-    line.stride = line.N / line.pixels
-    line.samples = audio.audio.subarray(line.start, line.end)
 
     // ... line
     const line = {}
-    expect(line.samples.length).to.equal(4410)
 
     line.start = start
     line.end = end
@@ -132,7 +139,6 @@ describe.skip('audio pixel bucket logic', function () {
       [3, 7],
       [4, 9],
       [5, 12]
-    ])
     ])
 
     const buckets = new Map([
@@ -158,6 +164,7 @@ describe.skip('audio pixel bucket logic', function () {
     }
   })
 })
+
 describe.only('audio pixel bucket logic', function () {
   it('100ms slice of 2s audio from 1.000s to 1.100ms, indexed from start of audio', function () {
     // ... setup
@@ -167,6 +174,7 @@ describe.only('audio pixel bucket logic', function () {
     const duration = clamp(audio.duration, 0, N / audio.fs)
     const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
     const end = duration === 0 ? 0 : clamp(Math.floor(N * to / duration), 0, N)
+
     expect(N).to.equal(88200)
     expect(duration).to.equal(2)
     expect(start).to.equals(44100)
@@ -174,9 +182,6 @@ describe.only('audio pixel bucket logic', function () {
 
     // ... line
     const line = {}
-    const duration = clamp(audio.duration, 0, N / audio.fs)
-    const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
-    const end = duration === 0 ? 0 : clamp(Math.floor(N * to / duration), 0, N)
 
     line.start = start
     line.end = end
@@ -203,15 +208,13 @@ describe.only('audio pixel bucket logic', function () {
 
     const compute = {
       stride: Math.fround(line.stride) // f32
+    }
 
     const roundµs = function (t) {
       return Math.round(1000_000 * duration * t / N) / 1000_000
     }
-    line.pixels = Math.min(width - 2 * padding, line.N)
-    line.stride = line.N / line.pixels
-    line.samples = audio.audio.subarray(line.start, line.end)
 
-    expect(line.start).to.equal(44104)
+    {
       const buckets = []
       let index = 0
       let start = Math.round(index * compute.stride)
@@ -234,7 +237,7 @@ describe.only('audio pixel bucket logic', function () {
         }
 
         index++
-    expect(compute.stride).to.be.closeTo(2.3457446098327637, 0.0001)
+
         start = Math.round(index * compute.stride)
         end = Math.round((index + 1) * compute.stride)
         t = { start: roundµs(start), end: roundµs(end) }
@@ -242,17 +245,9 @@ describe.only('audio pixel bucket logic', function () {
       }
 
       const startʼ = buckets.at(-1)
-      [4, 9],
-      [5, 12]
-    ])
 
       while (t.end <= to) {
         buckets.push({ index, t, start, end, bucket })
-      [1, [4410.6, 4410.7, 4410.8]],
-      [2, [4410.9, 4411.0]],
-      [3, [4411.1, 4411.2]],
-      [4, [4411.3, 4411.4, 4411.5]]
-    ])
 
         if (expected.has(index)) {
           const e = expected.get(index)
@@ -270,7 +265,9 @@ describe.only('audio pixel bucket logic', function () {
         t = { start: roundµs(start), end: roundµs(end) }
         bucket = audio.audio.subarray(start, end)
       }
+
       const endʼ = buckets.at(-1)
+
       expect(startʼ.index).to.equal(18799)
       expect(startʼ.t.start).to.be.closeTo(from, 0.00005)
       expect(startʼ.start).to.equal(44098)
@@ -288,7 +285,9 @@ describe.only('audio pixel bucket logic', function () {
       //
       //   console.log(i, bucket.index, bucket.start, bucket.end)
       // }
+    }
   })
+
   it('100ms slice of 2s audio from 1.000.1s to 1.100.1ms, indexed from start of audio', function () {
     // ... setup
     const from = 1.0001
@@ -297,18 +296,22 @@ describe.only('audio pixel bucket logic', function () {
     const duration = clamp(audio.duration, 0, N / audio.fs)
     const start = duration === 0 ? 0 : clamp(Math.floor(N * from / duration), 0, N)
     const end = duration === 0 ? 0 : clamp(Math.floor(N * to / duration), 0, N)
+
     expect(N).to.equal(88200)
     expect(duration).to.equal(2)
     expect(start).to.equals(44104)
     expect(end).to.equal(48514)
+
     // ... line
     const line = {}
+
     line.start = start
     line.end = end
     line.N = line.end - line.start
     line.pixels = Math.min(width - 2 * padding, line.N)
     line.stride = line.N / line.pixels
     line.samples = audio.audio.subarray(line.start, line.end)
+
     expect(line.start).to.equal(44104)
     expect(line.end).to.equal(48514)
     expect(line.N).to.equal(4410)
@@ -328,9 +331,11 @@ describe.only('audio pixel bucket logic', function () {
     const compute = {
       stride: Math.fround(line.stride) // f32
     }
+
     const roundµs = function (t) {
       return Math.round(1000_000 * duration * t / N) / 1000_000
     }
+
     {
       const buckets = []
       let index = 0
@@ -338,23 +343,31 @@ describe.only('audio pixel bucket logic', function () {
       let end = Math.round((index + 1) * compute.stride)
       let t = { start: roundµs(start), end: roundµs(end) }
       let bucket = audio.audio.subarray(start, end)
+
       buckets.push({ index, t, start, end, bucket })
+
       while (t.start < from) {
         buckets.push({ index, t, start, end, bucket })
+
         if (expected.has(index)) {
           const e = expected.get(index)
+
           expect(t.start).to.be.closeTo(e.t, 0.000001)
           expect(start).to.equal(e.start)
           expect(end).to.equal(e.end)
           expect(bucket).to.eql(new Float64Array(e.bucket))
         }
+
         index++
+
         start = Math.round(index * compute.stride)
         end = Math.round((index + 1) * compute.stride)
         t = { start: roundµs(start), end: roundµs(end) }
         bucket = audio.audio.subarray(start, end)
       }
+
       const startʼ = buckets.at(-1)
+
       while (t.end <= to) {
         buckets.push({ index, t, start, end, bucket })
 
@@ -374,6 +387,7 @@ describe.only('audio pixel bucket logic', function () {
         t = { start: roundµs(start), end: roundµs(end) }
         bucket = audio.audio.subarray(start, end)
       }
+
       const endʼ = buckets.at(-1)
 
       expect(startʼ.index).to.equal(18801)
@@ -399,7 +413,9 @@ describe.only('audio pixel bucket logic', function () {
       //
       //   console.log(i, bucket.index, bucket.start, bucket.end)
       // }
+    }
   })
+
   // 1 18799 44098 44100
   // 2 18800 44100 44102
   // 3 18801 44102 44105
@@ -410,6 +426,7 @@ describe.only('audio pixel bucket logic', function () {
     // const end = 48508
     const stride = Math.fround(2.345744680851064)
     const offset = 18799
+
     const expected = new Map([
       [0, { start: 0, end: 2 }],
       [1, { start: 2, end: 5 }],
@@ -423,10 +440,12 @@ describe.only('audio pixel bucket logic', function () {
         start: Math.round((offset + i) * stride) - start,
         end: Math.round((offset + i + 1) * stride) - start
       }
+
       expect(indices.start).to.equal(expected.get(i).start)
       expect(indices.end).to.equal(expected.get(i).end)
     }
   })
+
   // 1 18801 44102 44105
   // 2 18802 44105 44107
   // 3 18803 44107 44109
@@ -436,6 +455,7 @@ describe.only('audio pixel bucket logic', function () {
     const start = 44102
     const stride = Math.fround(2.345744680851064)
     const offset = 18801
+
     const expected = new Map([
       [0, { start: 0, end: 3 }],
       [1, { start: 3, end: 5 }],
@@ -443,15 +463,20 @@ describe.only('audio pixel bucket logic', function () {
       [3, { start: 7, end: 10 }],
       [4, { start: 10, end: 12 }]
     ])
+
     for (let i = 0; i < 5; i++) {
       const indices = {
         start: Math.round((offset + i) * stride) - start,
         end: Math.round((offset + i + 1) * stride) - start
       }
+
       // console.log(i, indices)
+
       expect(indices.start).to.equal(expected.get(i).start)
       expect(indices.end).to.equal(expected.get(i).end)
     }
+  })
+})
 
 function clamp (v, min, max) {
   return (v < min) ? min : ((v > max) ? max : v)
