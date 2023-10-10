@@ -1,14 +1,14 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
+import * as quantize from './quantize.js'
+
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function gradient3 (device, format, a, width, height, vscale, colour1, colour2, colour3, midpoint) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
-  const samples = a.audio.subarray(a.start, a.end)
-  const pixels = Math.min(width - 2 * PADDING, samples.length)
-  const stride = samples.length / pixels
+  const slice = quantize.slice(a, width, PADDING)
 
   const vertices = new Float32Array([
     0.0, +1.0,
@@ -116,17 +116,19 @@ export function gradient3 (device, format, a, width, height, vscale, colour1, co
   })
 
   const constants = pack({
-    pixels,
-    stride,
-    samples: samples.length,
+    pixels: slice.pixels,
+    start: slice.start,
+    offset: slice.offset,
+    stride: slice.stride,
+    samples: slice.audio.length,
     xscale,
     yscale,
     vscale,
     colours: [colour3, colour2, colour1, colour2, colour3]
   })
 
-  const waveform = new Float32Array(pixels * 2)
-  const audio = new Float32Array(samples)
+  const waveform = new Float32Array(slice.pixels * 2)
+  const audio = new Float32Array(slice.audio)
 
   const storage = {
     uniforms: device.createBuffer({
@@ -175,7 +177,7 @@ export function gradient3 (device, format, a, width, height, vscale, colour1, co
   }
 
   const compute = function (pass) {
-    const workgroups = Math.ceil(pixels / WORKGROUP_SIZE)
+    const workgroups = Math.ceil(slice.pixels / WORKGROUP_SIZE)
     const bindGroup = bindGroups.compute
 
     pass.setPipeline(computePipeline)
@@ -189,28 +191,33 @@ export function gradient3 (device, format, a, width, height, vscale, colour1, co
     pass.setPipeline(renderPipeline)
     pass.setVertexBuffer(0, vertexBuffer)
     pass.setBindGroup(0, bindGroup)
-    pass.draw(vertices.length / 2, pixels)
+    pass.draw(vertices.length / 2, slice.pixels)
   }
 
   return { compute, render }
 }
 
-function pack ({ pixels, stride, samples, xscale, yscale, vscale, colours }) {
+function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale, colours }) {
   const pad = 0
-  const buffer = new ArrayBuffer(32 + colours.length * 16)
+  const buffer = new ArrayBuffer(48 + colours.length * 16)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
-  view.setFloat32(4, stride, true)
-  view.setUint32(8, samples, true)
-  view.setUint32(12, pad, true)
-  view.setFloat32(16, xscale, true) // vec2f: must be on a 16-byte boundary
-  view.setFloat32(20, yscale, true) //
-  view.setFloat32(24, vscale, true)
+  view.setUint32(4, start, true)
+  view.setUint32(8, offset, true)
+  view.setFloat32(12, stride, true)
+  view.setUint32(16, samples, true)
+  view.setFloat32(20, vscale, true)
+
+  view.setUint32(24, pad, true)
+  view.setUint32(28, pad, true)
+
+  view.setFloat32(32, xscale, true) // vec2f: must be on a 16-byte boundary
+  view.setFloat32(36, yscale, true) //
 
   for (let i = 0; i < colours.length; i++) {
     const colour = colours[i]
-    const ix = 32 + i * 16
+    const ix = 48 + i * 16
 
     view.setFloat32(ix + 0, colour[0], true) // vec4f: must be on a 16-byte boundary
     view.setFloat32(ix + 4, colour[1], true) //
@@ -224,11 +231,14 @@ function pack ({ pixels, stride, samples, xscale, yscale, vscale, colours }) {
 const SHADER = `
     struct constants {
       pixels: u32,
+      origin: u32,
+      offset: u32,
       stride: f32,
       samples: u32,
-      pad: f32,
-      scale: vec2f,
       vscale: f32,
+      pad1: u32,
+      pad2: u32,
+      scale: vec2f,
       colours: array<vec4f,5>,
     };
 
@@ -276,11 +286,14 @@ const SHADER = `
 const COMPUTE = `
     struct constants {
       pixels: u32,
+      origin: u32,
+      offset: u32,
       stride: f32,
       samples: u32,
-      pad: f32,
-      scale: vec2f,
       vscale: f32,
+      pad1: u32,
+      pad2: u32,
+      scale: vec2f,
       colours: array<vec4f,5>
     };
 
@@ -293,8 +306,8 @@ const COMPUTE = `
        let samples = u32(uconstants.samples);
        let pixels = u32(uconstants.pixels);
        let stride = f32(uconstants.stride);
-       let start = u32(round(f32(pixel.x) * stride));
-       let end = u32(round(f32(pixel.x + 1) * stride));
+       let start = u32(round(f32(uconstants.offset + pixel.x) * stride)) - uconstants.origin;
+       let end = u32(round(f32(uconstants.offset + pixel.x + 1) * stride)) - uconstants.origin;
 
        var p = f32(0);
        var q = f32(0);

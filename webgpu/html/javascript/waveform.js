@@ -16,7 +16,6 @@ export function waveform (context, device, format, audio, style) {
 
   const width = context.canvas.width
   const height = context.canvas.height
-  const samples = audio.audio
 
   // ... line?
   if (style.type === 'line') {
@@ -35,7 +34,7 @@ export function waveform (context, device, format, audio, style) {
       colours = ['#80ccffff', '#80ccff80']
     } = style.gradient
 
-    return gradient(device, format, { start, end, audio: samples }, width, height, vscale, rgba(colours[0]), rgba(colours[1]))
+    return gradient(device, format, audio, width, height, vscale, rgba(colours[0]), rgba(colours[1]))
   }
 
   // ... gradient3?
@@ -46,11 +45,11 @@ export function waveform (context, device, format, audio, style) {
       stops = [0.0, 0.5, 1.0]
     } = style.gradient3
 
-    return gradient3(device, format, { start, end, audio: samples }, width, height, vscale, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]), stops[1])
+    return gradient3(device, format, audio, width, height, vscale, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]), stops[1])
   }
 
   // ... default
-  return line(device, format, { start, end, audio: samples }, width, height, 1.0, lightblue)
+  return line(device, format, audio, width, height, 1.0, lightblue)
 }
 
 function clamp (v, min, max) {

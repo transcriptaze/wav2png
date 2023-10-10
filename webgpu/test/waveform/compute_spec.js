@@ -470,7 +470,7 @@ describe.only('audio pixel bucket logic', function () {
         end: Math.round((offset + i + 1) * stride) - start
       }
 
-      console.log(i, indices)
+      // console.log(i, indices)
 
       expect(indices.start).to.equal(expected.get(i).start)
       expect(indices.end).to.equal(expected.get(i).end)

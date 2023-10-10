@@ -1,55 +1,14 @@
 /* global GPUBufferUsage,GPUShaderStage */
 
+import * as quantize from './quantize.js'
+
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function line (device, format, a, width, height, vscale, colour) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
-
-  const N = a.audio.length
-  const duration = clamp(a.duration, 0, N / a.fs)
-  const start = duration === 0 ? 0 : clamp(Math.floor(N * a.start / duration), 0, N)
-  const end = duration === 0 ? 0 : clamp(Math.floor(N * a.end / duration), 0, N)
-  const roundµs = function (t) {
-    return Math.round(1000_000 * duration * t / N) / 1000_000
-  }
-
-  const pixels = Math.min(width - 2 * PADDING, end - start)
-  const stride = Math.fround((end - start) / pixels)
-  const slice = {
-    start: 0,
-    end,
-    offset: 0,
-    audio: a.audio.subarray(start, end)
-  }
-
-  // ... calculate start/end indices and offset
-  {
-    let index = 0
-    let start = Math.round(index * stride)
-    let end = Math.round((index + 1) * stride)
-
-    while (roundµs(start) < a.start) {
-      slice.start = start
-      slice.offset = index
-
-      index += 1
-      start = Math.round(index * stride)
-    }
-
-    end = Math.round((index + 1) * stride)
-    slice.end = end
-
-    while (roundµs(end) <= a.end) {
-      slice.end = end
-
-      index += 1
-      end = Math.round((index + 1) * stride)
-    }
-
-    slice.audio = a.audio.subarray(slice.start, slice.end)
-  }
+  const slice = quantize.slice(a, width, PADDING)
 
   // ... setup geometry
   const vertices = new Float32Array([
@@ -155,10 +114,10 @@ export function line (device, format, a, width, height, vscale, colour) {
   })
 
   const constants = pack({
-    pixels,
+    pixels: slice.pixels,
     start: slice.start,
     offset: slice.offset,
-    stride,
+    stride: slice.stride,
     samples: slice.audio.length,
     xscale,
     yscale,
@@ -166,7 +125,7 @@ export function line (device, format, a, width, height, vscale, colour) {
     colour
   })
 
-  const waveform = new Float32Array(pixels * 2)
+  const waveform = new Float32Array(slice.pixels * 2)
   const audio = new Float32Array(slice.audio)
 
   const storage = {
@@ -216,7 +175,7 @@ export function line (device, format, a, width, height, vscale, colour) {
   }
 
   const compute = function (pass) {
-    const workgroups = Math.ceil(pixels / WORKGROUP_SIZE)
+    const workgroups = Math.ceil(slice.pixels / WORKGROUP_SIZE)
     const bindGroup = bindGroups.compute
 
     pass.setPipeline(computePipeline)
@@ -230,7 +189,7 @@ export function line (device, format, a, width, height, vscale, colour) {
     pass.setPipeline(renderPipeline)
     pass.setVertexBuffer(0, vertexBuffer)
     pass.setBindGroup(0, bindGroup)
-    pass.draw(vertices.length / 2, pixels)
+    pass.draw(vertices.length / 2, slice.pixels)
   }
 
   return { compute, render }
@@ -259,10 +218,6 @@ function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale,
   view.setFloat32(60, colour[3], true) //
 
   return new Uint8Array(buffer)
-}
-
-function clamp (v, min, max) {
-  return (v < min) ? min : ((v > max) ? max : v)
 }
 
 const SHADER = `
