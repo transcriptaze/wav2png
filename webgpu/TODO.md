@@ -5,15 +5,14 @@
       - [x] Set start offset in compute shader 
       - [ ] Fix jump at 1.002.2
 
-- [ ] gradient: bottom half is not gradiented      
+- [ ] Draggable endpoints
+      - [ ] Draggables
+      - [x] Bottom half is not gradiented ... because compute shader is only generating extremums
+```
+       let height = vscale * abs(waveform[input.instance]);
+```      
 
 - [ ] Distributable Go app
-
-- [x] Github build workflow
-- [x] Clip to grid (e.g. noise)
-- [x] Three point gradient
-- [x] Two point gradient
-      - (?) Draggable endpoints
 
 - [ ] Anti-aliasing
       - https://webkit.org/demos/webgpu/compute-blur.html

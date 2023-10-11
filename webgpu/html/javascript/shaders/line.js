@@ -129,6 +129,7 @@ export function line (device, format, a, width, height, vscale, colour) {
     yscale,
     vscale,
     colours: [colour3, colour2, colour1, colour2, colour3]
+    // colours: [[255,0,255, 255],colour2,colour1, [0,255,0,255], [255,0,0,255]]
   })
 
   const waveform = new Float32Array(slice.pixels * 2)
@@ -268,12 +269,17 @@ const SHADER = `
        let scale = uconstants.scale;
        let vscale = uconstants.vscale;
        let w = f32(uconstants.pixels - u32(1));
-
        let height = vscale * abs(waveform[input.instance]);
+
+       var h = height[0];
+       if (input.vertex > 2) {
+          h = height[1];
+       }
+
        let origin = vec2f(-1.0, 0.0);
        let offset = origin + 2.0*i/w;
        let x = input.pos.x + offset.x;
-       let y = clamp(input.pos.y*height[input.vertex/4],-1.0,1.0);
+       let y = clamp(input.pos.y*h,-1.0,1.0);
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
        output.colour = uconstants.colours[input.vertex];
@@ -327,8 +333,7 @@ const COMPUTE = `
           } else if (v < 0.0) {
              q += v; n++;
           } else {
-             p += v; m++;
-             q += v; n++;
+             m++; n++;
           }
        }
 
