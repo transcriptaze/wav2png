@@ -6,13 +6,17 @@ const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function gradient (device, format, a, width, height, vscale, colour1, colour2) {
+  const midpoint = 1.0
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const slice = quantize.slice(a, width, PADDING)
+  const colour3 = [colour2[0], colour2[1], colour2[2], 0]
 
   const vertices = new Float32Array([
     0.0, +1.0,
+    0.0, +1.0 * midpoint,
     0.0, 0.0,
+    0.0, -1.0 * midpoint,
     0.0, -1.0
   ])
 
@@ -122,7 +126,7 @@ export function gradient (device, format, a, width, height, vscale, colour1, col
     xscale,
     yscale,
     vscale,
-    colours: [colour2, colour1, colour2]
+    colours: [colour3, colour2, colour1, colour2, colour3]
   })
 
   const waveform = new Float32Array(slice.pixels * 2)
@@ -197,7 +201,7 @@ export function gradient (device, format, a, width, height, vscale, colour1, col
 
 function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale, colours }) {
   const pad = 0
-  const buffer = new ArrayBuffer(48 + 16 * colours.length)
+  const buffer = new ArrayBuffer(48 + colours.length * 16)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -217,7 +221,7 @@ function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale,
     const colour = colours[i]
     const ix = 48 + i * 16
 
-    view.setFloat32(ix, colour[0], true) // vec4f: must be on a 16-byte boundary
+    view.setFloat32(ix + 0, colour[0], true) // vec4f: must be on a 16-byte boundary
     view.setFloat32(ix + 4, colour[1], true) //
     view.setFloat32(ix + 8, colour[2], true) //
     view.setFloat32(ix + 12, colour[3], true) //
@@ -237,7 +241,7 @@ const SHADER = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colours: array<vec4f,3>
+      colours: array<vec4f,5>,
     };
 
     struct VertexInput {
@@ -267,7 +271,7 @@ const SHADER = `
        let origin = vec2f(-1.0, 0.0);
        let offset = origin + 2.0*i/w;
        let x = input.pos.x + offset.x;
-       let y = clamp(input.pos.y*height[input.vertex/2],-1.0,1.0);
+       let y = clamp(input.pos.y*height[input.vertex/4],-1.0,1.0);
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
        output.colour = uconstants.colours[input.vertex];
@@ -292,7 +296,7 @@ const COMPUTE = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colours: array<vec4f,3>
+      colours: array<vec4f,5>
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;

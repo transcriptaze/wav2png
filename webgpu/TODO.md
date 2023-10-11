@@ -5,14 +5,16 @@
       - [x] Set start offset in compute shader 
       - [ ] Fix jump at 1.002.2
 
+- [ ] gradient: bottom half is not gradiented      
+
 - [ ] Distributable Go app
 
 - [x] Github build workflow
 - [x] Clip to grid (e.g. noise)
+- [x] Three point gradient
 - [x] Two point gradient
       - (?) Draggable endpoints
-- [ ] Three point gradient
-      - [ ] Draggable midpoint
+
 - [ ] Anti-aliasing
       - https://webkit.org/demos/webgpu/compute-blur.html
 

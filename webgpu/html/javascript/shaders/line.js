@@ -6,13 +6,19 @@ const PADDING = 20
 const WORKGROUP_SIZE = 64
 
 export function line (device, format, a, width, height, vscale, colour) {
+  const midpoint = 1.0
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const slice = quantize.slice(a, width, PADDING)
+  const colour1 = colour
+  const colour2 = colour
+  const colour3 = [colour[0], colour[1], colour[2], 0]
 
-  // ... setup geometry
   const vertices = new Float32Array([
     0.0, +1.0,
+    0.0, +1.0 * midpoint,
+    0.0, 0.0,
+    0.0, -1.0 * midpoint,
     0.0, -1.0
   ])
 
@@ -122,7 +128,7 @@ export function line (device, format, a, width, height, vscale, colour) {
     xscale,
     yscale,
     vscale,
-    colour
+    colours: [colour3, colour2, colour1, colour2, colour3]
   })
 
   const waveform = new Float32Array(slice.pixels * 2)
@@ -195,10 +201,9 @@ export function line (device, format, a, width, height, vscale, colour) {
   return { compute, render }
 }
 
-function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale, colour }) {
-  console.log({ pixels }, { samples }, { stride }, Math.fround(stride))
+function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale, colours }) {
   const pad = 0
-  const buffer = new ArrayBuffer(64)
+  const buffer = new ArrayBuffer(48 + colours.length * 16)
   const view = new DataView(buffer)
 
   view.setUint32(0, pixels, true)
@@ -213,10 +218,16 @@ function pack ({ pixels, start, offset, stride, samples, xscale, yscale, vscale,
 
   view.setFloat32(32, xscale, true) // vec2f: must be on a 16-byte boundary
   view.setFloat32(36, yscale, true) //
-  view.setFloat32(48, colour[0], true) // vec4f: must be on a 16-byte boundary
-  view.setFloat32(52, colour[1], true) //
-  view.setFloat32(56, colour[2], true) //
-  view.setFloat32(60, colour[3], true) //
+
+  for (let i = 0; i < colours.length; i++) {
+    const colour = colours[i]
+    const ix = 48 + i * 16
+
+    view.setFloat32(ix + 0, colour[0], true) // vec4f: must be on a 16-byte boundary
+    view.setFloat32(ix + 4, colour[1], true) //
+    view.setFloat32(ix + 8, colour[2], true) //
+    view.setFloat32(ix + 12, colour[3], true) //
+  }
 
   return new Uint8Array(buffer)
 }
@@ -232,7 +243,7 @@ const SHADER = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colour: vec4f
+      colours: array<vec4f,5>,
     };
 
     struct VertexInput {
@@ -262,10 +273,10 @@ const SHADER = `
        let origin = vec2f(-1.0, 0.0);
        let offset = origin + 2.0*i/w;
        let x = input.pos.x + offset.x;
-       let y = clamp(input.pos.y*height[input.vertex],-1.0,1.0);
+       let y = clamp(input.pos.y*height[input.vertex/4],-1.0,1.0);
 
        output.pos = vec4f(scale.x*x, scale.y*y, 0.0, 1.0);
-       output.colour = uconstants.colour;
+       output.colour = uconstants.colours[input.vertex];
 
        return output;
     }
@@ -287,7 +298,7 @@ const COMPUTE = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colour: vec4f
+      colours: array<vec4f,5>
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;
