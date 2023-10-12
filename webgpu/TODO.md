@@ -8,9 +8,7 @@
 - [ ] Draggable endpoints
       - [ ] Draggables
       - [x] Bottom half is not gradiented ... because compute shader is only generating extremums
-```
-       let height = vscale * abs(waveform[input.instance]);
-```      
+
 
 - [ ] Distributable Go app
 

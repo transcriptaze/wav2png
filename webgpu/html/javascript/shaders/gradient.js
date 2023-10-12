@@ -16,6 +16,7 @@ export function gradient (device, format, a, width, height, vscale, colour1, col
     0.0, +1.0,
     0.0, +1.0 * midpoint,
     0.0, 0.0,
+    0.0, 0.0,
     0.0, -1.0 * midpoint,
     0.0, -1.0
   ])
@@ -126,7 +127,7 @@ export function gradient (device, format, a, width, height, vscale, colour1, col
     xscale,
     yscale,
     vscale,
-    colours: [colour3, colour2, colour1, colour2, colour3]
+    colours: [colour3, colour2, colour1, colour1, colour2, colour3]
   })
 
   const waveform = new Float32Array(slice.pixels * 2)
@@ -241,7 +242,7 @@ const SHADER = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colours: array<vec4f,5>,
+      colours: array<vec4f,6>,
     };
 
     struct VertexInput {
@@ -266,12 +267,10 @@ const SHADER = `
        let scale = uconstants.scale;
        let vscale = uconstants.vscale;
        let w = f32(uconstants.pixels - u32(1));
-       let height = vscale * abs(waveform[input.instance]);
 
-       var h = height[0];
-       if (input.vertex > 2) {
-          h = height[1];
-       }
+       let height = vscale * abs(waveform[input.instance]);
+       let hx = input.vertex/3 % 2;
+       let h = height[hx];
 
        let origin = vec2f(-1.0, 0.0);
        let offset = origin + 2.0*i/w;
