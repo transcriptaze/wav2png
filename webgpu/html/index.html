@@ -111,11 +111,7 @@
         </div>
         <div id="settings">
           <div for="line" class="line">
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-                 viewBox="-64 0 128 512"
-                 class="exemplar">
-              <rect x="-24" y="0" width="48" height="512" fill="#80ccff" stroke="#444444" stroke-width="8" rx="20"/>
-            </svg>
+            <wav2png-gradient class="gradient"></wav2png-gradient>
             <input id="rgb"   class="swatch" type="color" value="#80ccff" />
             <input id="alpha" class="alpha"  type="range" step="1" min="0" max="255" value="255" />
           </div>
@@ -153,6 +149,12 @@
           <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />
         </div>
       </fieldset>
+    </template>
+
+    <template id="template-gradient">
+      <div id="wav2png-gradient">
+        <input class="slider" type="range" step="any" min="0.0" max="1.0" value="1.0" />
+      </div>
     </template>
 
     <template id="template-x-axis">

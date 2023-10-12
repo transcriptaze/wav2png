@@ -7,6 +7,7 @@
 
 - [ ] Draggable endpoints
       - [ ] Draggables
+            - https://css-tricks.com/multi-thumb-sliders-general-case/
       - [x] Bottom half is not gradiented ... because compute shader is only generating extremums
 
 

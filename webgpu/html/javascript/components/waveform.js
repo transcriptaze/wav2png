@@ -267,15 +267,15 @@ function recolour (component) {
   const shadow = component.shadowRoot
 
   // ... line
-  {
-    const settings = shadow.querySelector('div[for="line"]')
-    const svg = settings.querySelector('svg')
-    const bar = svg.querySelector('rect')
-    const rgb = settings.querySelector('input#rgb').value
-    const alpha = settings.querySelector('input#alpha').value
-
-    bar.setAttributeNS(null, 'fill', rgba(rgb, alpha))
-  }
+  // {
+  //   const settings = shadow.querySelector('div[for="line"]')
+  //   const svg = settings.querySelector('svg')
+  //   const bar = svg.querySelector('rect')
+  //   const rgb = settings.querySelector('input#rgb').value
+  //   const alpha = settings.querySelector('input#alpha').value
+  //
+  //   bar.setAttributeNS(null, 'fill', rgba(rgb, alpha))
+  // }
 
   // ... gradient
   {

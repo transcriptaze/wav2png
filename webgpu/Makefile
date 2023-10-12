@@ -1,6 +1,6 @@
 DIST ?= development
 
-.DEFAULT_GOAL := buil
+.DEFAULT_GOAL := build
 
 .PHONY: sass
 

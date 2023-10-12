@@ -59,13 +59,16 @@ fieldset.waveform {
         flex-direction: column;
 
         div.line {
+            --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccff40 50%, #80ccff80 100%);
+
+            height: 140px;
             margin-top: 8px;
             margin-bottom: 8px;
 
             display: grid;
             grid-template-columns: auto auto;
-            grid-template-rows: auto auto;
-            grid-template-areas: "exemplar swatch" "exemplar alpha";
+            grid-template-rows: 1fr auto auto 1fr;
+            grid-template-areas:  "gradient unused1" "gradient swatch" "gradient alpha" "gradient unused2";
             column-gap: 12px;
 
             padding-top: 4px;
@@ -76,9 +79,8 @@ fieldset.waveform {
             border: 1px solid grey;
             border-radius: 4px;
 
-            .exemplar {
-                grid-area: exemplar;
-                height: 48px;
+            wav2png-gradient {
+                grid-area: gradient;
             }
 
             input.swatch {

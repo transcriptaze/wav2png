@@ -1,0 +1,47 @@
+#wav2png-gradient {
+    width: 0px;
+    height: 100%;
+    margin-left: 8px;
+
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+
+    input.slider {
+        grid-column: 1;
+        grid-row: 1;
+        place-self: center;
+
+        transform: translate(-50%,0%) rotate(-90deg);
+        -webkit-appearance: none;
+    }
+
+    input.slider:focus {
+        outline: none; 
+    }
+
+    input.slider::-webkit-slider-thumb {
+        height: 12px;
+        width: 12px;
+        background: #ffffff;
+        margin-top: -3.5px;
+        padding-top: 2px;
+        border: 1px solid #000000;
+        border-radius: 8px;
+        cursor: pointer;
+
+        -webkit-appearance: none;
+    }
+
+    input.slider::-webkit-slider-runnable-track {
+        height: 6px;
+        width: 100%;
+        background: var(--gradient);
+        border: 1px solid #000000;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+
+    input.slider::focus::-webkit-slider-runnable-track {
+    }
+}

@@ -202,12 +202,14 @@ fieldset.waveform div#settings {
   flex-direction: column;
 }
 fieldset.waveform div#settings div.line {
+  --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccff40 50%, #80ccff80 100%);
+  height: 140px;
   margin-top: 8px;
   margin-bottom: 8px;
   display: grid;
   grid-template-columns: auto auto;
-  grid-template-rows: auto auto;
-  grid-template-areas: "exemplar swatch" "exemplar alpha";
+  grid-template-rows: 1fr auto auto 1fr;
+  grid-template-areas: "gradient unused1" "gradient swatch" "gradient alpha" "gradient unused2";
   column-gap: 12px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -216,9 +218,8 @@ fieldset.waveform div#settings div.line {
   border: 1px solid grey;
   border-radius: 4px;
 }
-fieldset.waveform div#settings div.line .exemplar {
-  grid-area: exemplar;
-  height: 48px;
+fieldset.waveform div#settings div.line wav2png-gradient {
+  grid-area: gradient;
 }
 fieldset.waveform div#settings div.line input.swatch {
   grid-area: swatch;
@@ -337,6 +338,43 @@ canvas.overlay {
   outline: none;
 }
 
+#wav2png-gradient {
+  width: 0px;
+  height: 100%;
+  margin-left: 8px;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+}
+#wav2png-gradient input.slider {
+  grid-column: 1;
+  grid-row: 1;
+  place-self: center;
+  transform: translate(-50%, 0%) rotate(-90deg);
+  -webkit-appearance: none;
+}
+#wav2png-gradient input.slider:focus {
+  outline: none;
+}
+#wav2png-gradient input.slider::-webkit-slider-thumb {
+  height: 12px;
+  width: 12px;
+  background: #ffffff;
+  margin-top: -3.5px;
+  padding-top: 2px;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+#wav2png-gradient input.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  width: 100%;
+  background: var(--gradient);
+  border: 1px solid #000000;
+  border-radius: 2px;
+  cursor: pointer;
+}
 div#x-axis {
   display: grid;
   grid-template-columns: auto 100px 1fr auto auto auto 1fr 100px auto;
