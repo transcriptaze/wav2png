@@ -7,3 +7,4 @@
    - https://stackoverflow.com/questions/3783677/how-to-read-integers-from-a-file-that-are-24bit-and-little-endian-using-python
    - https://www.mathworks.com/matlabcentral/answers/133547-how-to-convert-a-24-bit-two-s-complement-value-into-a-signed-integer
 
+2. https://biniou.net/

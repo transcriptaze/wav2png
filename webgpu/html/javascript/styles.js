@@ -6,12 +6,13 @@ export const LINE = {
   }
 }
 
-export function lineStyle (vscale, colour) {
+export function lineStyle (vscale, colour, midpoint) {
   return {
     type: 'line',
     line: {
       vscale,
-      colour
+      colour,
+      midpoint
     }
   }
 }

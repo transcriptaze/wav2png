@@ -32,7 +32,10 @@ export class Waveform extends HTMLElement {
     const styles = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
     const swatches = Array.from(shadow.querySelectorAll('#settings input.swatch'))
     const alphas = Array.from(shadow.querySelectorAll('#settings input.alpha'))
-    const midpoint = shadow.querySelector('#settings input#midpoint')
+    const gradients = [
+      shadow.querySelector('#settings div[for="line"] wav2png-gradient'),
+      shadow.querySelector('#settings input#midpoint')
+    ]
     const vscale = shadow.querySelector('#settings input#vscale')
 
     styles.forEach((e) => {
@@ -49,8 +52,10 @@ export class Waveform extends HTMLElement {
       e.onchange = (event) => onChanged(this, e)
     })
 
-    midpoint.oninput = (event) => onChange(this, midpoint)
-    midpoint.onchange = (event) => onChanged(this, midpoint)
+    gradients.forEach((e) => {
+      e.oninput = (event) => onChange(this, e)
+      e.onchange = (event) => onChanged(this, e)
+    })
 
     vscale.oninput = (event) => onChange(this, vscale)
     vscale.onchange = (event) => onChanged(this, vscale)
@@ -171,8 +176,9 @@ export class Waveform extends HTMLElement {
         const settings = shadow.querySelector('div[for="line"]')
         const rgb = settings.querySelector('input#rgb').value
         const alpha = settings.querySelector('input#alpha').value
+        const midpoint = settings.querySelector('wav2png-gradient').value
 
-        return styles.lineStyle(this.vscale, rgba(rgb, alpha))
+        return styles.lineStyle(this.vscale, rgba(rgb, alpha), midpoint)
       }
 
       case 'gradient': {

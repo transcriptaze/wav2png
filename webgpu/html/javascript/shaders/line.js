@@ -5,8 +5,7 @@ import * as quantize from './quantize.js'
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function line (device, format, a, width, height, vscale, colour) {
-  const midpoint = 1.0
+export function line (device, format, a, width, height, vscale, colour, midpoint) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const slice = quantize.slice(a, width, PADDING)

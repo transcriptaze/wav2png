@@ -21,10 +21,11 @@ export function waveform (context, device, format, audio, style) {
   if (style.type === 'line') {
     const {
       vscale = '1.0',
-      colour = '#80ccffff'
+      colour = '#80ccffff',
+      midpoint = 1.0
     } = style.line
 
-    return line(device, format, audio, width, height, vscale, rgba(colour))
+    return line(device, format, audio, width, height, vscale, rgba(colour), midpoint)
   }
 
   // ... gradient?

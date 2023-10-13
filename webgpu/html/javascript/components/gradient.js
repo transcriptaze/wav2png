@@ -57,15 +57,21 @@ export class Gradient extends HTMLElement {
     this.internal.onChanged = v
   }
 
-  // /* eslint-disable-next-line accessor-pairs */
-  // set colour (v) {
-  // }
-
   get value () {
-    return 1.0
+    const shadow = this.shadowRoot
+    const slider = shadow.querySelector('#gradient-slider')
+
+    return slider.value
   }
 
   set value (v) {
+    const shadow = this.shadowRoot
+    const slider = shadow.querySelector('#gradient-slider')
+    const f = Number.parseFloat(`${v}`)
+
+    if (Number.isNaN(f)) {
+      slider.value = clamp(f, 0.0, 1.0)
+    }
   }
 }
 
@@ -86,6 +92,10 @@ function onChanged (component, e) {
 }
 
 function recolour (component) {
+}
+
+function clamp (v, min, max) {
+  return (v < min) ? min : ((v > max) ? max : v)
 }
 
 // function rgba (rgb, alpha) {
