@@ -273,15 +273,22 @@ function recolour (component) {
   const shadow = component.shadowRoot
 
   // ... line
-  // {
-  //   const settings = shadow.querySelector('div[for="line"]')
-  //   const svg = settings.querySelector('svg')
-  //   const bar = svg.querySelector('rect')
-  //   const rgb = settings.querySelector('input#rgb').value
-  //   const alpha = settings.querySelector('input#alpha').value
-  //
-  //   bar.setAttributeNS(null, 'fill', rgba(rgb, alpha))
-  // }
+  {
+    const settings = shadow.querySelector('div[for="line"]')
+    const stops = ['#80ccff00', '#80ccffff', '#80ccffff']
+
+    const rgb = settings.querySelector('input#rgb').value
+    const alpha = settings.querySelector('input#alpha').value
+    const midpoint = Math.round(settings.querySelector('wav2png-gradient').value * 100)
+
+    stops[0] = rgba(rgb, 0)
+    stops[1] = rgba(rgb, alpha)
+    stops[2] = rgba(rgb, alpha)
+
+    const gradient = `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} ${midpoint}%, ${stops[0]} 100%)`
+
+    settings.style.setProperty('--gradient', gradient)
+  }
 
   // ... gradient
   {
@@ -307,8 +314,7 @@ function recolour (component) {
   {
     const settings = shadow.querySelector('div[for="gradient3"]')
     const stops = ['#80ccff80', '#80ccff40', '#80ccffff']
-
-    settings.style.setProperty('--gradient', 'linear-gradient(90deg, #ffff00 0%, #ff00ff 50%, #00ffff 100%)')
+    const midpoint = Math.round(settings.querySelector('input#midpoint').value * 100)
 
     {
       const rgb = settings.querySelector('input#rgb3').value
@@ -328,7 +334,11 @@ function recolour (component) {
       stops[2] = rgba(rgb, alpha)
     }
 
-    settings.style.setProperty('--gradient', `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} 50%, ${stops[0]} 100%)`)
+    const gradient = `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} ${midpoint}%, ${stops[0]} 100%)`
+
+    console.log(gradient)
+
+    settings.style.setProperty('--gradient', gradient)
   }
 }
 

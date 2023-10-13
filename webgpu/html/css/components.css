@@ -202,7 +202,7 @@ fieldset.waveform div#settings {
   flex-direction: column;
 }
 fieldset.waveform div#settings div.line {
-  --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccff40 50%, #80ccff80 100%);
+  --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccffff 100%, #80ccff80 100%);
   height: 140px;
   margin-top: 8px;
   margin-bottom: 8px;
