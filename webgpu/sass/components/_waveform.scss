@@ -72,6 +72,10 @@ fieldset.waveform {
             border-radius: 4px;
         }
 
+        div.panel.hidden {
+            display: none;
+        }
+
         div.line {
             --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccffff 100%, #80ccff00 100%);
 
@@ -94,10 +98,6 @@ fieldset.waveform {
                 grid-column: 2;
                 grid-row: 3;
             }
-        }
-
-        div.line.hidden {
-            display: none;
         }
 
         div.gradient {
@@ -134,89 +134,48 @@ fieldset.waveform {
             }
         }
 
-        div.gradient.hidden {
-            display: none;
-        }
-
-
         div.gradient3 {
             --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccff40 50%, #80ccff80 100%);
             
             display: grid;
             grid-template-columns: 14px auto;
             grid-template-rows: auto auto auto auto auto auto;
-            grid-template-areas: 
-                "exemplar swatch3" 
-                "exemplar alpha3" 
-                "exemplar swatch2" 
-                "exemplar alpha2" 
-                "exemplar swatch1" 
-                "exemplar alpha1";
             column-gap: 12px;
 
-            input.exemplar {       
-                grid-area: exemplar;
-                transform: rotate(-90deg);
-                place-self: center;
-                -webkit-appearance: none;
+            wav2png-gradient {       
+                grid-column: 1;
+                grid-row: 1 / 7;
             }
-
-            input.exemplar:focus {
-                outline: none; 
-            }
-
-            input.exemplar::-webkit-slider-thumb {
-                height: 12px;
-                width: 12px;
-                background: #ffffff;
-                margin-top: -3.5px;
-                padding-top: 2px;
-                border: 1px solid #000000;
-                border-radius: 8px;
-                cursor: pointer;
-
-                -webkit-appearance: none;
-            }
-
-            input.exemplar::-webkit-slider-runnable-track {
-                height: 6px;
-                width: 100%;
-                background: var(--gradient);
-                border: 1px solid #000000;
-                border-radius: 2px;
-                cursor: pointer;
-            }
-
-            input.exemplar::focus::-webkit-slider-runnable-track {
-            }    
 
             input.rgb1 {
-                grid-area: swatch1;
+                grid-column: 2;
+                grid-row: 5;
             }
 
             input.alpha1 {
-                grid-area: alpha1;
+                grid-column: 1;
+                grid-row: 6;
             }
 
             input.rgb2 {
-                grid-area: swatch2;
+                grid-column: 1;
+                grid-row: 3;
             }
 
             input.alpha2 {
-                grid-area: alpha2;
+                grid-column: 1;
+                grid-row: 4;
             }
 
             input.rgb3 {
-                grid-area: swatch3;
+                grid-column: 1;
+                grid-row: 1;
             }
 
             input.alpha3 {
-                grid-area: alpha3;
+                grid-column: 1;
+                grid-row: 2;
             }
-        }
-
-        div.gradient3.hidden {
-            display: none;
         }
     }
 }

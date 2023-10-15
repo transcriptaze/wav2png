@@ -212,6 +212,9 @@ fieldset.waveform div#settings div.panel {
   border: 1px solid grey;
   border-radius: 4px;
 }
+fieldset.waveform div#settings div.panel.hidden {
+  display: none;
+}
 fieldset.waveform div#settings div.line {
   --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccffff 100%, #80ccff00 100%);
   display: grid;
@@ -230,9 +233,6 @@ fieldset.waveform div#settings div.line input.swatch {
 fieldset.waveform div#settings div.line input.alpha {
   grid-column: 2;
   grid-row: 3;
-}
-fieldset.waveform div#settings div.line.hidden {
-  display: none;
 }
 fieldset.waveform div#settings div.gradient {
   --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccffff 100%, #80ccff00 100%);
@@ -261,65 +261,40 @@ fieldset.waveform div#settings div.gradient input#alpha2 {
   grid-column: 2;
   grid-row: 2;
 }
-fieldset.waveform div#settings div.gradient.hidden {
-  display: none;
-}
 fieldset.waveform div#settings div.gradient3 {
   --gradient: linear-gradient(90deg, #80ccffff 0%, #80ccff40 50%, #80ccff80 100%);
   display: grid;
   grid-template-columns: 14px auto;
   grid-template-rows: auto auto auto auto auto auto;
-  grid-template-areas: "exemplar swatch3" "exemplar alpha3" "exemplar swatch2" "exemplar alpha2" "exemplar swatch1" "exemplar alpha1";
   column-gap: 12px;
 }
-fieldset.waveform div#settings div.gradient3 input.exemplar {
-  grid-area: exemplar;
-  transform: rotate(-90deg);
-  place-self: center;
-  -webkit-appearance: none;
-}
-fieldset.waveform div#settings div.gradient3 input.exemplar:focus {
-  outline: none;
-}
-fieldset.waveform div#settings div.gradient3 input.exemplar::-webkit-slider-thumb {
-  height: 12px;
-  width: 12px;
-  background: #ffffff;
-  margin-top: -3.5px;
-  padding-top: 2px;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  cursor: pointer;
-  -webkit-appearance: none;
-}
-fieldset.waveform div#settings div.gradient3 input.exemplar::-webkit-slider-runnable-track {
-  height: 6px;
-  width: 100%;
-  background: var(--gradient);
-  border: 1px solid #000000;
-  border-radius: 2px;
-  cursor: pointer;
+fieldset.waveform div#settings div.gradient3 wav2png-gradient {
+  grid-column: 1;
+  grid-row: 1/7;
 }
 fieldset.waveform div#settings div.gradient3 input.rgb1 {
-  grid-area: swatch1;
+  grid-column: 2;
+  grid-row: 5;
 }
 fieldset.waveform div#settings div.gradient3 input.alpha1 {
-  grid-area: alpha1;
+  grid-column: 1;
+  grid-row: 6;
 }
 fieldset.waveform div#settings div.gradient3 input.rgb2 {
-  grid-area: swatch2;
+  grid-column: 1;
+  grid-row: 3;
 }
 fieldset.waveform div#settings div.gradient3 input.alpha2 {
-  grid-area: alpha2;
+  grid-column: 1;
+  grid-row: 4;
 }
 fieldset.waveform div#settings div.gradient3 input.rgb3 {
-  grid-area: swatch3;
+  grid-column: 1;
+  grid-row: 1;
 }
 fieldset.waveform div#settings div.gradient3 input.alpha3 {
-  grid-area: alpha3;
-}
-fieldset.waveform div#settings div.gradient3.hidden {
-  display: none;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 canvas.overlay {

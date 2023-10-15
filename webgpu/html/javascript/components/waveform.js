@@ -32,11 +32,7 @@ export class Waveform extends HTMLElement {
     const styles = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
     const swatches = Array.from(shadow.querySelectorAll('#settings input.swatch'))
     const alphas = Array.from(shadow.querySelectorAll('#settings input.alpha'))
-    const gradients = [
-      shadow.querySelector('#settings div[for="line"] wav2png-gradient'),
-      shadow.querySelector('#settings div[for="gradient"] wav2png-gradient'),
-      shadow.querySelector('#settings input#midpoint')
-    ]
+    const gradients = Array.from(shadow.querySelectorAll('#settings wav2png-gradient'))
     const vscale = shadow.querySelector('#settings input#vscale')
 
     styles.forEach((e) => {
@@ -201,7 +197,7 @@ export class Waveform extends HTMLElement {
         const alpha2 = settings.querySelector('input#alpha2').value
         const rgb3 = settings.querySelector('input#rgb3').value
         const alpha3 = settings.querySelector('input#alpha3').value
-        const midpoint = settings.querySelector('input#midpoint').value
+        const midpoint = settings.querySelector('wav2png-gradient').value
 
         return styles.gradient3Style(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2), rgba(rgb3, alpha3), midpoint)
       }
@@ -323,7 +319,7 @@ function recolour (component) {
   {
     const settings = shadow.querySelector('div[for="gradient3"]')
     const stops = ['#80ccff80', '#80ccff40', '#80ccffff']
-    const midpoint = Math.round(settings.querySelector('input#midpoint').value * 100)
+    const midpoint = Math.round(settings.querySelector('wav2png-gradient').value * 100)
 
     {
       const rgb = settings.querySelector('input#rgb3').value
