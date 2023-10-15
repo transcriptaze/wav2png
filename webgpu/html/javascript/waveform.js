@@ -32,10 +32,11 @@ export function waveform (context, device, format, audio, style) {
   if (style.type === 'gradient') {
     const {
       vscale = '1.0',
-      colours = ['#80ccffff', '#80ccff80']
+      colours = ['#80ccffff', '#80ccff80'],
+      midpoint = 1.0
     } = style.gradient
 
-    return gradient(device, format, audio, width, height, vscale, rgba(colours[0]), rgba(colours[1]))
+    return gradient(device, format, audio, width, height, vscale, rgba(colours[0]), rgba(colours[1]), midpoint)
   }
 
   // ... gradient3?

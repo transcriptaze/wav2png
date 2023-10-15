@@ -34,6 +34,7 @@ export class Waveform extends HTMLElement {
     const alphas = Array.from(shadow.querySelectorAll('#settings input.alpha'))
     const gradients = [
       shadow.querySelector('#settings div[for="line"] wav2png-gradient'),
+      shadow.querySelector('#settings div[for="gradient"] wav2png-gradient'),
       shadow.querySelector('#settings input#midpoint')
     ]
     const vscale = shadow.querySelector('#settings input#vscale')
@@ -187,8 +188,9 @@ export class Waveform extends HTMLElement {
         const alpha1 = settings.querySelector('input#alpha1').value
         const rgb2 = settings.querySelector('input#rgb2').value
         const alpha2 = settings.querySelector('input#alpha2').value
+        const midpoint = settings.querySelector('wav2png-gradient').value
 
-        return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2))
+        return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2), midpoint)
       }
 
       case 'gradient3': {
@@ -208,8 +210,9 @@ export class Waveform extends HTMLElement {
         const settings = shadow.querySelector('div[for="line"]')
         const rgb = settings.querySelector('input#rgb').value
         const alpha = settings.querySelector('input#alpha').value
+        const midpoint = settings.querySelector('wav2png-gradient').value
 
-        return styles.lineStyle(this.vscale, rgba(rgb, alpha))
+        return styles.lineStyle(this.vscale, rgba(rgb, alpha), midpoint)
       }
     }
   }
@@ -275,7 +278,7 @@ function recolour (component) {
   // ... line
   {
     const settings = shadow.querySelector('div[for="line"]')
-    const stops = ['#80ccff00', '#80ccffff', '#80ccffff']
+    const stops = ['#00000000', '#80ccffff', '#80ccffff']
 
     const rgb = settings.querySelector('input#rgb').value
     const alpha = settings.querySelector('input#alpha').value
@@ -293,21 +296,27 @@ function recolour (component) {
   // ... gradient
   {
     const settings = shadow.querySelector('div[for="gradient"]')
-    const svg = settings.querySelector('svg')
-    const gradient = svg.querySelector('#gradient')
-    const stops = gradient.querySelectorAll('stop')
+    const midpoint = Math.round(settings.querySelector('wav2png-gradient').value * 100)
+    const stops = ['#00000000', '#80ccffff', '#80ccffff']
 
     {
       const rgb = settings.querySelector('input#rgb2').value
       const alpha = settings.querySelector('input#alpha2').value
-      stops[0].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+      stops[1] = rgba(rgb, alpha)
     }
 
     {
       const rgb = settings.querySelector('input#rgb1').value
       const alpha = settings.querySelector('input#alpha1').value
-      stops[1].setAttributeNS(null, 'stop-color', rgba(rgb, alpha))
+      stops[2] = rgba(rgb, alpha)
     }
+
+    const gradient = `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} ${midpoint}%, ${stops[0]} 100%)`
+
+    console.log('>>', midpoint)
+    console.log(gradient)
+
+    settings.style.setProperty('--gradient', gradient)
   }
 
   // ... gradient3
@@ -335,8 +344,6 @@ function recolour (component) {
     }
 
     const gradient = `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} ${midpoint}%, ${stops[0]} 100%)`
-
-    console.log(gradient)
 
     settings.style.setProperty('--gradient', gradient)
   }

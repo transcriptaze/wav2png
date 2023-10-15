@@ -5,8 +5,7 @@ import * as quantize from './quantize.js'
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function gradient (device, format, a, width, height, vscale, colour1, colour2) {
-  const midpoint = 1.0
+export function gradient (device, format, a, width, height, vscale, colour1, colour2, midpoint) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const slice = quantize.slice(a, width, PADDING)
