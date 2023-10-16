@@ -187,7 +187,7 @@ export class Waveform extends HTMLElement {
         const midpoint1 = settings.querySelector('#gradient1').value
         const midpoint2 = settings.querySelector('#gradient2').value
 
-        return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2), midpoint2, midpoint1)
+        return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2), midpoint1, midpoint2)
       }
 
       case 'gradient3': {
@@ -295,22 +295,23 @@ function recolour (component) {
     const settings = shadow.querySelector('div[for="gradient"]')
     const midpoint1 = Math.round(settings.querySelector('#gradient1').value * 100)
     const midpoint2 = Math.round(settings.querySelector('#gradient2').value * 100)
-    const stops = ['#00000000', '#80ccffff', '#80ccffff', '#80ccffff']
-
-    {
-      const rgb = settings.querySelector('input#rgb2').value
-      const alpha = settings.querySelector('input#alpha2').value
-      stops[1] = rgba(rgb, alpha)
-    }
+    const stops = ['#80ccffff', '#80ccffff', '#80ccffff', '#00000000']
 
     {
       const rgb = settings.querySelector('input#rgb1').value
       const alpha = settings.querySelector('input#alpha1').value
-      stops[2] = rgba(rgb, alpha)
-      stops[3] = rgba(rgb, alpha)
+      stops[0] = rgba(rgb, alpha)
+      stops[1] = rgba(rgb, alpha)
     }
 
-    const gradient = `linear-gradient(90deg, ${stops[3]} 0%, ${stops[2]} ${midpoint2}%, ${stops[1]} ${midpoint1}%, ${stops[0]} 100%)`
+    {
+      const rgb = settings.querySelector('input#rgb2').value
+      const alpha = settings.querySelector('input#alpha2').value
+      stops[2] = rgba(rgb, alpha)
+      stops[3] = '#00000000'
+    }
+
+    const gradient = `linear-gradient(90deg, ${stops[0]} 0%, ${stops[1]} ${midpoint1}%, ${stops[2]} ${midpoint2}%, ${stops[3]} 100%)`
 
     settings.style.setProperty('--gradient', gradient)
   }

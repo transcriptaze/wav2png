@@ -1,6 +1,6 @@
 export class Gradient extends HTMLElement {
   static get observedAttributes () {
-    return [ 'value' ]
+    return ['value']
   }
 
   constructor () {
