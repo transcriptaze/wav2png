@@ -111,28 +111,30 @@
         </div>
         <div id="settings">
           <div for="line" class="panel line">
-            <wav2png-gradient class="gradient"></wav2png-gradient>
-            <input id="rgb"   class="swatch" type="color" value="#80ccff" />
-            <input id="alpha" class="alpha"  type="range" step="1" min="0" max="255" value="255" />
+            <wav2png-gradient id="g1gradient1" class="gradient"></wav2png-gradient>
+            <input id="g1rgb1"   class="rgb"   type="color" value="#80ccff" />
+            <input id="g1alpha1" class="alpha" type="range" step="1" min="0" max="255" value="255" />
           </div>
 
           <div for="gradient" class="panel gradient hidden">
-            <wav2png-gradient id="gradient1" class="gradient" value="0"></wav2png-gradient>
-            <wav2png-gradient id="gradient2" class="gradient" value="1"></wav2png-gradient>
-            <input id="rgb2"   class="swatch" type="color" value="#80ccff" />
-            <input id="alpha2" class="alpha"  type="range" step="1" min="0" max="255" value="128" />
-            <input id="rgb1"   class="swatch" type="color" value="#80ccff" />
-            <input id="alpha1" class="alpha"  type="range" step="any" min="0" max="255" value="255" />
+            <wav2png-gradient id="g2gradient1" class="gradient" value="0"></wav2png-gradient>
+            <wav2png-gradient id="g2gradient2" class="gradient" value="1"></wav2png-gradient>
+            <input id="g2rgb1"   class="rgb"   type="color" value="#80ccff" />
+            <input id="g2alpha1" class="alpha" type="range" step="any" min="0" max="255" value="255" />
+            <input id="g2rgb2"   class="rgb"   type="color" value="#80ccff" />
+            <input id="g2alpha2" class="alpha" type="range" step="1" min="0" max="255" value="128" />
           </div>
 
           <div for="gradient3" class="panel gradient3 hidden">
-            <wav2png-gradient class="gradient"></wav2png-gradient>
-            <input id="rgb3"     class="swatch" type="color" value="#80ccff" />
-            <input id="alpha3"   class="alpha"  type="range" step="1" min="0" max="255" value="192" />
-            <input id="rgb2"     class="swatch" type="color" value="#80ccff" />
-            <input id="alpha2"   class="alpha"  type="range" step="1" min="0" max="255" value="128" />
-            <input id="rgb1"     class="swatch" type="color" value="#80ccff" />
-            <input id="alpha1"   class="alpha"  type="range" step="any" min="0" max="255" value="255" />
+            <wav2png-gradient id="g3gradient1" class="gradient" value="0"></wav2png-gradient>
+            <wav2png-gradient id="g3gradient2" class="gradient" value="0.5"></wav2png-gradient>
+            <wav2png-gradient id="g3gradient3" class="gradient" value="1"></wav2png-gradient>
+            <input id="g3rgb1"   class="rgb"   type="color" value="#80ccff" />
+            <input id="g3alpha1" class="alpha" type="range" step="any" min="0" max="255" value="255" />
+            <input id="g3rgb2"   class="rgb"   type="color" value="#80ccff" />
+            <input id="g3alpha2" class="alpha" type="range" step="1" min="0" max="255" value="128" />
+            <input id="g3rgb3"   class="rgb"   type="color" value="#80ccff" />
+            <input id="g3alpha3" class="alpha" type="range" step="1" min="0" max="255" value="192" />
           </div>
 
           <input id="vscale" type="range" step="any" min="0.0" max="4.0" value="1.0" />

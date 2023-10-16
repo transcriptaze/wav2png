@@ -9,7 +9,7 @@ export function gradient (device, format, a, width, height, vscale, colour1, col
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const slice = quantize.slice(a, width, PADDING)
-  const colour3 = [colour2[0], colour2[1], colour2[2], 0]
+  const colour3 = [0, 0, 0, 0]
 
   const vertices = new Float32Array([
     0.0, +1.0,

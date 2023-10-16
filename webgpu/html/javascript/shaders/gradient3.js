@@ -5,17 +5,20 @@ import * as quantize from './quantize.js'
 const PADDING = 20
 const WORKGROUP_SIZE = 64
 
-export function gradient3 (device, format, a, width, height, vscale, colour1, colour2, colour3, midpoint) {
+export function gradient3 (device, format, a, width, height, vscale, colour1, colour2, colour3, stops) {
   const xscale = (width - 2 * PADDING) / width
   const yscale = (height - 2 * PADDING) / height
   const slice = quantize.slice(a, width, PADDING)
+  const colour4 = [0, 0, 0, 0]
 
   const vertices = new Float32Array([
     0.0, +1.0,
-    0.0, +1.0 * midpoint,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, -1.0 * midpoint,
+    0.0, +1.0 * stops[2],
+    0.0, +1.0 * stops[1],
+    0.0, +1.0 * stops[0],
+    0.0, -1.0 * stops[0],
+    0.0, -1.0 * stops[1],
+    0.0, -1.0 * stops[2],
     0.0, -1.0
   ])
 
@@ -125,7 +128,7 @@ export function gradient3 (device, format, a, width, height, vscale, colour1, co
     xscale,
     yscale,
     vscale,
-    colours: [colour3, colour2, colour1, colour1, colour2, colour3]
+    colours: [colour4, colour3, colour2, colour1, colour1, colour2, colour3, colour4]
   })
 
   const waveform = new Float32Array(slice.pixels * 2)
@@ -240,7 +243,7 @@ const SHADER = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colours: array<vec4f,6>,
+      colours: array<vec4f,8>,
     };
 
     struct VertexInput {
@@ -267,7 +270,7 @@ const SHADER = `
        let w = f32(uconstants.pixels - u32(1));
 
        let height = vscale * abs(waveform[input.instance]);
-       let hx = input.vertex/3 % 2;
+       let hx = input.vertex/4 % 2;
        let h = height[hx];
 
        let origin = vec2f(-1.0, 0.0);
@@ -298,7 +301,7 @@ const COMPUTE = `
       pad1: u32,
       pad2: u32,
       scale: vec2f,
-      colours: array<vec4f,5>
+      colours: array<vec4f,8>
     };
 
     @group(0) @binding(0) var<uniform> uconstants: constants;

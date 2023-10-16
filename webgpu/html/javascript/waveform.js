@@ -47,7 +47,7 @@ export function waveform (context, device, format, audio, style) {
       stops = [0.0, 0.5, 1.0]
     } = style.gradient3
 
-    return gradient3(device, format, audio, width, height, vscale, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]), stops[1])
+    return gradient3(device, format, audio, width, height, vscale, rgba(colours[0]), rgba(colours[1]), rgba(colours[2]), stops)
   }
 
   // ... default
