@@ -17,13 +17,13 @@ export function lineStyle (vscale, colour, midpoint) {
   }
 }
 
-export function gradientStyle (vscale, colour1, colour2, midpoint) {
+export function gradientStyle (vscale, colour1, colour2, midpoint1, midpoint2) {
   return {
     type: 'gradient',
     gradient: {
       vscale,
       colours: [colour1, colour2],
-      midpoint
+      midpoints: [midpoint1, midpoint2]
     }
   }
 }

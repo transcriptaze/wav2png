@@ -1,6 +1,6 @@
 export class Gradient extends HTMLElement {
   static get observedAttributes () {
-    return []
+    return [ 'value' ]
   }
 
   constructor () {
@@ -39,6 +39,9 @@ export class Gradient extends HTMLElement {
   }
 
   attributeChangedCallback (name, from, to) {
+    if (name === 'value') {
+      this.value = to
+    }
   }
 
   get onchange () {
@@ -69,7 +72,7 @@ export class Gradient extends HTMLElement {
     const slider = shadow.querySelector('#gradient-slider')
     const f = Number.parseFloat(`${v}`)
 
-    if (Number.isNaN(f)) {
+    if (!Number.isNaN(f)) {
       slider.value = clamp(f, 0.0, 1.0)
     }
   }
@@ -97,14 +100,5 @@ function recolour (component) {
 function clamp (v, min, max) {
   return (v < min) ? min : ((v > max) ? max : v)
 }
-
-// function rgba (rgb, alpha) {
-//   const match = `${rgb}`.match(/^#([a-fA-F0-9]{6})$/)
-//
-//   const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
-//   const v = Number.parseInt(`${alpha}`).toString(16).padStart(2, '0')
-//
-//   return `#${u}${v}`
-// }
 
 customElements.define('wav2png-gradient', Gradient)
