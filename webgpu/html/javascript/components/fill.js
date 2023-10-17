@@ -26,14 +26,14 @@ export class Fill extends HTMLElement {
 
   connectedCallback () {
     const shadow = this.shadowRoot
-    const rgb = shadow.querySelector('input#rgb')
-    const alpha = shadow.querySelector('input#alpha')
 
-    rgb.oninput = (event) => onChange(this)
-    alpha.oninput = (event) => onChange(this)
-
-    rgb.onchange = (event) => onChanged(this)
-    alpha.onchange = (event) => onChanged(this)
+    document.addEventListener('DOMContentLoaded', () => {
+      const rgba = shadow.querySelector('wav2png-rgba')
+      if (rgba) {
+        rgba.onchange = (event) => onChange(this)
+        rgba.onchanged = (event) => onChanged(this)
+      }
+    })
   }
 
   disconnectedCallback () {
@@ -43,9 +43,16 @@ export class Fill extends HTMLElement {
   }
 
   attributeChangedCallback (name, from, to) {
-    if (name === 'colour' || name === 'color') {
-      this.colour = to
-    }
+    const shadow = this.shadowRoot
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const rgba = shadow.querySelector('wav2png-rgba')
+      if (rgba) {
+        if (name === 'colour' || name === 'color') {
+          this.colour = to
+        }
+      }
+    })
   }
 
   get onchange () {
@@ -66,32 +73,16 @@ export class Fill extends HTMLElement {
 
   get colour () {
     const shadow = this.shadowRoot
-    const input = shadow.querySelector('input#rgb')
-    const range = shadow.querySelector('input#alpha')
-    const rgb = input.value
-    const alpha = Math.trunc(range.value * 255).toString(16).padStart(2, '0')
+    const rgba = shadow.querySelector('wav2png-rgba')
 
-    return `${rgb}${alpha}`
+    return rgba.value
   }
 
   set colour (v) {
     const shadow = this.shadowRoot
-    const input = shadow.querySelector('input#rgb')
-    const range = shadow.querySelector('input#alpha')
-    const match = `${v}`.match(/^#([a-fA-F0-9]{6})([a-fA-F0-9]{2})?$/)
+    const rgba = shadow.querySelector('wav2png-rgba')
 
-    if (match != null) {
-      const rgb = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
-      const alpha = Number.parseInt(match[2], 16)
-
-      input.value = `#${rgb}`
-
-      if (!Number.isNaN(alpha)) {
-        range.value = Math.min(Math.max(alpha, 0), 255) / 255
-      } else {
-        range.value = 1.0
-      }
-    }
+    rgba.value = v
   }
 }
 

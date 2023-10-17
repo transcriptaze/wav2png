@@ -315,6 +315,14 @@ canvas.overlay {
   outline: none;
 }
 
+#wav2png-rgba input[type=color] {
+  width: 48px;
+  border: none;
+}
+#wav2png-rgba input[type=range] {
+  width: 128px;
+}
+
 #wav2png-gradient {
   width: 0px;
   height: 100%;
