@@ -122,25 +122,16 @@ export class Waveform extends HTMLElement {
     { const settings = shadow.querySelector('div[for="line"]')
       const rgba = settings.querySelector('wav2png-rgba')
 
-      rgba.value = v
+      rgba.colour = v
     }
 
     // ... gradient
     { const settings = shadow.querySelector('div[for="gradient"]')
+      const rgba1 = settings.querySelector('#g2rgba1')
+      const rgba2 = settings.querySelector('#g2rgba2')
 
-      { const rgb = settings.querySelector('#g2rgb1')
-        const alpha = settings.querySelector('#g2alpha1')
-
-        rgb.value = v
-        alpha.value = 255
-      }
-
-      { const rgb = settings.querySelector('#g2rgb2')
-        const alpha = settings.querySelector('#g2alpha2')
-
-        rgb.value = v
-        alpha.value = 128
-      }
+      rgba1.colour = rgba(rgb(v), 255)
+      rgba2.colour = rgba(rgb(v), 128)
     }
 
     // ... gradient3
@@ -183,14 +174,12 @@ export class Waveform extends HTMLElement {
 
       case 'gradient': {
         const settings = shadow.querySelector('div[for="gradient"]')
-        const rgb1 = settings.querySelector('#g2rgb1').value
-        const alpha1 = settings.querySelector('#g2alpha1').value
-        const rgb2 = settings.querySelector('#g2rgb2').value
-        const alpha2 = settings.querySelector('#g2alpha2').value
+        const rgba1 = settings.querySelector('#g2rgba1').value
+        const rgba2 = settings.querySelector('#g2rgba2').value
         const stop1 = settings.querySelector('#g2gradient1').value
         const stop2 = settings.querySelector('#g2gradient2').value
 
-        return styles.gradientStyle(this.vscale, rgba(rgb1, alpha1), rgba(rgb2, alpha2), stop1, stop2)
+        return styles.gradientStyle(this.vscale, rgba1, rgba2, stop1, stop2)
       }
 
       case 'gradient3': {
@@ -281,15 +270,16 @@ function recolour (component) {
     const settings = shadow.querySelector('div[for="line"]')
     const colour = settings.querySelector('wav2png-rgba').value
     const midpoint = settings.querySelector('wav2png-gradient').value
-    const colours = ['#00000000', '#80ccffff', '#80ccffff']
 
-    const stop = Math.round(midpoint * 100)
+    const colours = [colour, colour, rgba(rgb(colour), 0)]
+    const midpoints = [Math.round(midpoint * 100)]
+    const stops = [
+      `${colours[0]} 0%`,
+      `${colours[1]} ${midpoints[0]}%`,
+      `${colours[2]} 100%`
+    ]
 
-    colours[0] = rgba(rgb(colour), 0)
-    colours[1] = colour
-    colours[2] = colour
-
-    const gradient = `linear-gradient(90deg, ${colours[2]} 0%, ${colours[1]} ${stop}%, ${colours[0]} 100%)`
+    const gradient = `linear-gradient(90deg, ${stops[0]}, ${stops[1]}, ${stops[2]})`
 
     settings.style.setProperty('--gradient', gradient)
   }
@@ -297,25 +287,25 @@ function recolour (component) {
   // ... gradient
   {
     const settings = shadow.querySelector('div[for="gradient"]')
-    const midpoint1 = Math.round(settings.querySelector('#g2gradient1').value * 100)
-    const midpoint2 = Math.round(settings.querySelector('#g2gradient2').value * 100)
-    const stops = ['#80ccffff', '#80ccffff', '#80ccffff', '#00000000']
+    const colour1 = settings.querySelector('#g2rgba1').value
+    const colour2 = settings.querySelector('#g2rgba2').value
+    const midpoint1 = settings.querySelector('#g2gradient1').value
+    const midpoint2 = settings.querySelector('#g2gradient2').value
 
-    {
-      const rgb = settings.querySelector('#g2rgb1').value
-      const alpha = settings.querySelector('#g2alpha1').value
-      stops[0] = rgba(rgb, alpha)
-      stops[1] = rgba(rgb, alpha)
-    }
+    const colours = [colour1, colour1, colour2, '#00000000']
+    const midpoints = [
+      Math.round(midpoint1 * 100),
+      Math.round(midpoint2 * 100)
+    ]
 
-    {
-      const rgb = settings.querySelector('#g2rgb2').value
-      const alpha = settings.querySelector('#g2alpha2').value
-      stops[2] = rgba(rgb, alpha)
-      stops[3] = '#00000000'
-    }
+    const stops = [
+      `${colours[0]} 0%`,
+      `${colours[1]} ${midpoints[0]}%`,
+      `${colours[2]} ${midpoints[1]}%`,
+      `${colours[3]} 100%`
+    ]
 
-    const gradient = `linear-gradient(90deg, ${stops[0]} 0%, ${stops[1]} ${midpoint1}%, ${stops[2]} ${midpoint2}%, ${stops[3]} 100%)`
+    const gradient = `linear-gradient(90deg, ${stops[0]}, ${stops[1]}, ${stops[2]}, ${stops[3]}`
 
     settings.style.setProperty('--gradient', gradient)
   }
