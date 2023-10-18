@@ -54,9 +54,9 @@
 
       <div id="toolbox">
         <wav2png-background id="background" colour="#ffffff"></wav2png-background>
-        <wav2png-fill     id="fill" colour="#000000ff"></wav2png-fill>
-        <wav2png-grid     id="grid" colour='#00ff00ff'></wav2png-grid>
-        <wav2png-waveform id="waveform" vscale='1.0' colour="#80ccff"></wav2png-waveform>
+        <wav2png-fill     id="fill"     colour="#000000ff"></wav2png-fill>
+        <wav2png-grid     id="grid"     colour='#00ff00ff'></wav2png-grid>
+        <wav2png-waveform id="waveform" colour="#80ccff" vscale='1.0'></wav2png-waveform>
       </div>
 
       <wav2png-x-axis id="x-axis"></wav2png-x-axis>
@@ -106,8 +106,7 @@
         <div id="settings">
           <div for="line" class="panel line">
             <wav2png-gradient id="g1gradient1" class="gradient"></wav2png-gradient>
-            <input id="g1rgb1"   class="rgb"   type="color" value="#80ccff" />
-            <input id="g1alpha1" class="alpha" type="range" step="1" min="0" max="255" value="255" />
+            <wav2png-rgba colour="#80ccffff"></wav2png-rgba>
           </div>
 
           <div for="gradient" class="panel gradient hidden">

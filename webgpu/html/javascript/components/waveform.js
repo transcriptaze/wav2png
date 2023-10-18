@@ -30,6 +30,7 @@ export class Waveform extends HTMLElement {
   connectedCallback () {
     const shadow = this.shadowRoot
     const styles = Array.from(shadow.querySelectorAll('#waveforms input[type="radio"]'))
+    const rgbas = Array.from(shadow.querySelectorAll('#settings wav2png-rgba'))
     const swatches = Array.from(shadow.querySelectorAll('#settings input.rgb'))
     const alphas = Array.from(shadow.querySelectorAll('#settings input.alpha'))
     const gradients = Array.from(shadow.querySelectorAll('#settings wav2png-gradient'))
@@ -37,6 +38,11 @@ export class Waveform extends HTMLElement {
 
     styles.forEach((e) => {
       e.oninput = (event) => onStyle(this, e)
+    })
+
+    rgbas.forEach((e) => {
+      e.onchange = (event) => onChanged(this, e)
+      e.onchanged = (event) => onChanged(this, e)
     })
 
     swatches.forEach((e) => {
@@ -114,11 +120,9 @@ export class Waveform extends HTMLElement {
 
     // ... line
     { const settings = shadow.querySelector('div[for="line"]')
-      const rgb = settings.querySelector('#g1rgb1')
-      const alpha = settings.querySelector('#g1alpha1')
+      const rgba = settings.querySelector('wav2png-rgba')
 
-      rgb.value = v
-      alpha.value = 255
+      rgba.value = v
     }
 
     // ... gradient
@@ -171,11 +175,10 @@ export class Waveform extends HTMLElement {
     switch (this.internal.style) {
       case 'line': {
         const settings = shadow.querySelector('div[for="line"]')
-        const rgb = settings.querySelector('#g1rgb1').value
-        const alpha = settings.querySelector('#g1alpha1').value
+        const rgba = settings.querySelector('wav2png-rgba').value
         const stop = settings.querySelector('#g1gradient1').value
 
-        return styles.lineStyle(this.vscale, rgba(rgb, alpha), stop)
+        return styles.lineStyle(this.vscale, rgba, stop)
       }
 
       case 'gradient': {
@@ -207,11 +210,10 @@ export class Waveform extends HTMLElement {
 
       default: {
         const settings = shadow.querySelector('div[for="line"]')
-        const rgb = settings.querySelector('#g1rgb1').value
-        const alpha = settings.querySelector('#g1alpha1').value
+        const rgba = settings.querySelector('wav2png-rgba').value
         const stop = settings.querySelector('#g1gradient1').value
 
-        return styles.lineStyle(this.vscale, rgba(rgb, alpha), stop)
+        return styles.lineStyle(this.vscale, rgba, stop)
       }
     }
   }
@@ -277,17 +279,17 @@ function recolour (component) {
   // ... line
   {
     const settings = shadow.querySelector('div[for="line"]')
-    const stops = ['#00000000', '#80ccffff', '#80ccffff']
+    const colour = settings.querySelector('wav2png-rgba').value
+    const midpoint = settings.querySelector('wav2png-gradient').value
+    const colours = ['#00000000', '#80ccffff', '#80ccffff']
 
-    const rgb = settings.querySelector('#g1rgb1').value
-    const alpha = settings.querySelector('#g1alpha1').value
-    const midpoint = Math.round(settings.querySelector('#g1gradient1').value * 100)
+    const stop = Math.round(midpoint * 100)
 
-    stops[0] = rgba(rgb, 0)
-    stops[1] = rgba(rgb, alpha)
-    stops[2] = rgba(rgb, alpha)
+    colours[0] = rgba(rgb(colour), 0)
+    colours[1] = colour
+    colours[2] = colour
 
-    const gradient = `linear-gradient(90deg, ${stops[2]} 0%, ${stops[1]} ${midpoint}%, ${stops[0]} 100%)`
+    const gradient = `linear-gradient(90deg, ${colours[2]} 0%, ${colours[1]} ${stop}%, ${colours[0]} 100%)`
 
     settings.style.setProperty('--gradient', gradient)
   }
@@ -346,17 +348,28 @@ function recolour (component) {
       stops[4] = '#00000000'
     }
 
-    console.log('RGB1', stops[0])
-
     const gradient = `linear-gradient(90deg, ${stops[0]} 0%, ${stops[1]} ${midpoint1}%, ${stops[2]} ${midpoint2}%, ${stops[3]} ${midpoint3}%, ${stops[4]} 100%)`
 
     settings.style.setProperty('--gradient', gradient)
   }
 }
 
-function rgba (rgb, alpha) {
-  const match = `${rgb}`.match(/^#([a-fA-F0-9]{6})$/)
+function rgb (rgba) {
+  const match = `${rgba}`.match(/^#([a-fA-F0-9]{6})([a-fA-F0-9]{2})?$/)
+  const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
 
+  return `#${u}`
+}
+
+// function alpha (rgba) {
+//   const match = `${rgba}`.match(/^#([a-fA-F0-9]{6})([a-fA-F0-9]{2})$/)
+//   const v = Number.parseInt(match[2], 16).toString(16).padStart(2, '0')
+//
+//   return `${v}`
+// }
+
+function rgba (rgb, alpha) {
+  const match = `${rgb}`.match(/^#([a-fA-F0-9]{6})([a-fA-F0-9]{2})?$/)
   const u = Number.parseInt(match[1], 16).toString(16).padStart(6, '0')
   const v = Number.parseInt(`${alpha}`).toString(16).padStart(2, '0')
 

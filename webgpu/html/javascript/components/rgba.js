@@ -64,6 +64,14 @@ export class RGBA extends HTMLElement {
     this.internal.onChanged = v
   }
 
+  get colour () {
+    return this.value
+  }
+
+  set colour (v) {
+    this.value = v
+  }
+
   get value () {
     const shadow = this.shadowRoot
     const rgb = shadow.querySelector('#rgb').value
