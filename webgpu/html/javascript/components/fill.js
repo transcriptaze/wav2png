@@ -27,13 +27,11 @@ export class Fill extends HTMLElement {
   connectedCallback () {
     const shadow = this.shadowRoot
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const rgba = shadow.querySelector('wav2png-rgba')
-      if (rgba) {
-        rgba.onchange = (event) => onChange(this)
-        rgba.onchanged = (event) => onChanged(this)
-      }
-    })
+    const rgba = shadow.querySelector('wav2png-rgba')
+    if (rgba) {
+      rgba.onchange = (event) => onChange(this)
+      rgba.onchanged = (event) => onChanged(this)
+    }
   }
 
   disconnectedCallback () {
@@ -45,14 +43,12 @@ export class Fill extends HTMLElement {
   attributeChangedCallback (name, from, to) {
     const shadow = this.shadowRoot
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const rgba = shadow.querySelector('wav2png-rgba')
-      if (rgba) {
-        if (name === 'colour' || name === 'color') {
-          this.colour = to
-        }
+    const rgba = shadow.querySelector('wav2png-rgba')
+    if (rgba) {
+      if (name === 'colour' || name === 'color') {
+        this.colour = to
       }
-    })
+    }
   }
 
   get onchange () {

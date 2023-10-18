@@ -315,6 +315,11 @@ canvas.overlay {
   outline: none;
 }
 
+#wav2png-rgba {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
 #wav2png-rgba input[type=color] {
   width: 48px;
   border: none;

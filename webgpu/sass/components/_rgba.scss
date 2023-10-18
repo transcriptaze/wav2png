@@ -1,4 +1,8 @@
 #wav2png-rgba {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    
     input[type="color"] {
         width: 48px;
         border: none;
