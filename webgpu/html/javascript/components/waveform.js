@@ -141,7 +141,7 @@ export class Waveform extends HTMLElement {
       case 'line': {
         const settings = shadow.querySelector('div[for="line"]')
         const rgba = settings.querySelector('wav2png-rgba').value
-        const stop = settings.querySelector('#g1gradient1').value
+        const stop = settings.querySelector('wav2png-gradient').value[0]
 
         return styles.lineStyle(this.vscale, rgba, stop)
       }
@@ -150,8 +150,8 @@ export class Waveform extends HTMLElement {
         const settings = shadow.querySelector('div[for="gradient"]')
         const rgba1 = settings.querySelector('#g2rgba1').value
         const rgba2 = settings.querySelector('#g2rgba2').value
-        const stop1 = settings.querySelector('#g2gradient1').value
-        const stop2 = settings.querySelector('#g2gradient2').value
+        const stop1 = settings.querySelector('wav2png-gradient').value[0]
+        const stop2 = settings.querySelector('wav2png-gradient').value[1]
 
         return styles.gradientStyle(this.vscale, rgba1, rgba2, stop1, stop2)
       }
@@ -162,9 +162,9 @@ export class Waveform extends HTMLElement {
         const rgba2 = settings.querySelector('#g3rgba2').value
         const rgba3 = settings.querySelector('#g3rgba3').value
 
-        const stop1 = settings.querySelector('#g3gradient1').value
-        const stop2 = settings.querySelector('#g3gradient2').value
-        const stop3 = settings.querySelector('#g3gradient3').value
+        const stop1 = settings.querySelector('wav2png-gradient').value[0]
+        const stop2 = settings.querySelector('wav2png-gradient').value[1]
+        const stop3 = settings.querySelector('wav2png-gradient').value[2]
 
         return styles.gradient3Style(this.vscale, rgba1, rgba2, rgba3, stop1, stop2, stop3)
       }
@@ -172,7 +172,7 @@ export class Waveform extends HTMLElement {
       default: {
         const settings = shadow.querySelector('div[for="line"]')
         const rgba = settings.querySelector('wav2png-rgba').value
-        const stop = settings.querySelector('#g1gradient1').value
+        const stop = settings.querySelector('wav2png-gradient').value[0]
 
         return styles.lineStyle(this.vscale, rgba, stop)
       }
@@ -249,7 +249,7 @@ function recolour (component) {
     ]
 
     const midpoints = [
-      Math.round(settings.querySelector('wav2png-gradient').value * 100)
+      Math.round(settings.querySelector('wav2png-gradient').value[0] * 100)
     ]
 
     const stops = [
@@ -275,8 +275,8 @@ function recolour (component) {
     ]
 
     const midpoints = [
-      Math.round(settings.querySelector('#g2gradient1').value * 100),
-      Math.round(settings.querySelector('#g2gradient2').value * 100)
+      Math.round(settings.querySelector('wav2png-gradient').value[0] * 100),
+      Math.round(settings.querySelector('wav2png-gradient').value[1] * 100)
     ]
 
     const stops = [
@@ -304,9 +304,9 @@ function recolour (component) {
     ]
 
     const midpoints = [
-      Math.round(settings.querySelector('#g3gradient1').value * 100),
-      Math.round(settings.querySelector('#g3gradient2').value * 100),
-      Math.round(settings.querySelector('#g3gradient3').value * 100)
+      Math.round(settings.querySelector('wav2png-gradient').value[0] * 100),
+      Math.round(settings.querySelector('wav2png-gradient').value[1] * 100),
+      Math.round(settings.querySelector('wav2png-gradient').value[2] * 100)
     ]
 
     const stops = [

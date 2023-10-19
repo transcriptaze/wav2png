@@ -105,21 +105,18 @@
         </div>
         <div id="settings">
           <div for="line" class="panel line">
-            <wav2png-gradient id="g1gradient1" class="gradient"></wav2png-gradient>
-            <wav2png-rgba     id="g1rgba1" colour="#80ccffff"></wav2png-rgba>
+            <wav2png-gradient class="gradient"></wav2png-gradient>
+            <wav2png-rgba id="g1rgba1" colour="#80ccffff"></wav2png-rgba>
           </div>
 
           <div for="gradient" class="panel gradient hidden">
-            <wav2png-gradient id="g2gradient1" class="gradient" value="0"></wav2png-gradient>
-            <wav2png-gradient id="g2gradient2" class="gradient" value="1"></wav2png-gradient>
+            <wav2png-gradient class="gradient" value="0"></wav2png-gradient>
             <wav2png-rgba id="g2rgba2" colour="#80ccff80"></wav2png-rgba>
             <wav2png-rgba id="g2rgba1" colour="#80ccffff"></wav2png-rgba>
           </div>
 
           <div for="gradient3" class="panel gradient3 hidden">
-            <wav2png-gradient id="g3gradient1" class="gradient" value="0"></wav2png-gradient>
-            <wav2png-gradient id="g3gradient2" class="gradient" value="0.5"></wav2png-gradient>
-            <wav2png-gradient id="g3gradient3" class="gradient" value="1"></wav2png-gradient>
+            <wav2png-gradient class="gradient" value="0"></wav2png-gradient>
             <wav2png-rgba id="g3rgba3" colour="#80ccffc0"></wav2png-rgba>
             <wav2png-rgba id="g3rgba2" colour="#80ccff80"></wav2png-rgba>
             <wav2png-rgba id="g3rgba1" colour="#80ccffff"></wav2png-rgba>
@@ -132,7 +129,9 @@
 
     <template id="template-gradient">
       <div id="wav2png-gradient">
-        <input id="gradient-slider" class="slider" type="range" step="any" min="0.0" max="1.0" value="1.0" />
+        <input part="slider1" id="slider1" class="slider" type="range" step="any" min="0.0" max="1.0" value="1.0" orient="vertical" />
+        <input part="slider2" id="slider2" class="slider" type="range" step="any" min="0.0" max="1.0" value="1.0" orient="vertical" />
+        <input part="slider3" id="slider3" class="slider" type="range" step="any" min="0.0" max="1.0" value="1.0" orient="vertical" />
       </div>
     </template>
 

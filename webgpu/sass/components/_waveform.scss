@@ -89,6 +89,14 @@ fieldset.waveform {
                 grid-row: 1 / 4;
             }
 
+            wav2png-gradient::part(slider2) {
+                display: none;
+            }
+
+            wav2png-gradient::part(slider3) {
+                display: none;
+            }
+
             wav2png-rgba {
                 grid-column: 2;
                 grid-row: 2;
@@ -103,13 +111,8 @@ fieldset.waveform {
             grid-template-rows: auto 1fr auto;
             column-gap: 12px;
 
-            #g2gradient1 {
+            wav2png-gradient {
                 grid-column: 1;
-                grid-row: 1 / 4;
-            }
-
-            #g2gradient2 {
-                grid-column: 2;
                 grid-row: 1 / 4;
             }
 
@@ -122,6 +125,10 @@ fieldset.waveform {
                 grid-column: 3;
                 grid-row: 1;
             }
+
+            wav2png-gradient::part(slider3) {
+                display: none;
+            }
         }
 
         div.gradient3 {
@@ -132,18 +139,8 @@ fieldset.waveform {
             grid-template-rows: auto auto auto;
             column-gap: 12px;
 
-            #g3gradient1 {       
+            wav2png-gradient {
                 grid-column: 1;
-                grid-row: 1 / 4;
-            }
-
-            #g3gradient2 {       
-                grid-column: 2;
-                grid-row: 1 / 4;
-            }
-
-            #g3gradient3 {       
-                grid-column: 3;
                 grid-row: 1 / 4;
             }
 

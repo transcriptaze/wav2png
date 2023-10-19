@@ -26,7 +26,7 @@ export class Gradient extends HTMLElement {
 
   connectedCallback () {
     const shadow = this.shadowRoot
-    const slider = shadow.querySelector('#gradient-slider')
+    const slider = shadow.querySelector('#slider1')
 
     slider.oninput = (event) => onChange(this, slider)
     slider.onchange = (event) => onChanged(this, slider)
@@ -62,14 +62,16 @@ export class Gradient extends HTMLElement {
 
   get value () {
     const shadow = this.shadowRoot
-    const slider = shadow.querySelector('#gradient-slider')
+    const slider1 = shadow.querySelector('#slider1').value
+    const slider2 = shadow.querySelector('#slider2').value
+    const slider3 = shadow.querySelector('#slider3').value
 
-    return slider.value
+    return [slider1, slider2, slider3]
   }
 
   set value (v) {
     const shadow = this.shadowRoot
-    const slider = shadow.querySelector('#gradient-slider')
+    const slider = shadow.querySelector('#slider1')
     const f = Number.parseFloat(`${v}`)
 
     if (!Number.isNaN(f)) {
